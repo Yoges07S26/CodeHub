@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodeHub - Modern Code Hosting & Versioning Platform</title>
+    <link rel="icon" type="image/png" href="logo.png">
+    
+    <!-- Local Offline React 19 / ReactDOM Bundle (100% Offline, no network needed) -->
+    <script src="vendor/react.bundle.js"></script>
+
+    <!-- Custom Modern Theme variables and animations -->
+    <style>
+        :root {
+            --bg-primary: #f6f8fa;
+            --bg-surface: #ffffff;
+            --bg-secondary: #f3f4f6;
+            --border-color: #d0d7de;
+            --text-main: #1f2328;
+            --text-muted: #57606a;
+            --accent-brand: #0969da;
+            --accent-cyan: #059669;
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #090d16;
+            --bg-surface: #111827;
+            --bg-secondary: #1e293b;
+            --border-color: #334155;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent-brand: #60a5fa;
+            --accent-cyan: #22d3ee;
+        }
+
+        [data-theme="light"] {
+            --bg-primary: #f6f8fa;
+            --bg-surface: #ffffff;
+            --bg-secondary: #f3f4f6;
+            --border-color: #d0d7de;
+            --text-main: #1f2328;
+            --text-muted: #4b5563;
+            --accent-brand: #0969da;
+            --accent-cyan: #059669;
+        }
+
+        /* Global Layout Reset & Zero-Gap Fix */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html, body {
+            margin: 0 !important;
+            padding: 0 !important;
+            width: 100%;
+            min-height: 100%;
+            background-color: var(--bg-primary);
+            color: var(--text-main);
+            transition: background-color 0.25s ease, color 0.25s ease;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            overflow-x: hidden;
+        }
+
+        #root {
+            width: 100%;
+            min-height: 100vh;
+            margin: 0 !important;
+            padding: 0 !important;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .surface-card {
+            background-color: var(--bg-surface);
+            border-color: var(--border-color);
+        }
+
+        .secondary-card {
+            background-color: var(--bg-secondary);
+            border-color: var(--border-color);
+        }
+
+        /* ── LIGHT MODE COMPREHENSIVE FONT & CARD CONTRAST ENHANCEMENTS ── */
+        [data-theme="light"] {
+            color: #1f2328 !important;
+        }
+
+        [data-theme="light"] h1,
+        [data-theme="light"] h2,
+        [data-theme="light"] h3,
+        [data-theme="light"] h4,
+        [data-theme="light"] h5,
+        [data-theme="light"] h6 {
+            color: #1f2328 !important;
+        }
+
+        /* In light mode, override hardcoded dark-mode white/light-gray text to dark high-contrast charcoal */
+        [data-theme="light"] [style*="color: #e6edf3"],
+        [data-theme="light"] [style*="color:#e6edf3"],
+        [data-theme="light"] [style*="color: #c9d1d9"],
+        [data-theme="light"] [style*="color:#c9d1d9"],
+        [data-theme="light"] [style*="color: #f0f6fc"],
+        [data-theme="light"] [style*="color:#f0f6fc"],
+        [data-theme="light"] [style*="color: rgb(230, 237, 243)"],
+        [data-theme="light"] [style*="color: rgb(201, 209, 217)"] {
+            color: #1f2328 !important;
+        }
+
+        /* In light mode, override hardcoded pale-gray muted text to clear, legible slate gray */
+        [data-theme="light"] [style*="color: #8b949e"],
+        [data-theme="light"] [style*="color:#8b949e"],
+        [data-theme="light"] [style*="color: #6e7681"],
+        [data-theme="light"] [style*="color:#6e7681"],
+        [data-theme="light"] [style*="color: #7d8590"],
+        [data-theme="light"] [style*="color:#7d8590"],
+        [data-theme="light"] [style*="color: rgb(139, 148, 158)"] {
+            color: #57606a !important;
+        }
+
+        /* In light mode, override dark card containers to clean white cards with crisp borders */
+        [data-theme="light"] [style*="background: #161b22"],
+        [data-theme="light"] [style*="background:#161b22"],
+        [data-theme="light"] [style*="background-color: #161b22"],
+        [data-theme="light"] [style*="background-color:#161b22"],
+        [data-theme="light"] [style*="background: #0d1117"],
+        [data-theme="light"] [style*="background:#0d1117"],
+        [data-theme="light"] [style*="background-color: #0d1117"],
+        [data-theme="light"] [style*="background-color:#0d1117"] {
+            background: #ffffff !important;
+            border-color: #d0d7de !important;
+            color: #1f2328 !important;
+            box-shadow: 0 1px 3px rgba(31, 35, 40, 0.08) !important;
+        }
+
+        /* Secondary containers & toolbars in light mode */
+        [data-theme="light"] [style*="background: #21262d"],
+        [data-theme="light"] [style*="background:#21262d"],
+        [data-theme="light"] [style*="background-color: #21262d"],
+        [data-theme="light"] [style*="background-color:#21262d"],
+        [data-theme="light"] [style*="background: #010409"],
+        [data-theme="light"] [style*="background:#010409"] {
+            background: #f6f8fa !important;
+            border-color: #d0d7de !important;
+            color: #1f2328 !important;
+        }
+
+        /* Crisp borders for light mode */
+        [data-theme="light"] [style*="border: 1px solid #30363d"],
+        [data-theme="light"] [style*="border: 1px solid #21262d"],
+        [data-theme="light"] [style*="border-bottom: 1px solid #30363d"],
+        [data-theme="light"] [style*="border-top: 1px solid #30363d"],
+        [data-theme="light"] [style*="border-left: 1px solid #30363d"],
+        [data-theme="light"] [style*="border-right: 1px solid #30363d"] {
+            border-color: #d0d7de !important;
+        }
+
+        /* Form elements high-contrast in light mode */
+        [data-theme="light"] input,
+        [data-theme="light"] select,
+        [data-theme="light"] textarea {
+            background-color: #ffffff !important;
+            color: #1f2328 !important;
+            border: 1px solid #d0d7de !important;
+        }
+
+        [data-theme="light"] input::placeholder,
+        [data-theme="light"] textarea::placeholder {
+            color: #6e7681 !important;
+        }
+
+        /* Modal backdrop and card in light mode */
+        [data-theme="light"] .modal-overlay,
+        [data-theme="light"] [style*="position: fixed"][style*="inset: 0"] {
+            background: rgba(15, 23, 42, 0.45) !important;
+        }
+
+        [data-theme="light"] [style*="position: fixed"][style*="inset: 0"] > div {
+            background: #ffffff !important;
+            border-color: #d0d7de !important;
+            color: #1f2328 !important;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15) !important;
+        }
+
+        /* Tables, Code, Pre blocks in light mode */
+        [data-theme="light"] pre,
+        [data-theme="light"] code {
+            background-color: #f6f8fa !important;
+            color: #1f2328 !important;
+            border-color: #d0d7de !important;
+        }
+
+        /* ── Floating Small Luminous Bubbles ── */
+        @keyframes smallBubbleDrift {
+            0% {
+                transform: translateY(0px) translateX(0px) scale(1);
+                opacity: 0.7;
+            }
+            33% {
+                transform: translateY(-28px) translateX(12px) scale(1.15);
+                opacity: 0.95;
+            }
+            66% {
+                transform: translateY(-56px) translateX(-10px) scale(0.9);
+                opacity: 0.8;
+            }
+            100% {
+                transform: translateY(-84px) translateX(0px) scale(1);
+                opacity: 0.7;
+            }
+        }
+
+        .luminous-bubble {
+            position: absolute;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 1;
+            animation: smallBubbleDrift ease-in-out infinite alternate;
+        }
+
+        /* Smooth custom scrollbars */
+        ::-webkit-scrollbar {
+            width: 7px;
+            height: 7px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.05);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(100, 116, 139, 0.4);
+            border-radius: 4px;
+        }
+
+        /* Subtle glowing elements */
+        .neon-glow {
+            box-shadow: 0 0 25px rgba(59, 130, 246, 0.35);
+        }
+        .neon-border {
+            border: 1px solid rgba(59, 130, 246, 0.4);
+        }
+
+        /* Dynamic keyframes for interactive auth and UI */
+        @keyframes floatSlow {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-12px) rotate(3deg); }
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { opacity: 0.4; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.08); }
+        }
+
+        @keyframes cardSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(24px) scale(0.98);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        @keyframes shimmerBorder {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .animate-float-slow {
+            animation: floatSlow 7s ease-in-out infinite;
+        }
+
+        .animate-pulse-glow {
+            animation: pulseGlow 4s ease-in-out infinite;
+        }
+
+        .auth-card-entrance {
+            animation: cardSlideUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .gradient-shimmer-border {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.5), rgba(168, 85, 247, 0.5), rgba(6, 182, 212, 0.5));
+            background-size: 200% 200%;
+            animation: shimmerBorder 6s ease infinite;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <!-- Production bundle -->
+    <script src="app.js"></script>
+</body>
+</html>

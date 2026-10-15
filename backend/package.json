@@ -1,0 +1,15 @@
+{
+  "name": "codehub-backend",
+  "version": "2.0.0",
+  "description": "CodeHub Backend API - Express & MongoDB",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "seed": "node seed_admin.js",
+    "seed:jobs": "node seed_jobs.js"
+  },
+  "keywords": ["codehub", "express", "mongodb", "mongoose"],
+  "author": "CodeHub",
+  "license": "ISC",
+  "type": "commonjs"
+}
