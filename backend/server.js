@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const fs = require('fs');
 const config = require('./config/app');
 const { connectDB } = require('./config/db');
 
@@ -119,6 +120,7 @@ app.get('/api/jobs', JobController.listJobs);
 app.get('/api/jobs/my-applications', requireAuth, JobController.getUserApplications);
 app.get('/api/jobs/:id', JobController.getJob);
 app.post('/api/jobs', requireAdmin, JobController.createJob);
+app.post('/api/jobs/upload-image', requireAdmin, JobController.uploadImage);
 app.post('/api/jobs/:id/apply', requireAuth, JobController.applyToJob);
 app.put('/api/admin/jobs/:id', requireAdmin, JobController.updateJobStatus);
 app.delete('/api/admin/jobs/:id', requireAdmin, JobController.deleteJob);
@@ -127,11 +129,33 @@ app.get('/api/admin/jobs/:id/applicants', requireAdmin, JobController.getJobAppl
 app.put('/api/admin/jobs/applications/:id/status', requireAdmin, JobController.updateApplicationStatus);
 
 // ============================================================
-// Serve frontend static files (fallback)
+// Serve local storage files (job images, uploaded assets)
+// ============================================================
+const storageJobsPath = path.resolve(__dirname, '../storage/jobs');
+if (!fs.existsSync(storageJobsPath)) {
+  fs.mkdirSync(storageJobsPath, { recursive: true });
+}
+app.use('/uploads/jobs', express.static(storageJobsPath));
+app.use('/storage/jobs', express.static(storageJobsPath));
+
+// ============================================================
+// Serve frontend static files (instant loading with no stale bundle caching)
 // ============================================================
 const frontendPath = path.resolve(__dirname, '../frontend/public');
-app.use(express.static(frontendPath));
-// Express 5 catch-all fallback for SPA & 404
+app.use(express.static(frontendPath, {
+  setHeaders: (res, filePath) => {
+    if (filePath.endsWith('.html') || filePath.endsWith('.js') || filePath.endsWith('.jsx')) {
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '0');
+    } else {
+      res.setHeader('Cache-Control', 'public, max-age=3600');
+    }
+  },
+  etag: false
+}));
+
+// Express catch-all fallback for SPA & 404
 app.use((req, res) => {
   if (!req.path.startsWith('/api/')) {
     return res.sendFile(path.join(frontendPath, 'index.html'));
@@ -140,14 +164,12 @@ app.use((req, res) => {
 });
 
 // ============================================================
-// Start Server
+// Start Server with Fast Startup & Asynchronous DB Connection
 // ============================================================
 async function startServer() {
   try {
-    await connectDB();
-    console.log('[MongoDB] Database connection established.');
-
-    app.listen(config.port, () => {
+    // Start listening immediately so web UI & static files respond instantly
+    const server = app.listen(config.port, () => {
       console.log(`\n====================================================`);
       console.log(`  CodeHub API Server — Node.js + Express + MongoDB`);
       console.log(`====================================================`);
@@ -157,6 +179,17 @@ async function startServer() {
       console.log(`  🌐 Frontend served:   http://localhost:${config.port}`);
       console.log(`====================================================\n`);
     });
+
+    // Establish DB connection asynchronously (Mongoose buffers queries during connect)
+    connectDB()
+      .then(() => {
+        console.log('[MongoDB] Database connection established.');
+      })
+      .catch((err) => {
+        console.error('[MongoDB] Connection error:', err.message);
+      });
+
+    return server;
   } catch (err) {
     console.error('[Server] Failed to start:', err.message);
     process.exit(1);

@@ -20,9 +20,21 @@ export default function DashboardView({
   onOpenDeleteAccount,
   onOpenAdmin,
   onNavFeed,
+  theme,
 }) {
+  const isDark = theme !== 'light';
+  const cardBg = isDark ? '#161b22' : '#ffffff';
+  const cardBorder = isDark ? '#30363d' : '#d0d7de';
+  const textMain = isDark ? '#e6edf3' : '#1f2328';
+  const textMuted = isDark ? '#8b949e' : '#57606a';
+  const inputBg = isDark ? '#0d1117' : '#ffffff';
+  const innerBg = isDark ? '#0d1117' : '#f6f8fa';
+  const shadow = isDark ? '0 8px 24px rgba(0,0,0,0.3)' : '0 1px 3px rgba(31, 35, 40, 0.08)';
+
   const [dashData, setDashData] = useState(user ? { user } : null);
   const [fetchError, setFetchError] = useState('');
+  const [featuredJobs, setFeaturedJobs] = useState([]);
+  const [jobsLoading, setJobsLoading] = useState(false);
   const userRepos = user && Array.isArray(repositories) ? repositories.filter(r => r.user_id == user.id) : [];
   const isAdmin = user?.role === 'admin';
   const profile = dashData?.user || user;
@@ -41,20 +53,32 @@ export default function DashboardView({
           setFetchError('Dashboard data could not be loaded yet. Showing saved profile info.');
         });
     }
+
+    if (!isAdmin && typeof apiCall === 'function') {
+      setJobsLoading(true);
+      apiCall('/jobs?status=open')
+        .then(res => {
+          setFeaturedJobs(res.jobs ? res.jobs.slice(0, 4) : []);
+        })
+        .catch(() => {})
+        .finally(() => setJobsLoading(false));
+    }
   }, [user, isAdmin]);
 
   if (!user) {
     return (
       <div style={{ textAlign: 'center', padding: 60 }}>
-        <p style={{ color: '#8b949e', fontSize: 16 }}>Please sign in to access your dashboard.</p>
+        <p style={{ color: textMuted, fontSize: 16 }}>Please sign in to access your dashboard.</p>
       </div>
     );
   }
 
   if (!dashData && !fetchError) {
     return (
-      <div style={{ textAlign: 'center', padding: 60, color: '#8b949e' }}>
-        Loading dashboard data…
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '80px 20px', gap: 14 }}>
+        <div style={{ width: 44, height: 44, border: '3px solid rgba(88, 166, 255, 0.2)', borderTopColor: '#58a6ff', borderRadius: '50%', animation: 'codehubSpin 0.75s linear infinite' }} />
+        <div style={{ fontWeight: 700, fontSize: 15, color: textMain }}>Loading dashboard data…</div>
+        <div style={{ fontSize: 12, color: textMuted }}>Fetching real-time metrics and repository telemetry</div>
       </div>
     );
   }
@@ -69,8 +93,10 @@ export default function DashboardView({
       
       {/* ── Welcome Banner ── */}
       <div style={{
-        background: 'linear-gradient(135deg, #0d1f47 0%, #161240 50%, #1a0d40 100%)',
-        border: '1px solid #1f4280',
+        background: isDark
+          ? (isAdmin ? 'linear-gradient(135deg, #1f1035, #161b22)' : 'linear-gradient(135deg, #0d1f47 0%, #161240 50%, #1a0d40 100%)')
+          : (isAdmin ? 'linear-gradient(135deg, #f5f0ff, #f0fdf4)' : 'linear-gradient(135deg, #e0f2fe, #f0fdf4)'),
+        border: '1px solid ' + (isAdmin ? (isDark ? '#6e40c9' : '#e9d5ff') : (isDark ? '#1f4280' : '#bae6fd')),
         borderRadius: 20,
         padding: '30px 34px',
         display: 'flex',
@@ -78,30 +104,39 @@ export default function DashboardView({
         alignItems: 'center',
         flexWrap: 'wrap',
         gap: 20,
-        boxShadow: '0 12px 32px rgba(0,0,0,0.35)'
+        boxShadow: shadow
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
           <UserAvatar user={profile || user} size={64} />
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', marginBottom: 6 }}>
-              <h1 style={{ fontWeight: 900, fontSize: 24, color: '#e6edf3', margin: 0 }}>
+              <h1 style={{ fontWeight: 900, fontSize: 24, color: textMain, margin: 0 }}>
                 Good {new Date().getHours() < 12 ? 'morning' : new Date().getHours() < 18 ? 'afternoon' : 'evening'}, {(profile?.full_name || profile?.username || profile?.email || user?.full_name || user?.username || user?.email)}! 👋
               </h1>
               <span style={{
                 fontSize: 11, padding: '3px 10px', borderRadius: 20, fontWeight: 800,
-                background: isAdmin ? 'rgba(210,168,255,0.2)' : 'rgba(88,166,255,0.2)',
-                color: isAdmin ? '#d2a8ff' : '#79c0ff',
-                border: `1px solid ${isAdmin ? 'rgba(210,168,255,0.4)' : 'rgba(88,166,255,0.4)'}`
+                background: isAdmin
+                  ? (isDark ? 'rgba(210,168,255,0.2)' : '#f3e8ff')
+                  : (isDark ? 'rgba(88,166,255,0.2)' : '#e0f2fe'),
+                color: isAdmin
+                  ? (isDark ? '#d2a8ff' : '#7c3aed')
+                  : (isDark ? '#79c0ff' : '#0284c7'),
+                border: `1px solid ${isAdmin ? (isDark ? 'rgba(210,168,255,0.4)' : '#e9d5ff') : (isDark ? 'rgba(88,166,255,0.4)' : '#bae6fd')}`
               }}>
                 {isAdmin ? 'ADMINISTRATOR' : 'DEVELOPER'}
               </span>
               {user.is_verified && (
-                <span style={{ fontSize: 11, padding: '3px 10px', borderRadius: 20, fontWeight: 700, background: 'rgba(63,185,80,0.15)', color: '#3fb950', border: '1px solid rgba(63,185,80,0.3)' }}>
+                <span style={{
+                  fontSize: 11, padding: '3px 10px', borderRadius: 20, fontWeight: 700,
+                  background: isDark ? 'rgba(63,185,80,0.15)' : '#dcfce7',
+                  color: isDark ? '#3fb950' : '#15803d',
+                  border: `1px solid ${isDark ? 'rgba(63,185,80,0.3)' : '#bbf7d0'}`
+                }}>
                   ✅ Verified
                 </span>
               )}
             </div>
-            <p style={{ color: '#8b949e', fontSize: 13, margin: 0 }}>
+            <p style={{ color: textMuted, fontSize: 13, margin: 0 }}>
               {isAdmin ? 'System Administrator Portal — Platform Management, User Moderation & Security Logs' : "Welcome to your active CodeHub developer environment. Everything is up to date."}
             </p>
           </div>
@@ -114,8 +149,8 @@ export default function DashboardView({
               disabled={!user.is_verified}
               style={{
                 padding: '11px 22px', borderRadius: 14, fontWeight: 800, fontSize: 13,
-                background: user.is_verified ? 'linear-gradient(135deg, #238636, #2ea043)' : '#21262d',
-                color: user.is_verified ? '#fff' : '#8b949e',
+                background: user.is_verified ? 'linear-gradient(135deg, #238636, #2ea043)' : (isDark ? '#21262d' : '#e2e8f0'),
+                color: user.is_verified ? '#fff' : textMuted,
                 cursor: user.is_verified ? 'pointer' : 'not-allowed', border: 'none',
                 boxShadow: user.is_verified ? '0 4px 16px rgba(35,134,54,0.35)' : 'none'
               }}
@@ -128,8 +163,8 @@ export default function DashboardView({
               onClick={onOpenAdmin}
               style={{
                 padding: '11px 22px', borderRadius: 14, fontWeight: 800, fontSize: 13,
-                background: 'linear-gradient(135deg, #3d1f6e, #532b9b)',
-                color: '#d2a8ff', border: '1px solid #6e40c9', cursor: 'pointer',
+                background: isDark ? 'linear-gradient(135deg, #3d1f6e, #532b9b)' : 'linear-gradient(135deg, #7c3aed, #6d28d9)',
+                color: '#fff', border: 'none', cursor: 'pointer',
                 boxShadow: '0 4px 16px rgba(110,64,201,0.35)'
               }}
             >
@@ -143,30 +178,30 @@ export default function DashboardView({
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 14 }}>
         {(isAdmin
           ? [
-              { label: 'Total Users', value: stats.total_users ?? 0, icon: '👥', color: '#58a6ff', sub: `${stats.active_users ?? 0} active` },
-              { label: 'Total Repositories', value: stats.total_repositories ?? 0, icon: '📁', color: '#3fb950', sub: `${stats.public_repositories ?? 0} public` },
-              { label: 'Total Commits', value: stats.total_commits ?? 0, icon: '📦', color: '#79c0ff', sub: `${stats.total_files ?? 0} files` },
-              { label: 'Community Posts', value: stats.total_feed_posts ?? 0, icon: '📰', color: '#d2a8ff', sub: 'Active stream' },
-              { label: 'Pending Purges', value: stats.pending_deletions ?? 0, icon: '🚨', color: '#f85149', sub: 'Review needed' },
-              { label: 'System Access', value: 'Overriding', icon: '⚡', color: '#e3b341', sub: 'Full privilege' },
+              { label: 'Total Users', value: stats.total_users ?? 0, icon: '👥', color: isDark ? '#58a6ff' : '#0969da', sub: `${stats.active_users ?? 0} active` },
+              { label: 'Total Repositories', value: stats.total_repositories ?? 0, icon: '📁', color: isDark ? '#3fb950' : '#15803d', sub: `${stats.public_repositories ?? 0} public` },
+              { label: 'Total Commits', value: stats.total_commits ?? 0, icon: '📦', color: isDark ? '#79c0ff' : '#0284c7', sub: `${stats.total_files ?? 0} files` },
+              { label: 'Community Posts', value: stats.total_feed_posts ?? 0, icon: '📰', color: isDark ? '#d2a8ff' : '#7c3aed', sub: 'Active stream' },
+              { label: 'Pending Purges', value: stats.pending_deletions ?? 0, icon: '🚨', color: isDark ? '#f85149' : '#b91c1c', sub: 'Review needed' },
+              { label: 'System Access', value: 'Overriding', icon: '⚡', color: isDark ? '#e3b341' : '#a16207', sub: 'Full privilege' },
             ]
           : [
-              { label: 'Repositories', value: stats.repositories ?? userRepos.length, icon: '📁', color: '#58a6ff', sub: 'Hosted projects' },
-              { label: 'Total Commits', value: stats.commits ?? 0, icon: '📦', color: '#3fb950', sub: 'Pushed versions' },
-              { label: 'Issues & PRs', value: (stats.issues ?? 0) + (stats.pull_requests ?? 0), icon: '🔀', color: '#d2a8ff', sub: `${stats.pull_requests ?? 0} PRs, ${stats.issues ?? 0} issues` },
-              { label: 'Community Feed', value: stats.feed_posts ?? 0, icon: '📰', color: '#79c0ff', sub: `${stats.likes_received ?? 0} likes received` },
-              { label: 'Drive Storage', value: `${storageMB} MB`, icon: '☁️', color: '#e3b341', sub: `${stats.files_stored ?? 0} files synced` },
-              { label: 'Account Tier', value: user.role?.toUpperCase(), icon: '👤', color: '#58a6ff', sub: user.is_verified ? 'Verified access' : 'Unverified' },
+              { label: 'Repositories', value: stats.repositories ?? userRepos.length, icon: '📁', color: isDark ? '#58a6ff' : '#0969da', sub: 'Hosted projects' },
+              { label: 'Total Commits', value: stats.commits ?? 0, icon: '📦', color: isDark ? '#3fb950' : '#15803d', sub: 'Pushed versions' },
+              { label: 'Issues & PRs', value: (stats.issues ?? 0) + (stats.pull_requests ?? 0), icon: '🔀', color: isDark ? '#d2a8ff' : '#7c3aed', sub: `${stats.pull_requests ?? 0} PRs, ${stats.issues ?? 0} issues` },
+              { label: 'Community Feed', value: stats.feed_posts ?? 0, icon: '📰', color: isDark ? '#79c0ff' : '#0284c7', sub: `${stats.likes_received ?? 0} likes received` },
+              { label: 'Drive Storage', value: `${storageMB} MB`, icon: '☁️', color: isDark ? '#e3b341' : '#a16207', sub: `${stats.files_stored ?? 0} files synced` },
+              { label: 'Account Tier', value: user.role?.toUpperCase(), icon: '👤', color: isDark ? '#58a6ff' : '#0969da', sub: user.is_verified ? 'Verified access' : 'Unverified' },
             ]
         ).map((s, i) => (
-          <div key={i} style={{ background: '#161b22', border: '1px solid #21262d', borderRadius: 16, padding: '20px 18px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+          <div key={i} style={{ background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: 16, padding: '20px 18px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', boxShadow: shadow }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
               <span style={{ fontSize: 24 }}>{s.icon}</span>
-              <span style={{ fontSize: 11, color: '#8b949e', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 700 }}>{s.label}</span>
+              <span style={{ fontSize: 11, color: textMuted, textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 700 }}>{s.label}</span>
             </div>
             <div>
               <div style={{ fontSize: 24, fontWeight: 900, color: s.color }}>{s.value}</div>
-              <div style={{ fontSize: 11, color: '#8b949e', marginTop: 4 }}>{s.sub}</div>
+              <div style={{ fontSize: 11, color: textMuted, marginTop: 4 }}>{s.sub}</div>
             </div>
           </div>
         ))}
@@ -175,54 +210,54 @@ export default function DashboardView({
       {/* ── Developer Profile & Cloud Sync Summary ── */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
         {/* Developer Info Card */}
-        <div style={{ background: '#161b22', border: '1px solid #21262d', borderRadius: 16, padding: '22px 24px', display: 'flex', flexDirection: 'column', gap: 14 }}>
+        <div style={{ background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: 16, padding: '22px 24px', display: 'flex', flexDirection: 'column', gap: 14, boxShadow: shadow }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <h3 style={{ fontWeight: 800, fontSize: 15, color: '#e6edf3', margin: 0 }}>👤 Developer Identity</h3>
+            <h3 style={{ fontWeight: 800, fontSize: 15, color: textMain, margin: 0 }}>👤 Developer Identity</h3>
             <button
               onClick={() => window.dispatchEvent(new CustomEvent('navTo', { detail: 'settings' }))}
-              style={{ background: 'none', border: 'none', color: '#58a6ff', fontSize: 12, cursor: 'pointer', fontWeight: 700 }}>
+              style={{ background: 'none', border: 'none', color: isDark ? '#58a6ff' : '#0969da', fontSize: 12, cursor: 'pointer', fontWeight: 700 }}>
               Edit Profile →
             </button>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
             <div>
-              <div style={{ fontSize: 11, color: '#8b949e', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 700 }}>Username</div>
-              <div style={{ fontSize: 13, fontWeight: 700, color: '#58a6ff', fontFamily: 'monospace' }}>@{profile?.username || 'not_set'}</div>
+              <div style={{ fontSize: 11, color: textMuted, textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 700 }}>Username</div>
+              <div style={{ fontSize: 13, fontWeight: 700, color: isDark ? '#58a6ff' : '#0969da', fontFamily: 'monospace' }}>@{profile?.username || 'not_set'}</div>
             </div>
             <div>
-              <div style={{ fontSize: 11, color: '#8b949e', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 700 }}>Organization</div>
-              <div style={{ fontSize: 13, fontWeight: 600, color: '#e6edf3' }}>{profile?.organization || 'Independent'}</div>
+              <div style={{ fontSize: 11, color: textMuted, textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 700 }}>Organization</div>
+              <div style={{ fontSize: 13, fontWeight: 600, color: textMain }}>{profile?.organization || 'Independent'}</div>
             </div>
             <div>
-              <div style={{ fontSize: 11, color: '#8b949e', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 700 }}>Location</div>
-              <div style={{ fontSize: 13, fontWeight: 600, color: '#e6edf3' }}>{profile?.location || 'Remote / Worldwide'}</div>
+              <div style={{ fontSize: 11, color: textMuted, textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 700 }}>Location</div>
+              <div style={{ fontSize: 13, fontWeight: 600, color: textMain }}>{profile?.location || 'Remote / Worldwide'}</div>
             </div>
             <div>
-              <div style={{ fontSize: 11, color: '#8b949e', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 700 }}>Website</div>
-              <div style={{ fontSize: 13, fontWeight: 600, color: '#58a6ff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                {profile?.website_url ? <a href={profile.website_url} target="_blank" rel="noreferrer" style={{ color: '#58a6ff', textDecoration: 'none' }}>{profile.website_url.replace(/^https?:\/\//, '')}</a> : '—'}
+              <div style={{ fontSize: 11, color: textMuted, textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 700 }}>Website</div>
+              <div style={{ fontSize: 13, fontWeight: 600, color: isDark ? '#58a6ff' : '#0969da', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                {profile?.website_url ? <a href={profile.website_url} target="_blank" rel="noreferrer" style={{ color: isDark ? '#58a6ff' : '#0969da', textDecoration: 'none' }}>{profile.website_url.replace(/^https?:\/\//, '')}</a> : '—'}
               </div>
             </div>
           </div>
           {profile?.bio && (
-            <div style={{ background: '#0d1117', border: '1px solid #21262d', borderRadius: 12, padding: '10px 14px', fontSize: 12, color: '#8b949e', lineHeight: 1.5 }}>
+            <div style={{ background: innerBg, border: `1px solid ${cardBorder}`, borderRadius: 12, padding: '10px 14px', fontSize: 12, color: textMuted, lineHeight: 1.5 }}>
               "{profile.bio}"
             </div>
           )}
         </div>
 
         {/* Cloud Sync Status Card */}
-        <div style={{ background: '#161b22', border: '1px solid #21262d', borderRadius: 16, padding: '22px 24px', display: 'flex', flexDirection: 'column', gap: 14 }}>
+        <div style={{ background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: 16, padding: '22px 24px', display: 'flex', flexDirection: 'column', gap: 14, boxShadow: shadow }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <h3 style={{ fontWeight: 800, fontSize: 15, color: '#e6edf3', margin: 0 }}>☁️ Cloud Drive Sync & Health</h3>
-            <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 12, background: 'rgba(63,185,80,0.15)', color: '#3fb950', fontWeight: 700 }}>Connected</span>
+            <h3 style={{ fontWeight: 800, fontSize: 15, color: textMain, margin: 0 }}>☁️ Cloud Drive Sync & Health</h3>
+            <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 12, background: isDark ? 'rgba(63,185,80,0.15)' : '#dcfce7', color: isDark ? '#3fb950' : '#15803d', fontWeight: 700 }}>Connected</span>
           </div>
-          <p style={{ fontSize: 12, color: '#8b949e', margin: 0, lineHeight: 1.5 }}>
+          <p style={{ fontSize: 12, color: textMuted, margin: 0, lineHeight: 1.5 }}>
             Automated Google Drive version sync active. All commits create real-time snapshot files in isolated repository cloud folders.
           </p>
-          <div style={{ background: '#0d1117', border: '1px solid #21262d', borderRadius: 12, padding: '12px 14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 12 }}>
-            <span style={{ color: '#8b949e' }}>Storage Used</span>
-            <span style={{ fontWeight: 800, color: '#58a6ff' }}>{storageMB} MB / 15 GB Free Quota</span>
+          <div style={{ background: innerBg, border: `1px solid ${cardBorder}`, borderRadius: 12, padding: '12px 14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 12 }}>
+            <span style={{ color: textMuted }}>Storage Used</span>
+            <span style={{ fontWeight: 800, color: isDark ? '#58a6ff' : '#0969da' }}>{storageMB} MB / 15 GB Free Quota</span>
           </div>
           <div style={{ display: 'flex', gap: 10 }}>
             <button
@@ -232,7 +267,7 @@ export default function DashboardView({
             </button>
             <button
               onClick={onNavFeed}
-              style={{ flex: 1, padding: '8px 14px', borderRadius: 12, fontSize: 12, fontWeight: 700, background: '#21262d', color: '#58a6ff', border: '1px solid #30363d', cursor: 'pointer' }}>
+              style={{ flex: 1, padding: '8px 14px', borderRadius: 12, fontSize: 12, fontWeight: 700, background: isDark ? '#21262d' : '#f6f8fa', color: isDark ? '#58a6ff' : '#0969da', border: `1px solid ${cardBorder}`, cursor: 'pointer' }}>
               📰 Feed Updates
             </button>
           </div>
@@ -240,10 +275,11 @@ export default function DashboardView({
       </div>
 
       {/* ── Quick Actions Bar ── */}
-      <div style={{ background: '#161b22', border: '1px solid #21262d', borderRadius: 16, padding: '22px 24px' }}>
-        <h3 style={{ fontWeight: 800, fontSize: 15, marginBottom: 16, color: '#e6edf3' }}>⚡ Developer Quick Launch</h3>
+      <div style={{ background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: 16, padding: '22px 24px', boxShadow: shadow }}>
+        <h3 style={{ fontWeight: 800, fontSize: 15, marginBottom: 16, color: textMain }}>⚡ Developer Quick Launch</h3>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: 12 }}>
           {[
+            { icon: '💼', label: isAdmin ? 'Manage Jobs' : 'Explore Jobs', action: () => window.dispatchEvent(new CustomEvent('navTo', { detail: 'jobs' })) },
             { icon: '📰', label: 'Community Feed', action: onNavFeed },
             { icon: '✨', label: 'Ask AI Copilot', action: () => window.dispatchEvent(new CustomEvent('navTo', { detail: 'ai' })) },
             ...(!isAdmin ? [
@@ -260,17 +296,18 @@ export default function DashboardView({
               key={i}
               onClick={qa.action}
               style={{
-                padding: '14px 10px', borderRadius: 14, background: '#0d1117',
-                border: '1px solid #30363d', color: '#e6edf3', fontSize: 12, fontWeight: 700,
+                padding: '14px 10px', borderRadius: 14, background: innerBg,
+                border: `1px solid ${cardBorder}`, color: textMain, fontSize: 12, fontWeight: 700,
                 cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8,
                 transition: 'all 0.2s',
+                boxShadow: isDark ? 'none' : '0 1px 2px rgba(31,35,40,0.04)'
               }}
               onMouseEnter={e => {
-                e.currentTarget.style.borderColor = '#58a6ff';
+                e.currentTarget.style.borderColor = '#0969da';
                 e.currentTarget.style.transform = 'translateY(-2px)';
               }}
               onMouseLeave={e => {
-                e.currentTarget.style.borderColor = '#30363d';
+                e.currentTarget.style.borderColor = cardBorder;
                 e.currentTarget.style.transform = 'translateY(0)';
               }}
             >
@@ -281,32 +318,110 @@ export default function DashboardView({
         </div>
       </div>
 
+      {/* ── Recommended Tech Jobs & Careers (Developer Dashboard) ── */}
+      {!isAdmin && (
+        <div style={{ background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: 16, padding: '22px 24px', boxShadow: shadow }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, flexWrap: 'wrap', gap: 10 }}>
+            <div>
+              <h3 style={{ fontWeight: 800, fontSize: 16, color: textMain, margin: 0 }}>
+                💼 Recommended Tech Jobs & Career Opportunities
+              </h3>
+              <p style={{ margin: '4px 0 0', fontSize: 12, color: textMuted }}>
+                Active open positions curated across engineering disciplines. Click to view full details and apply.
+              </p>
+            </div>
+            <button
+              onClick={() => window.dispatchEvent(new CustomEvent('navTo', { detail: 'jobs' }))}
+              style={{
+                padding: '8px 16px',
+                borderRadius: 20,
+                background: isDark ? '#21262d' : '#e0f2fe',
+                border: `1px solid ${isDark ? '#30363d' : '#bae6fd'}`,
+                color: isDark ? '#58a6ff' : '#0969da',
+                fontSize: 12,
+                fontWeight: 700,
+                cursor: 'pointer'
+              }}
+            >
+              Explore All Jobs →
+            </button>
+          </div>
+
+          {jobsLoading ? (
+            <div style={{ textAlign: 'center', padding: 24, color: textMuted, fontSize: 13 }}>Loading opportunities...</div>
+          ) : featuredJobs.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: 24, color: textMuted, fontSize: 13, background: innerBg, borderRadius: 12, border: `1px solid ${cardBorder}` }}>
+              No open job postings available right now. Check back soon!
+            </div>
+          ) : (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 14 }}>
+              {featuredJobs.map(job => (
+                <div
+                  key={job.id}
+                  onClick={() => window.dispatchEvent(new CustomEvent('navTo', { detail: 'jobs' }))}
+                  style={{
+                    background: innerBg,
+                    border: `1px solid ${cardBorder}`,
+                    borderRadius: 14,
+                    padding: 16,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                    gap: 12,
+                    transition: 'all 0.2s',
+                    boxShadow: isDark ? 'none' : '0 1px 2px rgba(31,35,40,0.04)'
+                  }}
+                  onMouseEnter={e => { e.currentTarget.style.borderColor = '#0969da'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
+                  onMouseLeave={e => { e.currentTarget.style.borderColor = cardBorder; e.currentTarget.style.transform = 'translateY(0)'; }}
+                >
+                  <div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
+                      <span style={{ fontWeight: 800, fontSize: 14, color: textMain }}>{job.title}</span>
+                      <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 10, background: isDark ? 'rgba(63,185,80,0.15)' : '#dcfce7', color: isDark ? '#3fb950' : '#15803d', fontWeight: 700, textTransform: 'uppercase' }}>
+                        {job.job_type}
+                      </span>
+                    </div>
+                    <div style={{ fontSize: 12, color: isDark ? '#58a6ff' : '#0969da', marginTop: 4 }}>🏢 {job.company}</div>
+                    <div style={{ fontSize: 11, color: textMuted, marginTop: 2 }}>📍 {job.location} · 💰 {job.salary_range}</div>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: `1px solid ${isDark ? '#21262d' : '#e2e8f0'}`, paddingTop: 10 }}>
+                    <span style={{ fontSize: 11, color: textMuted }}>{job.skills && job.skills.slice(0, 2).join(' · ')}</span>
+                    <span style={{ fontSize: 12, color: isDark ? '#58a6ff' : '#0969da', fontWeight: 700 }}>Apply Now →</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
       {/* ── Lower Grid: Repositories & Activity ── */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 20 }}>
         {isAdmin ? (
-          <div style={{ background: '#161b22', border: '1px solid #21262d', borderRadius: 16, padding: '22px 24px' }}>
+          <div style={{ background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: 16, padding: '22px 24px', boxShadow: shadow }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-              <h3 style={{ fontWeight: 800, fontSize: 15, color: '#e6edf3', margin: 0 }}>📰 Community Feed Moderation</h3>
-              <button onClick={onNavFeed} style={{ background: 'none', border: 'none', color: '#58a6ff', fontSize: 12, cursor: 'pointer', fontWeight: 700 }}>
+              <h3 style={{ fontWeight: 800, fontSize: 15, color: textMain, margin: 0 }}>📰 Community Feed Moderation</h3>
+              <button onClick={onNavFeed} style={{ background: 'none', border: 'none', color: isDark ? '#58a6ff' : '#0969da', fontSize: 12, cursor: 'pointer', fontWeight: 700 }}>
                 Open Feed →
               </button>
             </div>
-            <p style={{ fontSize: 13, color: '#8b949e', lineHeight: 1.5, marginBottom: 16 }}>
+            <p style={{ fontSize: 13, color: textMuted, lineHeight: 1.5, marginBottom: 16 }}>
               Review technical updates and snippets shared across the developer ecosystem. Administrators have overriding deletion and moderation authority.
             </p>
             <button
               onClick={onNavFeed}
-              style={{ padding: '9px 18px', borderRadius: 12, background: '#21262d', border: '1px solid #30363d', color: '#58a6ff', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}
+              style={{ padding: '9px 18px', borderRadius: 12, background: isDark ? '#21262d' : '#f6f8fa', border: `1px solid ${cardBorder}`, color: isDark ? '#58a6ff' : '#0969da', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}
             >
               View Community Stream
             </button>
           </div>
         ) : (
-          <div style={{ background: '#161b22', border: '1px solid #21262d', borderRadius: 16, padding: '22px 24px' }}>
+          <div style={{ background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: 16, padding: '22px 24px', boxShadow: shadow }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-              <h3 style={{ fontWeight: 800, fontSize: 15, marginBottom: 0, color: '#e6edf3' }}>📁 Active Repositories</h3>
+              <h3 style={{ fontWeight: 800, fontSize: 15, marginBottom: 0, color: textMain }}>📁 Active Repositories</h3>
               {user.is_verified && (
-                <button onClick={onOpenCreateRepo} style={{ background: 'none', border: 'none', color: '#58a6ff', fontSize: 12, cursor: 'pointer', fontWeight: 700 }}>
+                <button onClick={onOpenCreateRepo} style={{ background: 'none', border: 'none', color: isDark ? '#58a6ff' : '#0969da', fontSize: 12, cursor: 'pointer', fontWeight: 700 }}>
                   + New
                 </button>
               )}
@@ -318,31 +433,32 @@ export default function DashboardView({
                   onClick={() => onSelectRepo(r.id)}
                   style={{
                     padding: '12px 14px', borderRadius: 12, cursor: 'pointer',
-                    border: '1px solid #21262d', background: '#0d1117',
+                    border: `1px solid ${cardBorder}`, background: innerBg,
                     display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                    transition: 'all 0.2s'
+                    transition: 'all 0.2s',
+                    boxShadow: isDark ? 'none' : '0 1px 2px rgba(31,35,40,0.04)'
                   }}
                   onMouseEnter={e => {
-                    e.currentTarget.style.borderColor = '#58a6ff';
+                    e.currentTarget.style.borderColor = '#0969da';
                     e.currentTarget.style.transform = 'translateY(-1px)';
                   }}
                   onMouseLeave={e => {
-                    e.currentTarget.style.borderColor = '#21262d';
+                    e.currentTarget.style.borderColor = cardBorder;
                     e.currentTarget.style.transform = 'translateY(0)';
                   }}
                 >
                   <div>
-                    <div style={{ fontWeight: 800, fontSize: 13, color: '#58a6ff' }}>📦 {r.name}</div>
-                    <div style={{ fontSize: 11, color: '#8b949e', marginTop: 3 }}>{r.description || 'No description provided'}</div>
+                    <div style={{ fontWeight: 800, fontSize: 13, color: isDark ? '#58a6ff' : '#0969da' }}>📦 {r.name}</div>
+                    <div style={{ fontSize: 11, color: textMuted, marginTop: 3 }}>{r.description || 'No description provided'}</div>
                   </div>
-                  <div style={{ display: 'flex', gap: 8, fontSize: 11, color: '#8b949e' }}>
+                  <div style={{ display: 'flex', gap: 8, fontSize: 11, color: textMuted }}>
                     <span>🌿 {r.branch_count || 1}</span>
                     <span>📦 {r.commit_count || 1}</span>
                   </div>
                 </div>
               ))}
               {recentRepos.length === 0 && (
-                <div style={{ textAlign: 'center', padding: 30, color: '#8b949e', fontSize: 13 }}>
+                <div style={{ textAlign: 'center', padding: 30, color: textMuted, fontSize: 13 }}>
                   No repositories yet. Create your first code workspace!
                 </div>
               )}
@@ -351,10 +467,10 @@ export default function DashboardView({
         )}
 
         {/* Right Panel – Recent System & Workspace Activity */}
-        <div style={{ background: '#161b22', border: '1px solid #21262d', borderRadius: 16, padding: '22px 24px' }}>
-          <h3 style={{ fontWeight: 800, fontSize: 15, color: '#e6edf3', marginBottom: 14 }}>📊 Recent Activity Stream</h3>
+        <div style={{ background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: 16, padding: '22px 24px', boxShadow: shadow }}>
+          <h3 style={{ fontWeight: 800, fontSize: 15, color: textMain, marginBottom: 14 }}>📊 Recent Activity Stream</h3>
           {activity.length === 0 ? (
-            <p style={{ color: '#8b949e', fontSize: 13 }}>No recent activity recorded.</p>
+            <p style={{ color: textMuted, fontSize: 13 }}>No recent activity recorded.</p>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               {activity.slice(0, 7).map((a, i) => {
@@ -362,12 +478,12 @@ export default function DashboardView({
                 const timestamp = a && typeof a === 'object' ? (a.timestamp || a.created_at || '') : '';
                 const description = a && typeof a === 'object' ? (typeof a.description === 'string' ? a.description : JSON.stringify(a.description)) : String(a || '');
                 return (
-                  <div key={i} style={{ padding: '10px 12px', background: '#0d1117', border: '1px solid #21262d', borderRadius: 10, fontSize: 12 }}>
+                  <div key={i} style={{ padding: '10px 14px', background: innerBg, border: `1px solid ${cardBorder}`, borderRadius: 10, fontSize: 12 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 3 }}>
-                      <span style={{ fontSize: 10, fontWeight: 800, padding: '2px 8px', borderRadius: 10, background: 'rgba(88,166,255,0.15)', color: '#58a6ff' }}>{actionType || 'EVENT'}</span>
-                      <span style={{ marginLeft: 'auto', color: '#6e7681', fontSize: 11 }}>{timestamp}</span>
+                      <span style={{ fontSize: 10, fontWeight: 800, padding: '2px 8px', borderRadius: 10, background: isDark ? 'rgba(88,166,255,0.15)' : '#e0f2fe', color: isDark ? '#58a6ff' : '#0969da' }}>{actionType || 'EVENT'}</span>
+                      <span style={{ marginLeft: 'auto', color: textMuted, fontSize: 11 }}>{timestamp}</span>
                     </div>
-                    <div style={{ color: '#c9d1d9', lineHeight: 1.4 }}>{description}</div>
+                    <div style={{ color: textMain, lineHeight: 1.4 }}>{description}</div>
                   </div>
                 );
               })}

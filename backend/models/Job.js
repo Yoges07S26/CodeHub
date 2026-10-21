@@ -8,7 +8,21 @@ const jobSchema = new mongoose.Schema({
   type: { type: String, enum: ['Full-time', 'Part-time', 'Contract', 'Remote', 'Internship'], default: 'Full-time' },
   role: { 
     type: String, 
-    enum: ['Full Stack', 'Frontend', 'Backend', 'AI / ML Engineer', 'DevOps / Cloud', 'Mobile Developer', 'Cybersecurity', 'UI/UX & Product', 'Engineering Manager', 'Other'],
+    enum: [
+      'Full Stack', 
+      'Frontend', 
+      'Backend', 
+      'AI / ML Engineer', 
+      'DevOps / Cloud', 
+      'Mobile Developer', 
+      'Cybersecurity', 
+      'UI/UX & Product', 
+      'Engineering Manager', 
+      'QA & Testing', 
+      'Data Engineer', 
+      'Blockchain & Web3', 
+      'Other'
+    ],
     default: 'Full Stack',
     index: true 
   },
@@ -21,6 +35,7 @@ const jobSchema = new mongoose.Schema({
   poster_name: { type: String, default: 'CodeHub Employer' },
   poster_email: { type: String, default: '' },
   status: { type: String, enum: ['open', 'closed'], default: 'open', index: true },
+  image_url: { type: String, default: '' },
   applicants_count: { type: Number, default: 0 },
   created_at: { type: Date, default: Date.now, index: true }
 });

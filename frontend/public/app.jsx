@@ -94,15 +94,28 @@ function useTypewriter(text, speed = 55) {
 // ══════════════════════════════════════════════════════════════════════════════
 // ROOT APP
 // ══════════════════════════════════════════════════════════════════════════════
+const getStoredUser = () => {
+    try {
+        const raw = localStorage.getItem('codehub_user');
+        return raw ? JSON.parse(raw) : null;
+    } catch {
+        return null;
+    }
+};
+
 function App() {
     const [theme, setTheme] = useState(localStorage.getItem('codehub_theme') || 'dark');
-    const [user, setUser] = useState(() => {
-        try { return JSON.parse(localStorage.getItem('codehub_user')); } catch { return null; }
-    });
+    const [user, setUser] = useState(getStoredUser);
     // Default to dashboard after login so the page is always available as the main workspace view
     const [currentView, setCurrentView] = useState(user ? 'dashboard' : 'landing');
     const [selectedRepoId, setSelectedRepoId] = useState(null);
     const [notification, setNotification] = useState(null);
+
+    useEffect(() => {
+        if (user && (currentView === 'landing' || currentView === 'login' || currentView === 'register')) {
+            setCurrentView('dashboard');
+        }
+    }, [user, currentView]);
 
     // AI Chat
     const [chatMessages, setChatMessages] = useState([
@@ -244,7 +257,7 @@ function App() {
             {!isAuthOrLanding && (
                 <header style={{
                     background: theme === 'dark' ? '#161b22' : '#ffffff',
-                    borderBottom: '1px solid #30363d',
+                    borderBottom: theme === 'dark' ? '1px solid #30363d' : '1px solid #d0d7de',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
@@ -255,7 +268,8 @@ function App() {
                     zIndex: 40,
                     width: '100%',
                     margin: 0,
-                    boxSizing: 'border-box'
+                    boxSizing: 'border-box',
+                    boxShadow: theme === 'dark' ? 'none' : '0 1px 3px rgba(31, 35, 40, 0.06)'
                 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer', minWidth: 0 }} onClick={() => navTo(user ? 'dashboard' : 'landing')}>
                         <img src="logo.png" alt="CodeHub" style={{ width: 36, height: 36, borderRadius: 12, objectFit: 'contain', display: 'block', flexShrink: 0 }} />
@@ -275,10 +289,10 @@ function App() {
                             ].map(n => (
                                 <button key={n.view} onClick={() => navTo(n.view)}
                                     style={{
-                                        padding: '7px 14px', borderRadius: 14, fontWeight: 700, fontSize: 13,
-                                        background: currentView === n.view ? (theme === 'dark' ? '#21262d' : '#eaeef2') : 'transparent',
-                                        color: currentView === n.view ? '#58a6ff' : (theme === 'dark' ? '#8b949e' : '#57606a'),
-                                        border: currentView === n.view ? '1px solid rgba(88,166,255,0.3)' : '1px solid transparent',
+                                        padding: '7px 16px', borderRadius: 20, fontWeight: 700, fontSize: 13,
+                                        background: currentView === n.view ? (theme === 'dark' ? '#21262d' : '#e0f2fe') : 'transparent',
+                                        color: currentView === n.view ? (theme === 'dark' ? '#58a6ff' : '#0969da') : (theme === 'dark' ? '#8b949e' : '#57606a'),
+                                        border: currentView === n.view ? (theme === 'dark' ? '1px solid rgba(88,166,255,0.3)' : '1px solid #bae6fd') : '1px solid transparent',
                                         cursor: 'pointer', transition: 'all 0.2s'
                                     }}>
                                     {n.label}
@@ -290,21 +304,21 @@ function App() {
                     <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginLeft: user ? 0 : 'auto' }}>
                         <button onClick={() => setTheme(t => t === 'dark' ? 'light' : 'dark')}
                             title="Toggle Light/Dark Theme"
-                            style={{ padding: '7px 12px', borderRadius: 14, border: '1px solid #30363d', fontSize: 13, cursor: 'pointer', background: 'transparent' }}>
+                            style={{ padding: '7px 12px', borderRadius: 14, border: theme === 'dark' ? '1px solid #30363d' : '1px solid #d0d7de', fontSize: 13, cursor: 'pointer', background: theme === 'dark' ? 'transparent' : '#ffffff', color: theme === 'dark' ? '#e6edf3' : '#1f2328' }}>
                             {theme === 'dark' ? '☀️' : '🌙'}
                         </button>
                         {user ? (
                             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                <div onClick={() => navTo('settings')} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '5px 12px', borderRadius: 14, border: '1px solid #30363d', fontSize: 12, background: theme === 'dark' ? '#161b22' : '#f1f5f9', cursor: 'pointer' }}>
+                                <div onClick={() => navTo('settings')} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '5px 12px', borderRadius: 14, border: theme === 'dark' ? '1px solid #30363d' : '1px solid #d0d7de', fontSize: 12, background: theme === 'dark' ? '#161b22' : '#ffffff', cursor: 'pointer', color: theme === 'dark' ? '#e6edf3' : '#1f2328' }}>
                                     <UserAvatar user={user} size={26} />
                                     <span style={{ fontWeight: 700 }}>{user.username || user.email.split('@')[0]}</span>
-                                    <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 10, background: user.role === 'admin' ? '#3d1f6e' : '#0d3b5e', color: user.role === 'admin' ? '#d2a8ff' : '#79c0ff', fontWeight: 800, textTransform: 'uppercase' }}>{user.role}</span>
+                                    <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 10, background: user.role === 'admin' ? (theme === 'dark' ? '#3d1f6e' : '#f3e8ff') : (theme === 'dark' ? '#0d3b5e' : '#e0f2fe'), color: user.role === 'admin' ? (theme === 'dark' ? '#d2a8ff' : '#7c3aed') : (theme === 'dark' ? '#79c0ff' : '#0284c7'), fontWeight: 800, textTransform: 'uppercase' }}>{user.role}</span>
                                 </div>
-                                <button onClick={handleLogout} style={{ padding: '6px 14px', borderRadius: 14, fontSize: 12, fontWeight: 700, color: '#f85149', background: 'rgba(248,81,73,0.1)', border: '1px solid rgba(248,81,73,0.3)', cursor: 'pointer' }}>Sign Out</button>
+                                <button onClick={handleLogout} style={{ padding: '6px 14px', borderRadius: 14, fontSize: 12, fontWeight: 700, color: '#f85149', background: theme === 'dark' ? 'rgba(248,81,73,0.1)' : '#fee2e2', border: '1px solid rgba(248,81,73,0.3)', cursor: 'pointer' }}>Sign Out</button>
                             </div>
                         ) : (
                             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                <button onClick={() => navTo('login')} style={{ padding: '7px 16px', borderRadius: 14, fontSize: 13, fontWeight: 700, color: '#58a6ff', background: 'transparent', border: '1px solid #30363d', cursor: 'pointer' }}>Sign In</button>
+                                <button onClick={() => navTo('login')} style={{ padding: '7px 16px', borderRadius: 14, fontSize: 13, fontWeight: 700, color: '#58a6ff', background: 'transparent', border: theme === 'dark' ? '1px solid #30363d' : '1px solid #d0d7de', cursor: 'pointer' }}>Sign In</button>
                                 <button onClick={() => navTo('register')} style={{ padding: '7px 16px', borderRadius: 14, fontSize: 13, fontWeight: 700, background: 'linear-gradient(135deg, #238636, #2ea043)', color: '#fff', border: 'none', cursor: 'pointer', boxShadow: '0 2px 10px rgba(35,134,54,0.3)' }}>Register</button>
                             </div>
                         )}
@@ -374,29 +388,30 @@ function App() {
                         chatEndRef={chatEndRef}
                         user={user}
                         onExploreNext={() => navTo(user?.role === 'admin' ? 'feed' : 'repos')}
+                        theme={theme}
                     />
                 )}
 
                 {/* COMMUNITY ACTIVITY FEED */}
-                {currentView === 'feed' && <FeedView user={user} showNotify={showNotify} />}
+                {currentView === 'feed' && <FeedView user={user} showNotify={showNotify} theme={theme} />}
 
                 {/* JOB SEARCH & CAREER MODULE */}
                 {currentView === 'jobs' && <JobsView user={user} showNotify={showNotify} theme={theme} />}
 
                 {/* DASHBOARD */}
-                {currentView === 'dashboard' && <DashboardView user={user} repositories={repositories} onSelectRepo={id => { setSelectedRepoId(id); navTo('repo_detail'); }} onOpenCreateRepo={() => setIsCreateRepoOpen(true)} onOpenDeleteAccount={() => setIsDeleteAccountOpen(true)} onOpenAdmin={() => navTo('admin_cockpit')} onNavFeed={() => navTo('feed')} />}
+                {currentView === 'dashboard' && <DashboardView user={user} repositories={repositories} onSelectRepo={id => { setSelectedRepoId(id); navTo('repo_detail'); }} onOpenCreateRepo={() => setIsCreateRepoOpen(true)} onOpenDeleteAccount={() => setIsDeleteAccountOpen(true)} onOpenAdmin={() => navTo('admin_cockpit')} onNavFeed={() => navTo('feed')} theme={theme} />}
 
                 {/* REPOS LIST (USER ONLY) */}
-                {currentView === 'repos' && <ReposView user={user} repositories={repositories} onSelectRepo={id => { setSelectedRepoId(id); navTo('repo_detail'); }} onOpenCreateRepo={() => setIsCreateRepoOpen(true)} />}
+                {currentView === 'repos' && <ReposView user={user} repositories={repositories} onSelectRepo={id => { setSelectedRepoId(id); navTo('repo_detail'); }} onOpenCreateRepo={() => setIsCreateRepoOpen(true)} showNotify={showNotify} theme={theme} />}
 
                 {/* REPO DETAIL */}
-                {currentView === 'repo_detail' && <RepoDetailView repoId={selectedRepoId} user={user} onBack={() => { navTo(user?.role === 'admin' ? 'dashboard' : 'repos'); fetchRepositories(); }} showNotify={showNotify} />}
+                {currentView === 'repo_detail' && <RepoDetailView repoId={selectedRepoId} user={user} onBack={() => { navTo(user?.role === 'admin' ? 'dashboard' : 'repos'); fetchRepositories(); }} showNotify={showNotify} theme={theme} />}
 
                 {/* SETTINGS */}
                 {currentView === 'settings' && <SettingsView user={user} repositories={repositories} onSelectRepo={id => { setSelectedRepoId(id); navTo('repo_detail'); }} onOpenCreateRepo={() => setIsCreateRepoOpen(true)} showNotify={showNotify} onOpenDeleteAccount={() => setIsDeleteAccountOpen(true)} onUserUpdated={u => setUser(u)} theme={theme} />}
 
                 {/* ADMIN COCKPIT */}
-                {currentView === 'admin_cockpit' && <AdminCockpitView user={user} onBack={() => navTo('dashboard')} showNotify={showNotify} />}
+                {currentView === 'admin_cockpit' && <AdminCockpitView user={user} onBack={() => navTo('dashboard')} showNotify={showNotify} theme={theme} />}
             </main>
 
             {/* ── CREATE REPO MODAL ── */}
@@ -407,48 +422,48 @@ function App() {
                             <div style={{
                                 padding: 18,
                                 borderRadius: 12,
-                                background: 'rgba(248,81,73,0.1)',
-                                border: '1px solid rgba(248,81,73,0.3)',
-                                color: '#ffa198',
+                                background: theme === 'light' ? '#fee2e2' : 'rgba(248,81,73,0.1)',
+                                border: theme === 'light' ? '1px solid #fecaca' : '1px solid rgba(248,81,73,0.3)',
+                                color: theme === 'light' ? '#991b1b' : '#ffa198',
                                 fontSize: 13,
                                 lineHeight: 1.6
                             }}>
-                                <strong style={{ color: '#f85149', fontSize: 14, display: 'block', marginBottom: 6 }}>⛔ Action Reserved for Developer Accounts</strong>
+                                <strong style={{ color: theme === 'light' ? '#b91c1c' : '#f85149', fontSize: 14, display: 'block', marginBottom: 6 }}>⛔ Action Reserved for Developer Accounts</strong>
                                 Administrators are not permitted to create repositories. In CodeHub, repository creation and code commits are reserved exclusively for developer user accounts.
-                                <div style={{ marginTop: 8, color: '#e6edf3' }}>
+                                <div style={{ marginTop: 8, color: theme === 'light' ? '#1f2328' : '#e6edf3' }}>
                                     Administrator accounts handle <strong>talent recruitment, job management, user moderation, and platform security</strong>.
                                 </div>
                             </div>
                             <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                                <button type="button" onClick={() => setIsCreateRepoOpen(false)} style={{ padding: '8px 18px', borderRadius: 8, fontSize: 13, fontWeight: 700, background: '#21262d', color: '#e6edf3', border: '1px solid #30363d', cursor: 'pointer' }}>Close</button>
+                                <button type="button" onClick={() => setIsCreateRepoOpen(false)} style={{ padding: '8px 18px', borderRadius: 8, fontSize: 13, fontWeight: 700, background: theme === 'light' ? '#f6f8fa' : '#21262d', color: theme === 'light' ? '#1f2328' : '#e6edf3', border: theme === 'light' ? '1px solid #d0d7de' : '1px solid #30363d', cursor: 'pointer' }}>Close</button>
                             </div>
                         </div>
                     ) : (
                         <form onSubmit={handleCreateRepo} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                             <div>
-                                <label style={{ fontSize: 11, fontWeight: 700, color: '#8b949e', textTransform: 'uppercase', letterSpacing: 1 }}>Repository Name</label>
+                                <label style={{ fontSize: 11, fontWeight: 800, color: theme === 'light' ? '#57606a' : '#8b949e', textTransform: 'uppercase', letterSpacing: 1 }}>Repository Name</label>
                                 <input type="text" required placeholder="e.g. quantum-compiler" value={newRepoName} onChange={e => setNewRepoName(e.target.value)}
-                                    style={{ width: '100%', marginTop: 6, padding: '8px 12px', borderRadius: 8, border: '1px solid #30363d', background: '#0d1117', color: '#e6edf3', fontSize: 13 }} />
+                                    style={{ width: '100%', marginTop: 6, padding: '9px 14px', borderRadius: 8, border: theme === 'light' ? '1px solid #d0d7de' : '1px solid #30363d', background: theme === 'light' ? '#ffffff' : '#0d1117', color: theme === 'light' ? '#1f2328' : '#e6edf3', fontSize: 13 }} />
                             </div>
                             <div>
-                                <label style={{ fontSize: 11, fontWeight: 700, color: '#8b949e', textTransform: 'uppercase', letterSpacing: 1 }}>Description</label>
+                                <label style={{ fontSize: 11, fontWeight: 800, color: theme === 'light' ? '#57606a' : '#8b949e', textTransform: 'uppercase', letterSpacing: 1 }}>Description</label>
                                 <textarea placeholder="Brief description..." rows="3" value={newRepoDesc} onChange={e => setNewRepoDesc(e.target.value)}
-                                    style={{ width: '100%', marginTop: 6, padding: '8px 12px', borderRadius: 8, border: '1px solid #30363d', background: '#0d1117', color: '#e6edf3', fontSize: 13 }} />
+                                    style={{ width: '100%', marginTop: 6, padding: '9px 14px', borderRadius: 8, border: theme === 'light' ? '1px solid #d0d7de' : '1px solid #30363d', background: theme === 'light' ? '#ffffff' : '#0d1117', color: theme === 'light' ? '#1f2328' : '#e6edf3', fontSize: 13 }} />
                             </div>
                             <div>
-                                <label style={{ fontSize: 11, fontWeight: 700, color: '#8b949e', textTransform: 'uppercase', letterSpacing: 1 }}>Visibility</label>
+                                <label style={{ fontSize: 11, fontWeight: 800, color: theme === 'light' ? '#57606a' : '#8b949e', textTransform: 'uppercase', letterSpacing: 1 }}>Visibility</label>
                                 <select value={newRepoVisibility} onChange={e => setNewRepoVisibility(e.target.value)}
-                                    style={{ width: '100%', marginTop: 6, padding: '8px 12px', borderRadius: 8, border: '1px solid #30363d', background: '#0d1117', color: '#e6edf3', fontSize: 13 }}>
+                                    style={{ width: '100%', marginTop: 6, padding: '9px 14px', borderRadius: 8, border: theme === 'light' ? '1px solid #d0d7de' : '1px solid #30363d', background: theme === 'light' ? '#ffffff' : '#0d1117', color: theme === 'light' ? '#1f2328' : '#e6edf3', fontSize: 13 }}>
                                     <option value="public">🌐 Public – Anyone can view</option>
                                     <option value="private">🔒 Private – Only you and admins</option>
                                 </select>
                             </div>
-                            <div style={{ fontSize: 12, color: '#8b949e', padding: '10px 12px', borderRadius: 8, background: '#161b22', border: '1px solid #30363d' }}>
+                            <div style={{ fontSize: 12, color: theme === 'light' ? '#57606a' : '#8b949e', padding: '12px 14px', borderRadius: 10, background: theme === 'light' ? '#f6f8fa' : '#161b22', border: theme === 'light' ? '1px solid #d0d7de' : '1px solid #30363d' }}>
                                 ☁️ Creates a linked <strong>Google Drive folder</strong> + default <code>main</code> branch with README.md.
                             </div>
                             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
-                                <button type="button" onClick={() => setIsCreateRepoOpen(false)} style={{ padding: '8px 16px', borderRadius: 8, fontSize: 13 }}>Cancel</button>
-                                <button type="submit" style={{ padding: '8px 18px', borderRadius: 8, fontSize: 13, fontWeight: 700, background: '#238636', color: '#fff' }}>Create Repository</button>
+                                <button type="button" onClick={() => setIsCreateRepoOpen(false)} style={{ padding: '8px 16px', borderRadius: 8, fontSize: 13, background: theme === 'light' ? '#ffffff' : '#21262d', color: theme === 'light' ? '#57606a' : '#8b949e', border: theme === 'light' ? '1px solid #d0d7de' : '1px solid #30363d', cursor: 'pointer' }}>Cancel</button>
+                                <button type="submit" style={{ padding: '8px 18px', borderRadius: 8, fontSize: 13, fontWeight: 700, background: 'linear-gradient(135deg, #238636, #2ea043)', color: '#fff', border: 'none', cursor: 'pointer', boxShadow: '0 2px 8px rgba(35,134,54,0.3)' }}>Create Repository</button>
                             </div>
                         </form>
                     )}
@@ -458,15 +473,15 @@ function App() {
             {/* ── DELETE ACCOUNT MODAL ── */}
             {isDeleteAccountOpen && (
                 <Modal onClose={() => setIsDeleteAccountOpen(false)} title="Request Account Deletion" danger>
-                    <p style={{ fontSize: 13, color: '#8b949e', marginBottom: 16 }}>
+                    <p style={{ fontSize: 13, color: theme === 'light' ? '#57606a' : '#8b949e', marginBottom: 16 }}>
                         This submits a deletion request to administrators who will review and permanently purge your account, repositories, and all Google Drive data.
                     </p>
                     <form onSubmit={handleSelfDeleteSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                         <textarea required rows="3" placeholder="Reason for deletion..." value={deleteReason} onChange={e => setDeleteReason(e.target.value)}
-                            style={{ padding: '8px 12px', borderRadius: 8, border: '1px solid #f85149', background: '#0d1117', color: '#e6edf3', fontSize: 13 }} />
+                            style={{ padding: '10px 14px', borderRadius: 8, border: theme === 'light' ? '1px solid #fca5a5' : '1px solid #f85149', background: theme === 'light' ? '#ffffff' : '#0d1117', color: theme === 'light' ? '#1f2328' : '#e6edf3', fontSize: 13 }} />
                         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
-                            <button type="button" onClick={() => setIsDeleteAccountOpen(false)} style={{ padding: '8px 16px', borderRadius: 8, fontSize: 13 }}>Cancel</button>
-                            <button type="submit" style={{ padding: '8px 18px', borderRadius: 8, fontSize: 13, fontWeight: 700, background: '#da3633', color: '#fff' }}>Submit Deletion Request</button>
+                            <button type="button" onClick={() => setIsDeleteAccountOpen(false)} style={{ padding: '8px 16px', borderRadius: 8, fontSize: 13, background: theme === 'light' ? '#ffffff' : '#21262d', color: theme === 'light' ? '#57606a' : '#8b949e', border: theme === 'light' ? '1px solid #d0d7de' : '1px solid #30363d', cursor: 'pointer' }}>Cancel</button>
+                            <button type="submit" style={{ padding: '8px 18px', borderRadius: 8, fontSize: 13, fontWeight: 700, background: '#da3633', color: '#fff', border: 'none', cursor: 'pointer' }}>Submit Deletion Request</button>
                         </div>
                     </form>
                 </Modal>
@@ -539,11 +554,11 @@ function App() {
 // ══════════════════════════════════════════════════════════════════════════════
 function Modal({ children, onClose, title, danger }) {
     return (
-        <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16, zIndex: 50 }}>
-            <div onClick={(e) => e.stopPropagation()} style={{ background: '#161b22', border: `1px solid ${danger ? '#f85149' : '#30363d'}`, borderRadius: 12, maxWidth: 500, width: '100%', padding: 24, boxShadow: '0 20px 60px rgba(0,0,0,0.5)' }}>
+        <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16, zIndex: 50 }}>
+            <div onClick={(e) => e.stopPropagation()} style={{ background: 'var(--bg-surface, #ffffff)', border: `1px solid ${danger ? '#f85149' : 'var(--border-color, #d0d7de)'}`, borderRadius: 16, maxWidth: 500, width: '100%', padding: 24, boxShadow: '0 20px 60px rgba(0,0,0,0.25)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18 }}>
-                    <h3 style={{ fontWeight: 800, fontSize: 16, color: danger ? '#f85149' : '#e6edf3' }}>{title}</h3>
-                    <button onClick={onClose} style={{ color: '#8b949e', fontSize: 18, lineHeight: 1 }}>✕</button>
+                    <h3 style={{ fontWeight: 800, fontSize: 16, color: danger ? '#f85149' : 'var(--text-main, #1f2328)', margin: 0 }}>{title}</h3>
+                    <button onClick={onClose} style={{ color: 'var(--text-muted, #57606a)', fontSize: 18, lineHeight: 1, background: 'none', border: 'none', cursor: 'pointer' }}>✕</button>
                 </div>
                 {children}
             </div>
@@ -609,37 +624,55 @@ function LandingView({ onLogin, onRegister }) {
 // ══════════════════════════════════════════════════════════════════════════════
 // AI CHAT VIEW – Shown immediately after login/register
 // ══════════════════════════════════════════════════════════════════════════════
-function AIChatView({ chatMessages, aiInput, setAiInput, isAiLoading, onSend, chatEndRef, user, onExploreNext }) {
+function AIChatView({ chatMessages, aiInput, setAiInput, isAiLoading, onSend, chatEndRef, user, onExploreNext, theme }) {
+    const isDark = theme !== 'light';
+    const cardBg = isDark ? '#161b22' : '#ffffff';
+    const cardBorder = isDark ? '#30363d' : '#d0d7de';
+    const textMain = isDark ? '#e6edf3' : '#1f2328';
+    const textMuted = isDark ? '#8b949e' : '#57606a';
+    const inputBg = isDark ? '#0d1117' : '#ffffff';
+
     return (
-        <div style={{ maxWidth: 800, margin: '0 auto', display: 'flex', flexDirection: 'column', height: 'calc(100vh - 160px)' }}>
+        <div style={{ maxWidth: 840, margin: '0 auto', display: 'flex', flexDirection: 'column', height: 'calc(100vh - 160px)', boxShadow: isDark ? '0 8px 24px rgba(0,0,0,0.3)' : '0 2px 10px rgba(0,0,0,0.06)', borderRadius: 16, overflow: 'hidden' }}>
             {/* Header */}
-            <div style={{ background: 'linear-gradient(135deg,#0d1f47,#1a1060)', border: '1px solid #30363d', borderRadius: '12px 12px 0 0', padding: '18px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10 }}>
+            <div style={{
+                background: isDark ? 'linear-gradient(135deg,#0d1f47,#1a1060)' : 'linear-gradient(135deg,#e0f2fe,#f0fdf4)',
+                border: '1px solid ' + cardBorder,
+                borderBottom: 'none',
+                padding: '20px 24px',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                flexWrap: 'wrap',
+                gap: 10
+            }}>
                 <div>
-                    <h2 style={{ fontWeight: 800, fontSize: 18, color: '#e6edf3', margin: 0 }}>✨ Gemini AI Copilot</h2>
-                    <p style={{ fontSize: 12, color: '#8b949e', margin: '4px 0 0' }}>Your intelligent code review, analysis & advisory assistant</p>
+                    <h2 style={{ fontWeight: 800, fontSize: 18, color: textMain, margin: 0 }}>✨ Gemini AI Copilot</h2>
+                    <p style={{ fontSize: 12, color: textMuted, margin: '4px 0 0' }}>Your intelligent code review, analysis & advisory assistant</p>
                 </div>
-                <button onClick={onExploreNext} style={{ padding: '8px 18px', borderRadius: 8, fontWeight: 700, fontSize: 13, background: '#21262d', color: '#58a6ff', border: '1px solid #30363d', cursor: 'pointer' }}>
+                <button onClick={onExploreNext} style={{ padding: '8px 18px', borderRadius: 10, fontWeight: 700, fontSize: 13, background: isDark ? '#21262d' : '#ffffff', color: isDark ? '#58a6ff' : '#0969da', border: '1px solid ' + cardBorder, cursor: 'pointer' }}>
                     {user?.role === 'admin' ? '📰 Explore Community Feed →' : '📁 Explore Repositories →'}
                 </button>
             </div>
 
             {/* Messages */}
-            <div style={{ flex: 1, overflowY: 'auto', padding: '20px 24px', background: '#0d1117', border: '1px solid #30363d', borderTop: 'none', display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <div style={{ flex: 1, overflowY: 'auto', padding: '20px 24px', background: isDark ? '#0d1117' : '#f8fafc', borderLeft: '1px solid ' + cardBorder, borderRight: '1px solid ' + cardBorder, display: 'flex', flexDirection: 'column', gap: 12 }}>
                 {chatMessages.map((m, idx) => (
                     <div key={idx} style={{ display: 'flex', justifyContent: m.sender === 'user' ? 'flex-end' : 'flex-start' }}>
                         <div style={{
-                            maxWidth: '82%', padding: '10px 14px', borderRadius: m.sender === 'user' ? '14px 14px 4px 14px' : '14px 14px 14px 4px',
-                            background: m.sender === 'user' ? 'linear-gradient(135deg,#1f6feb,#388bfd)' : '#161b22',
-                            border: m.sender === 'user' ? 'none' : '1px solid #30363d',
-                            color: '#e6edf3', fontSize: 13, lineHeight: 1.6, whiteSpace: 'pre-wrap'
+                            maxWidth: '82%', padding: '10px 16px', borderRadius: m.sender === 'user' ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
+                            background: m.sender === 'user' ? 'linear-gradient(135deg,#1f6feb,#388bfd)' : (isDark ? '#161b22' : '#ffffff'),
+                            border: m.sender === 'user' ? 'none' : '1px solid ' + cardBorder,
+                            color: m.sender === 'user' ? '#ffffff' : textMain, fontSize: 13, lineHeight: 1.6, whiteSpace: 'pre-wrap',
+                            boxShadow: isDark ? 'none' : '0 1px 3px rgba(31,35,40,0.06)'
                         }}>
                             {m.text}
-                            {m.model && <div style={{ fontSize: 10, color: '#58a6ff', marginTop: 6 }}>{m.model}</div>}
+                            {m.model && <div style={{ fontSize: 10, color: isDark ? '#58a6ff' : '#0969da', marginTop: 6, fontWeight: 700 }}>{m.model}</div>}
                         </div>
                     </div>
                 ))}
                 {isAiLoading && (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#8b949e', fontSize: 13 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: textMuted, fontSize: 13 }}>
                         <span style={{ animation: 'shimmer 1.2s infinite' }}>✨</span> Gemini is thinking...
                     </div>
                 )}
@@ -647,10 +680,10 @@ function AIChatView({ chatMessages, aiInput, setAiInput, isAiLoading, onSend, ch
             </div>
 
             {/* Input */}
-            <form onSubmit={onSend} style={{ display: 'flex', gap: 10, padding: '12px 16px', background: '#161b22', border: '1px solid #30363d', borderTop: 'none', borderRadius: '0 0 12px 12px' }}>
+            <form onSubmit={onSend} style={{ display: 'flex', gap: 10, padding: '14px 18px', background: cardBg, border: '1px solid ' + cardBorder }}>
                 <input type="text" placeholder="Ask about code, architecture, security, PR summaries..." value={aiInput} onChange={e => setAiInput(e.target.value)}
-                    style={{ flex: 1, padding: '10px 14px', borderRadius: 8, border: '1px solid #30363d', background: '#0d1117', color: '#e6edf3', fontSize: 13, outline: 'none' }} />
-                <button type="submit" disabled={isAiLoading} style={{ padding: '10px 20px', borderRadius: 8, fontWeight: 700, fontSize: 13, background: isAiLoading ? '#21262d' : 'linear-gradient(135deg,#1f6feb,#388bfd)', color: isAiLoading ? '#8b949e' : '#fff', cursor: isAiLoading ? 'not-allowed' : 'pointer', border: 'none' }}>
+                    style={{ flex: 1, padding: '10px 14px', borderRadius: 10, border: '1px solid ' + cardBorder, background: inputBg, color: textMain, fontSize: 13, outline: 'none' }} />
+                <button type="submit" disabled={isAiLoading} style={{ padding: '10px 22px', borderRadius: 10, fontWeight: 700, fontSize: 13, background: isAiLoading ? (isDark ? '#21262d' : '#e2e8f0') : 'linear-gradient(135deg,#1f6feb,#388bfd)', color: isAiLoading ? textMuted : '#fff', cursor: isAiLoading ? 'not-allowed' : 'pointer', border: 'none' }}>
                     {isAiLoading ? '...' : 'Send'}
                 </button>
             </form>
@@ -661,7 +694,17 @@ function AIChatView({ chatMessages, aiInput, setAiInput, isAiLoading, onSend, ch
 // ══════════════════════════════════════════════════════════════════════════════
 // COMMUNITY FEED VIEW (Upload Content, Screenshots, Code Snippets, Likes)
 // ══════════════════════════════════════════════════════════════════════════════
-function FeedView({ user, showNotify }) {
+function FeedView({ user, showNotify, theme }) {
+    const isDark = theme !== 'light';
+    const cardBg = isDark ? '#161b22' : '#ffffff';
+    const cardBorder = isDark ? '#30363d' : '#d0d7de';
+    const textMain = isDark ? '#e6edf3' : '#1f2328';
+    const textMuted = isDark ? '#8b949e' : '#57606a';
+    const inputBg = isDark ? '#0d1117' : '#ffffff';
+    const innerCardBg = isDark ? '#0d1117' : '#f6f8fa';
+    const innerCardBorder = isDark ? '#21262d' : '#e2e8f0';
+    const shadow = isDark ? '0 8px 24px rgba(0,0,0,0.3)' : '0 1px 3px rgba(31, 35, 40, 0.08)';
+
     const [posts, setPosts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [filterCategory, setFilterCategory] = useState('all');
@@ -776,47 +819,74 @@ function FeedView({ user, showNotify }) {
     const filteredPosts = posts.filter(p => filterCategory === 'all' || p.category === filterCategory);
 
     return (
-        <div style={{ maxWidth: 840, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 24 }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto', width: '100%', display: 'flex', flexDirection: 'column', gap: 24 }}>
             
-            {/* Feed Header */}
-            <div>
-                <h1 style={{ fontWeight: 900, fontSize: 26, color: '#e6edf3', margin: '0 0 6px' }}>
-                    📰 Community Developer Feed
-                </h1>
-                <p style={{ fontSize: 13, color: '#8b949e', margin: 0 }}>
-                    Share your coding milestones, architectural concepts, UI designs, and technical updates with the community.
-                </p>
+            {/* Feed Header Banner */}
+            <div style={{
+                background: isDark ? 'linear-gradient(135deg, #0d1f47, #161b22)' : 'linear-gradient(135deg, #e0f2fe, #f0fdf4)',
+                border: '1px solid ' + cardBorder,
+                borderRadius: 16,
+                padding: '28px 32px',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                flexWrap: 'wrap',
+                gap: 16,
+                boxShadow: isDark ? '0 8px 24px rgba(0,0,0,0.3)' : '0 4px 16px rgba(0,0,0,0.05)'
+            }}>
+                <div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
+                        <span style={{ fontSize: 28 }}>📰</span>
+                        <h1 style={{ margin: 0, fontSize: 24, fontWeight: 900, color: textMain }}>
+                            Community Developer Feed
+                        </h1>
+                    </div>
+                    <p style={{ fontSize: 13, color: textMuted, margin: 0 }}>
+                        Share your coding milestones, architectural concepts, UI designs, and technical updates with the community.
+                    </p>
+                </div>
+                <span style={{
+                    fontSize: 12, padding: '6px 14px', borderRadius: 20, fontWeight: 700,
+                    background: isDark ? 'rgba(88,166,255,0.15)' : '#e0f2fe',
+                    color: isDark ? '#79c0ff' : '#0284c7',
+                    border: '1px solid ' + (isDark ? 'rgba(88,166,255,0.3)' : '#bae6fd')
+                }}>
+                    Live Community Updates
+                </span>
             </div>
 
             {/* Post Creator Box */}
             {user && (
-                <div style={{ background: '#161b22', border: '1px solid #30363d', borderRadius: 14, padding: 20, boxShadow: '0 8px 24px rgba(0,0,0,0.3)' }}>
+                <div style={{ background: cardBg, border: '1px solid ' + cardBorder, borderRadius: 16, padding: 24, boxShadow: shadow }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14 }}>
                         <UserAvatar user={user} size={42} />
                         <div>
-                            <div style={{ fontWeight: 700, fontSize: 14, color: '#e6edf3' }}>{user.full_name || user.username || user.email}</div>
-                            <div style={{ fontSize: 11, color: '#8b949e' }}>Posting to Community Feed</div>
+                            <div style={{ fontWeight: 700, fontSize: 14, color: textMain }}>{user.full_name || user.username || user.email}</div>
+                            <div style={{ fontSize: 11, color: textMuted }}>Posting to Community Feed</div>
                         </div>
                     </div>
 
                     <form onSubmit={handlePublishPost} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                         {/* Category selection */}
                         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                            {categories.map(c => (
-                                <button
-                                    key={c.id}
-                                    type="button"
-                                    onClick={() => setCategory(c.id)}
-                                    style={{
-                                        padding: '4px 12px', borderRadius: 20, fontSize: 11, fontWeight: 700,
-                                        background: category === c.id ? `${c.color}25` : '#0d1117',
-                                        color: category === c.id ? c.color : '#8b949e',
-                                        border: `1px solid ${category === c.id ? c.color : '#30363d'}`,
-                                        cursor: 'pointer'
-                                    }}>
-                                    {c.label}
-                                </button>
-                            ))}
+                            {categories.map(c => {
+                                const isSelected = category === c.id;
+                                return (
+                                    <button
+                                        key={c.id}
+                                        type="button"
+                                        onClick={() => setCategory(c.id)}
+                                        style={{
+                                            padding: '5px 14px', borderRadius: 20, fontSize: 11, fontWeight: 700,
+                                            background: isSelected ? (isDark ? `${c.color}25` : '#e0f2fe') : (isDark ? '#0d1117' : '#f6f8fa'),
+                                            color: isSelected ? (isDark ? c.color : '#0969da') : textMuted,
+                                            border: `1px solid ${isSelected ? (isDark ? c.color : '#bae6fd') : cardBorder}`,
+                                            cursor: 'pointer'
+                                        }}>
+                                        {c.label}
+                                    </button>
+                                );
+                            })}
                         </div>
 
                         {/* Content Textarea */}
@@ -825,12 +895,12 @@ function FeedView({ user, showNotify }) {
                             placeholder="What did you build or learn today? Share a feature update, screenshot, or code..."
                             value={content}
                             onChange={e => setContent(e.target.value)}
-                            style={{ width: '100%', padding: '12px 14px', borderRadius: 10, border: '1px solid #30363d', background: '#0d1117', color: '#e6edf3', fontSize: 13, outline: 'none', resize: 'vertical' }}
+                            style={{ width: '100%', boxSizing: 'border-box', padding: '12px 14px', borderRadius: 10, border: '1px solid ' + cardBorder, background: inputBg, color: textMain, fontSize: 13, outline: 'none', resize: 'vertical' }}
                         />
 
                         {/* Image Preview if attached */}
                         {imagePreview && (
-                            <div style={{ position: 'relative', borderRadius: 10, overflow: 'hidden', border: '1px solid #30363d', maxHeight: 280, background: '#0d1117' }}>
+                            <div style={{ position: 'relative', borderRadius: 10, overflow: 'hidden', border: '1px solid ' + cardBorder, maxHeight: 280, background: innerCardBg }}>
                                 <img src={imagePreview} alt="Attached Preview" style={{ width: '100%', maxHeight: 280, objectFit: 'contain' }} />
                                 <button
                                     type="button"
@@ -843,23 +913,23 @@ function FeedView({ user, showNotify }) {
 
                         {/* Code Snippet Box (Collapsible) */}
                         {showCodeInput && (
-                            <div style={{ background: '#0d1117', border: '1px solid #30363d', borderRadius: 10, padding: 12 }}>
+                            <div style={{ background: innerCardBg, border: '1px solid ' + innerCardBorder, borderRadius: 10, padding: 12 }}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
                                     <span style={{ fontSize: 11, fontWeight: 700, color: '#3fb950', fontFamily: 'monospace' }}>💻 Paste Code Snippet</span>
-                                    <button type="button" onClick={() => { setShowCodeInput(false); setCodeSnippet(''); }} style={{ background: 'none', border: 'none', color: '#8b949e', fontSize: 12, cursor: 'pointer' }}>Cancel</button>
+                                    <button type="button" onClick={() => { setShowCodeInput(false); setCodeSnippet(''); }} style={{ background: 'none', border: 'none', color: textMuted, fontSize: 12, cursor: 'pointer' }}>Cancel</button>
                                 </div>
                                 <textarea
                                     rows="6"
                                     placeholder="// Paste code here..."
                                     value={codeSnippet}
                                     onChange={e => setCodeSnippet(e.target.value)}
-                                    style={{ width: '100%', padding: '10px 12px', borderRadius: 6, border: '1px solid #21262d', background: '#010409', color: '#7ee787', fontFamily: 'monospace', fontSize: 12, outline: 'none', lineHeight: 1.5 }}
+                                    style={{ width: '100%', boxSizing: 'border-box', padding: '10px 12px', borderRadius: 6, border: '1px solid ' + innerCardBorder, background: isDark ? '#010409' : '#ffffff', color: isDark ? '#7ee787' : '#0969da', fontFamily: 'monospace', fontSize: 12, outline: 'none', lineHeight: 1.5 }}
                                 />
                             </div>
                         )}
 
                         {/* Actions bar */}
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: 6, borderTop: '1px solid #21262d' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: 6, borderTop: '1px solid ' + (isDark ? '#21262d' : '#e2e8f0') }}>
                             <div style={{ display: 'flex', gap: 10 }}>
                                 <input
                                     ref={fileInputRef}
@@ -871,13 +941,13 @@ function FeedView({ user, showNotify }) {
                                 <button
                                     type="button"
                                     onClick={() => fileInputRef.current?.click()}
-                                    style={{ padding: '6px 12px', borderRadius: 6, background: '#21262d', border: '1px solid #30363d', color: '#58a6ff', fontSize: 12, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
+                                    style={{ padding: '6px 14px', borderRadius: 8, background: isDark ? '#21262d' : '#f6f8fa', border: '1px solid ' + cardBorder, color: isDark ? '#58a6ff' : '#0969da', fontSize: 12, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
                                     🖼️ Upload Image
                                 </button>
                                 <button
                                     type="button"
                                     onClick={() => setShowCodeInput(s => !s)}
-                                    style={{ padding: '6px 12px', borderRadius: 6, background: '#21262d', border: '1px solid #30363d', color: '#3fb950', fontSize: 12, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
+                                    style={{ padding: '6px 14px', borderRadius: 8, background: isDark ? '#21262d' : '#f6f8fa', border: '1px solid ' + cardBorder, color: isDark ? '#3fb950' : '#15803d', fontSize: 12, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
                                     💻 Add Code
                                 </button>
                             </div>
@@ -886,9 +956,9 @@ function FeedView({ user, showNotify }) {
                                 type="submit"
                                 disabled={publishing}
                                 style={{
-                                    padding: '8px 24px', borderRadius: 8, fontWeight: 800, fontSize: 13,
-                                    background: publishing ? '#21262d' : 'linear-gradient(135deg, #238636, #2ea043)',
-                                    color: publishing ? '#8b949e' : '#fff', border: 'none',
+                                    padding: '8px 24px', borderRadius: 10, fontWeight: 800, fontSize: 13,
+                                    background: publishing ? (isDark ? '#21262d' : '#e2e8f0') : 'linear-gradient(135deg, #238636, #2ea043)',
+                                    color: publishing ? textMuted : '#fff', border: 'none',
                                     cursor: publishing ? 'not-allowed' : 'pointer',
                                     boxShadow: publishing ? 'none' : '0 4px 14px rgba(35,134,54,0.35)'
                                 }}>
@@ -900,28 +970,32 @@ function FeedView({ user, showNotify }) {
             )}
 
             {/* Filter Tabs */}
-            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', borderBottom: '1px solid #21262d', paddingBottom: 10 }}>
-                {[{ id: 'all', label: 'All Updates' }, ...categories].map(c => (
-                    <button
-                        key={c.id}
-                        onClick={() => setFilterCategory(c.id)}
-                        style={{
-                            padding: '6px 14px', borderRadius: 8, fontSize: 12, fontWeight: 700,
-                            background: filterCategory === c.id ? '#1f6feb' : '#161b22',
-                            color: filterCategory === c.id ? '#fff' : '#8b949e',
-                            border: `1px solid ${filterCategory === c.id ? '#1f6feb' : '#30363d'}`,
-                            cursor: 'pointer'
-                        }}>
-                        {c.label}
-                    </button>
-                ))}
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                {[{ id: 'all', label: 'All Updates' }, ...categories].map(c => {
+                    const isSelected = filterCategory === c.id;
+                    return (
+                        <button
+                            key={c.id}
+                            onClick={() => setFilterCategory(c.id)}
+                            style={{
+                                padding: '6px 16px', borderRadius: 20, fontSize: 12, fontWeight: 700,
+                                background: isSelected ? (isDark ? '#1f6feb' : '#e0f2fe') : (isDark ? '#161b22' : '#ffffff'),
+                                color: isSelected ? (isDark ? '#fff' : '#0969da') : textMuted,
+                                border: `1px solid ${isSelected ? (isDark ? '#1f6feb' : '#bae6fd') : cardBorder}`,
+                                cursor: 'pointer'
+                            }}>
+                            {c.label}
+                        </button>
+                    );
+                })}
             </div>
 
             {/* Feed Posts Stream */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                 {loading && (
-                    <div style={{ textAlign: 'center', padding: 40, color: '#8b949e' }}>
-                        Loading community feed updates...
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '60px 20px', gap: 12 }}>
+                        <div style={{ width: 36, height: 36, border: '3px solid rgba(88, 166, 255, 0.2)', borderTopColor: '#58a6ff', borderRadius: '50%', animation: 'codehubSpin 0.75s linear infinite' }} />
+                        <div style={{ fontWeight: 600, fontSize: 14, color: '#8b949e' }}>Loading community feed updates…</div>
                     </div>
                 )}
 
@@ -930,23 +1004,23 @@ function FeedView({ user, showNotify }) {
                     const isAuthorOrAdmin = user && (user.role === 'admin' || user.id == post.user_id);
 
                     return (
-                        <div key={post.id} style={{ background: '#161b22', border: '1px solid #21262d', borderRadius: 14, padding: 22, display: 'flex', flexDirection: 'column', gap: 14, boxShadow: '0 4px 16px rgba(0,0,0,0.2)' }}>
+                        <div key={post.id} style={{ background: cardBg, border: '1px solid ' + cardBorder, borderRadius: 16, padding: 24, display: 'flex', flexDirection: 'column', gap: 14, boxShadow: shadow }}>
                             {/* Author row */}
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                                     <UserAvatar user={{ full_name: post.full_name, username: post.username, email: post.email, avatar_url: post.avatar_url }} size={42} />
                                     <div>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                            <span style={{ fontWeight: 800, fontSize: 14, color: '#e6edf3' }}>{post.full_name || post.username || post.email}</span>
+                                            <span style={{ fontWeight: 800, fontSize: 14, color: textMain }}>{post.full_name || post.username || post.email}</span>
                                             {post.role_type === 'admin' && (
-                                                <span style={{ fontSize: 9, padding: '1px 6px', borderRadius: 4, background: '#3d1f6e', color: '#d2a8ff', fontWeight: 800, textTransform: 'uppercase' }}>ADMIN</span>
+                                                <span style={{ fontSize: 9, padding: '1px 6px', borderRadius: 4, background: isDark ? '#3d1f6e' : '#f3e8ff', color: isDark ? '#d2a8ff' : '#7c3aed', fontWeight: 800, textTransform: 'uppercase' }}>ADMIN</span>
                                             )}
-                                            <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 12, fontWeight: 700, background: `${catObj.color}20`, color: catObj.color, border: `1px solid ${catObj.color}40` }}>
+                                            <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 12, fontWeight: 700, background: isDark ? `${catObj.color}20` : '#e0f2fe', color: isDark ? catObj.color : '#0284c7', border: `1px solid ${isDark ? catObj.color + '40' : '#bae6fd'}` }}>
                                                 {catObj.label}
                                             </span>
                                         </div>
-                                        <div style={{ fontSize: 11, color: '#8b949e', marginTop: 2 }}>
-                                            {post.username && <span style={{ color: '#58a6ff', fontFamily: 'monospace' }}>@{post.username} • </span>}
+                                        <div style={{ fontSize: 11, color: textMuted, marginTop: 2 }}>
+                                            {post.username && <span style={{ color: isDark ? '#58a6ff' : '#0969da', fontFamily: 'monospace' }}>@{post.username} • </span>}
                                             <span>{post.created_at}</span>
                                         </div>
                                     </div>
@@ -957,9 +1031,9 @@ function FeedView({ user, showNotify }) {
                                         type="button"
                                         onClick={() => handleDeletePost(post.id)}
                                         title="Delete Post"
-                                        style={{ background: 'none', border: 'none', color: '#8b949e', cursor: 'pointer', fontSize: 14, padding: 4 }}
+                                        style={{ background: 'none', border: 'none', color: textMuted, cursor: 'pointer', fontSize: 14, padding: 4 }}
                                         onMouseEnter={e => e.currentTarget.style.color = '#f85149'}
-                                        onMouseLeave={e => e.currentTarget.style.color = '#8b949e'}>
+                                        onMouseLeave={e => e.currentTarget.style.color = textMuted}>
                                         🗑️
                                     </button>
                                 )}
@@ -967,65 +1041,65 @@ function FeedView({ user, showNotify }) {
 
                             {/* Content Text */}
                             {post.content && (
-                                <p style={{ fontSize: 13, color: '#e6edf3', lineHeight: 1.6, margin: 0, whiteSpace: 'pre-wrap' }}>
+                                <p style={{ fontSize: 13, color: textMain, lineHeight: 1.6, margin: 0, whiteSpace: 'pre-wrap' }}>
                                     {post.content}
                                 </p>
                             )}
 
                             {/* Attached Image */}
                             {post.image_url && (
-                                <div style={{ borderRadius: 10, overflow: 'hidden', border: '1px solid #30363d', background: '#0d1117' }}>
+                                <div style={{ borderRadius: 10, overflow: 'hidden', border: '1px solid ' + cardBorder, background: innerCardBg }}>
                                     <img src={post.image_url} alt="Attached Content" style={{ width: '100%', maxHeight: 440, objectFit: 'contain', display: 'block' }} />
                                 </div>
                             )}
 
                             {/* Code Snippet Box */}
                             {post.code_snippet && (
-                                <div style={{ background: '#010409', border: '1px solid #30363d', borderRadius: 8, overflow: 'hidden' }}>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '6px 12px', background: '#0d1117', borderBottom: '1px solid #21262d' }}>
-                                        <span style={{ fontSize: 11, fontFamily: 'monospace', color: '#3fb950', fontWeight: 700 }}>💻 Code Snippet</span>
+                                <div style={{ background: isDark ? '#010409' : '#f6f8fa', border: '1px solid ' + cardBorder, borderRadius: 8, overflow: 'hidden' }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '6px 12px', background: innerCardBg, borderBottom: '1px solid ' + innerCardBorder }}>
+                                        <span style={{ fontSize: 11, fontFamily: 'monospace', color: isDark ? '#3fb950' : '#15803d', fontWeight: 700 }}>💻 Code Snippet</span>
                                         <button
                                             type="button"
                                             onClick={() => {
                                                 navigator.clipboard.writeText(post.code_snippet);
                                                 showNotify('Code copied to clipboard! 📋');
                                             }}
-                                            style={{ background: 'none', border: 'none', color: '#58a6ff', fontSize: 11, cursor: 'pointer' }}>
+                                            style={{ background: 'none', border: 'none', color: isDark ? '#58a6ff' : '#0969da', fontSize: 11, cursor: 'pointer' }}>
                                             Copy Code
                                         </button>
                                     </div>
-                                    <pre style={{ margin: 0, padding: 14, fontSize: 12, fontFamily: 'monospace', color: '#7ee787', overflowX: 'auto', lineHeight: 1.5 }}>
+                                    <pre style={{ margin: 0, padding: 14, fontSize: 12, fontFamily: 'monospace', color: isDark ? '#7ee787' : '#0969da', overflowX: 'auto', lineHeight: 1.5 }}>
                                         <code>{post.code_snippet}</code>
                                     </pre>
                                 </div>
                             )}
 
                             {/* Post Footer / Like interaction */}
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 16, paddingTop: 10, borderTop: '1px solid #21262d', fontSize: 12 }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 16, paddingTop: 10, borderTop: '1px solid ' + (isDark ? '#21262d' : '#e2e8f0'), fontSize: 12 }}>
                                 <button
                                     type="button"
                                     onClick={() => handleToggleLike(post.id)}
                                     style={{
                                         display: 'flex', alignItems: 'center', gap: 6,
-                                        background: post.user_has_liked ? 'rgba(248,81,73,0.15)' : 'transparent',
-                                        border: `1px solid ${post.user_has_liked ? 'rgba(248,81,73,0.4)' : '#30363d'}`,
-                                        color: post.user_has_liked ? '#f85149' : '#8b949e',
-                                        padding: '5px 12px', borderRadius: 20, cursor: 'pointer', fontWeight: 700
+                                        background: post.user_has_liked ? (isDark ? 'rgba(248,81,73,0.15)' : '#fee2e2') : (isDark ? 'transparent' : '#f6f8fa'),
+                                        border: `1px solid ${post.user_has_liked ? (isDark ? 'rgba(248,81,73,0.4)' : '#fca5a5') : cardBorder}`,
+                                        color: post.user_has_liked ? '#f85149' : textMuted,
+                                        padding: '5px 14px', borderRadius: 20, cursor: 'pointer', fontWeight: 700
                                     }}>
                                     <span>{post.user_has_liked ? '❤️' : '🤍'}</span>
                                     <span>{post.likes_count}</span>
                                 </button>
-                                <span style={{ color: '#8b949e' }}>💬 Discussion Active</span>
+                                <span style={{ color: textMuted }}>💬 Discussion Active</span>
                             </div>
                         </div>
                     );
                 })}
 
                 {!loading && filteredPosts.length === 0 && (
-                    <div style={{ textAlign: 'center', padding: 60, background: '#161b22', border: '1px solid #21262d', borderRadius: 14, color: '#8b949e' }}>
+                    <div style={{ textAlign: 'center', padding: 60, background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: 16, color: textMuted, boxShadow: shadow }}>
                         <div style={{ fontSize: 36, marginBottom: 10 }}>📰</div>
-                        <p style={{ margin: 0, fontWeight: 600 }}>No posts in this category yet.</p>
-                        <p style={{ fontSize: 12, marginTop: 4 }}>Be the first to share your project update or code snippet above!</p>
+                        <p style={{ margin: 0, fontWeight: 700, fontSize: 15, color: textMain }}>No posts in this category yet.</p>
+                        <p style={{ fontSize: 13, marginTop: 4 }}>Be the first to share your project update or code snippet above!</p>
                     </div>
                 )}
             </div>
@@ -1080,7 +1154,29 @@ function JobsView({ user, showNotify, theme }) {
     const [newDesc, setNewDesc] = useState('');
     const [newReqs, setNewReqs] = useState('');
     const [newSkills, setNewSkills] = useState('');
+    const [newImageUrl, setNewImageUrl] = useState('');
     const [creatingJob, setCreatingJob] = useState(false);
+    const [uploadingJobImage, setUploadingJobImage] = useState(false);
+
+    const ROLE_DEFAULT_IMAGES = {
+        'Full Stack': '/uploads/jobs/role_full_stack.jpg',
+        'Frontend': '/uploads/jobs/role_frontend.jpg',
+        'Backend': '/uploads/jobs/role_backend.jpg',
+        'AI / ML Engineer': '/uploads/jobs/role_ai_ml.jpg',
+        'DevOps / Cloud': '/uploads/jobs/role_devops.jpg',
+        'Mobile Developer': '/uploads/jobs/role_mobile.jpg',
+        'Cybersecurity': '/uploads/jobs/role_cybersecurity.jpg',
+        'UI/UX & Product': '/uploads/jobs/role_ui_ux.jpg',
+        'Engineering Manager': '/uploads/jobs/role_engineering_manager.jpg',
+        'QA & Testing': '/uploads/jobs/job_42_qa_testing.jpg',
+        'Data Engineer': '/uploads/jobs/job_17_data_engineer.jpg',
+        'Blockchain & Web3': '/uploads/jobs/job_44_blockchain_web3.jpg',
+        'Other': '/uploads/jobs/role_other.jpg'
+    };
+
+    const getRoleFallbackImage = (role) => {
+        return ROLE_DEFAULT_IMAGES[role] || ROLE_DEFAULT_IMAGES['Full Stack'];
+    };
 
     const rolesList = [
         'All Roles',
@@ -1093,6 +1189,9 @@ function JobsView({ user, showNotify, theme }) {
         'Cybersecurity',
         'UI/UX & Product',
         'Engineering Manager',
+        'QA & Testing',
+        'Data Engineer',
+        'Blockchain & Web3',
         'Other'
     ];
 
@@ -1246,6 +1345,35 @@ function JobsView({ user, showNotify, theme }) {
         }
     };
 
+    // Admin: Upload job image file directly to local server storage
+    const handleJobImageUpload = async (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+        try {
+            setUploadingJobImage(true);
+            const formData = new FormData();
+            formData.append('image', file);
+
+            const token = localStorage.getItem('token');
+            const res = await fetch('/api/jobs/upload-image', {
+                method: 'POST',
+                headers: {
+                    ...(token ? { 'Authorization': 'Bearer ' + token } : {})
+                },
+                body: formData
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || 'Failed to upload image');
+            setNewImageUrl(data.image_url);
+            showNotify('Image uploaded and stored in folder! 📁');
+        } catch (err) {
+            showNotify(err.message, 'error');
+        } finally {
+            setUploadingJobImage(false);
+            if (e.target) e.target.value = '';
+        }
+    };
+
     // Admin: Post New Job
     const handleCreateJob = async (e) => {
         e.preventDefault();
@@ -1272,7 +1400,8 @@ function JobsView({ user, showNotify, theme }) {
                 location: newLocation.trim(),
                 description: newDesc.trim(),
                 requirements: reqsArray,
-                skills: skillsArray
+                skills: skillsArray,
+                image_url: newImageUrl.trim()
             });
 
             showNotify('New job opportunity published successfully! 🎉');
@@ -1282,6 +1411,7 @@ function JobsView({ user, showNotify, theme }) {
             setNewDesc('');
             setNewReqs('');
             setNewSkills('');
+            setNewImageUrl('');
             fetchJobs();
         } catch (err) {
             showNotify(err.message, 'error');
@@ -1311,7 +1441,39 @@ function JobsView({ user, showNotify, theme }) {
     );
 
     return (
-        <div style={{ maxWidth: 1100, margin: '0 auto', width: '100%', display: 'flex', flexDirection: 'column', gap: 24 }}>
+        <div style={{ maxWidth: 1360, margin: '0 auto', width: '100%', display: 'flex', flexDirection: 'column', gap: 24 }}>
+            <style>{`
+                .codehub-jobs-grid {
+                    display: grid;
+                    grid-template-columns: repeat(4, minmax(0, 1fr));
+                    gap: 16px;
+                }
+                @media (max-width: 1200px) {
+                    .codehub-jobs-grid {
+                        grid-template-columns: repeat(3, minmax(0, 1fr));
+                    }
+                }
+                @media (max-width: 860px) {
+                    .codehub-jobs-grid {
+                        grid-template-columns: repeat(2, minmax(0, 1fr));
+                    }
+                }
+                @media (max-width: 560px) {
+                    .codehub-jobs-grid {
+                        grid-template-columns: 1fr;
+                    }
+                }
+                .codehub-job-card {
+                    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+                }
+                .codehub-job-card:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 8px 24px rgba(0,0,0,0.12) !important;
+                }
+                .codehub-job-card:hover .codehub-job-img {
+                    transform: scale(1.04);
+                }
+            `}</style>
             {/* Header banner */}
             <div style={{
                 background: isDark 
@@ -1583,9 +1745,9 @@ function JobsView({ user, showNotify, theme }) {
 
                     {/* Jobs List */}
                     {loading ? (
-                        <div style={{ textAlign: 'center', padding: 50, color: textMuted }}>
-                            <div style={{ fontSize: 32, marginBottom: 8 }}>⏳</div>
-                            <div>Querying live job listings from MongoDB Compass...</div>
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 50, gap: 12 }}>
+                            <div style={{ width: 36, height: 36, border: '3px solid rgba(88, 166, 255, 0.2)', borderTopColor: '#58a6ff', borderRadius: '50%', animation: 'codehubSpin 0.75s linear infinite' }} />
+                            <div style={{ color: textMuted, fontSize: 13, fontWeight: 500 }}>Querying live job listings from MongoDB...</div>
                         </div>
                     ) : jobs.length === 0 ? (
                         <div style={{
@@ -1617,105 +1779,243 @@ function JobsView({ user, showNotify, theme }) {
                             </button>
                         </div>
                     ) : (
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+                        <div className="codehub-jobs-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: 16 }}>
                             {jobs.map(job => {
                                 const hasApplied = appliedJobIds.has(job.id);
                                 const isJobOpen = job.status === 'open';
+                                const jobImgSrc = job.image_url || getRoleFallbackImage(job.role);
 
                                 return (
                                     <div
                                         key={job.id}
+                                        className="codehub-job-card"
                                         style={{
                                             background: cardBg,
                                             border: '1px solid ' + (isJobOpen ? cardBorder : 'rgba(248,81,73,0.3)'),
                                             borderRadius: 14,
-                                            padding: '20px 24px',
+                                            overflow: 'hidden',
                                             display: 'flex',
                                             flexDirection: 'column',
-                                            gap: 12,
-                                            transition: 'border-color 0.2s',
-                                            boxShadow: isDark ? '0 2px 8px rgba(0,0,0,0.2)' : '0 2px 8px rgba(0,0,0,0.04)'
+                                            boxShadow: isDark ? '0 2px 8px rgba(0,0,0,0.2)' : '0 2px 8px rgba(0,0,0,0.04)',
+                                            position: 'relative'
                                         }}
                                     >
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 12 }}>
+                                        {/* Top Image Banner with Representative Imagery */}
+                                        <div style={{
+                                            position: 'relative',
+                                            width: '100%',
+                                            height: 135,
+                                            background: isDark ? '#21262d' : '#e2e8f0',
+                                            overflow: 'hidden'
+                                        }}>
+                                            <img
+                                                className="codehub-job-img"
+                                                src={jobImgSrc}
+                                                alt={job.title}
+                                                onError={(e) => {
+                                                    e.currentTarget.onerror = null;
+                                                    e.currentTarget.src = getRoleFallbackImage(job.role);
+                                                }}
+                                                style={{
+                                                    width: '100%',
+                                                    height: '100%',
+                                                    objectFit: 'cover',
+                                                    display: 'block',
+                                                    transition: 'transform 0.3s ease'
+                                                }}
+                                            />
+                                            {/* Status Badge overlay */}
+                                            <span style={{
+                                                position: 'absolute',
+                                                top: 10,
+                                                right: 10,
+                                                padding: '3px 8px',
+                                                borderRadius: 12,
+                                                fontSize: 10,
+                                                fontWeight: 800,
+                                                letterSpacing: '0.5px',
+                                                background: isJobOpen ? 'rgba(35, 134, 54, 0.92)' : 'rgba(218, 54, 51, 0.92)',
+                                                color: '#ffffff',
+                                                boxShadow: '0 2px 6px rgba(0,0,0,0.25)',
+                                                backdropFilter: 'blur(4px)'
+                                            }}>
+                                                {isJobOpen ? '🟢 OPEN' : '🔴 CLOSED'}
+                                            </span>
+
+                                            {/* Role overlay pill */}
+                                            <span style={{
+                                                position: 'absolute',
+                                                bottom: 10,
+                                                left: 10,
+                                                padding: '3px 9px',
+                                                borderRadius: 10,
+                                                fontSize: 11,
+                                                fontWeight: 700,
+                                                background: 'rgba(15, 23, 42, 0.88)',
+                                                color: '#58a6ff',
+                                                border: '1px solid rgba(88, 166, 255, 0.3)',
+                                                backdropFilter: 'blur(6px)',
+                                                maxWidth: '75%',
+                                                overflow: 'hidden',
+                                                textOverflow: 'ellipsis',
+                                                whiteSpace: 'nowrap'
+                                            }}>
+                                                {job.role}
+                                            </span>
+
+                                            {/* Type overlay badge */}
+                                            <span style={{
+                                                position: 'absolute',
+                                                bottom: 10,
+                                                right: 10,
+                                                padding: '3px 8px',
+                                                borderRadius: 10,
+                                                fontSize: 10,
+                                                fontWeight: 700,
+                                                background: 'rgba(15, 23, 42, 0.85)',
+                                                color: '#3fb950',
+                                                border: '1px solid rgba(63, 185, 80, 0.3)',
+                                                backdropFilter: 'blur(6px)'
+                                            }}>
+                                                {job.type}
+                                            </span>
+                                        </div>
+
+                                        {/* Card Content Area */}
+                                        <div style={{
+                                            padding: '14px 16px',
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            flex: 1,
+                                            justifyContent: 'space-between',
+                                            gap: 10
+                                        }}>
                                             <div>
-                                                <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
-                                                    <h3 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: textMain }}>
-                                                        {job.title}
-                                                    </h3>
+                                                {/* Company & Location */}
+                                                <div style={{
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'space-between',
+                                                    gap: 6,
+                                                    fontSize: 12,
+                                                    marginBottom: 4
+                                                }}>
                                                     <span style={{
-                                                        padding: '3px 10px',
-                                                        borderRadius: 12,
-                                                        fontSize: 11,
                                                         fontWeight: 700,
-                                                        background: 'rgba(88,166,255,0.15)',
-                                                        color: '#58a6ff',
-                                                        border: '1px solid rgba(88,166,255,0.3)'
+                                                        color: textMain,
+                                                        overflow: 'hidden',
+                                                        textOverflow: 'ellipsis',
+                                                        whiteSpace: 'nowrap',
+                                                        maxWidth: '65%'
                                                     }}>
-                                                        {job.role}
+                                                        🏢 {job.company}
                                                     </span>
                                                     <span style={{
-                                                        padding: '3px 10px',
-                                                        borderRadius: 12,
+                                                        color: textMuted,
                                                         fontSize: 11,
-                                                        fontWeight: 700,
-                                                        background: 'rgba(63,185,80,0.15)',
-                                                        color: '#3fb950',
-                                                        border: '1px solid rgba(63,185,80,0.3)'
+                                                        overflow: 'hidden',
+                                                        textOverflow: 'ellipsis',
+                                                        whiteSpace: 'nowrap'
                                                     }}>
-                                                        {job.type}
+                                                        📍 {job.location}
+                                                    </span>
+                                                </div>
+
+                                                {/* Job Title */}
+                                                <h3
+                                                    title={job.title}
+                                                    style={{
+                                                        margin: '4px 0 6px 0',
+                                                        fontSize: 15,
+                                                        fontWeight: 800,
+                                                        color: textMain,
+                                                        lineHeight: 1.35,
+                                                        minHeight: 40,
+                                                        display: '-webkit-box',
+                                                        WebkitLineClamp: 2,
+                                                        WebkitBoxOrient: 'vertical',
+                                                        overflow: 'hidden'
+                                                    }}
+                                                >
+                                                    {job.title}
+                                                </h3>
+
+                                                {/* Salary & Experience */}
+                                                <div style={{
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'space-between',
+                                                    gap: 6,
+                                                    marginBottom: 8
+                                                }}>
+                                                    <span style={{ fontWeight: 800, fontSize: 13, color: '#2da44e' }}>
+                                                        💰 {job.salary}
                                                     </span>
                                                     <span style={{
-                                                        padding: '3px 10px',
-                                                        borderRadius: 12,
                                                         fontSize: 11,
-                                                        fontWeight: 700,
-                                                        background: 'rgba(210,168,255,0.15)',
-                                                        color: '#d2a8ff',
-                                                        border: '1px solid rgba(210,168,255,0.3)'
+                                                        fontWeight: 600,
+                                                        color: textMuted,
+                                                        padding: '2px 6px',
+                                                        borderRadius: 6,
+                                                        background: isDark ? '#21262d' : '#f1f5f9'
                                                     }}>
                                                         {job.experienceLevel}
                                                     </span>
-                                                    <span style={{
-                                                        padding: '3px 10px',
-                                                        borderRadius: 12,
-                                                        fontSize: 11,
-                                                        fontWeight: 700,
-                                                        background: isJobOpen ? 'rgba(63,185,80,0.15)' : 'rgba(248,81,73,0.15)',
-                                                        color: isJobOpen ? '#3fb950' : '#f85149',
-                                                        border: `1px solid ${isJobOpen ? 'rgba(63,185,80,0.3)' : 'rgba(248,81,73,0.3)'}`
-                                                    }}>
-                                                        {isJobOpen ? '🟢 OPEN' : '🔴 CLOSED'}
-                                                    </span>
                                                 </div>
-                                                <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginTop: 6, fontSize: 13, color: textMuted, flexWrap: 'wrap' }}>
-                                                    <span style={{ fontWeight: 700, color: textMain }}>🏢 {job.company}</span>
-                                                    <span>📍 {job.location}</span>
-                                                    <span style={{ fontWeight: 700, color: '#3fb950' }}>💰 {job.salary}</span>
-                                                    <span>👥 {job.applicants_count || 0} applicants</span>
-                                                </div>
+
+                                                {/* Description preview */}
+                                                <p style={{
+                                                    margin: '0 0 10px 0',
+                                                    fontSize: 12,
+                                                    color: textMuted,
+                                                    lineHeight: 1.45,
+                                                    display: '-webkit-box',
+                                                    WebkitLineClamp: 2,
+                                                    WebkitBoxOrient: 'vertical',
+                                                    overflow: 'hidden'
+                                                }}>
+                                                    {job.description}
+                                                </p>
+
+                                                {/* Skills pills */}
+                                                {job.skills && job.skills.length > 0 && (
+                                                    <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap', alignItems: 'center', marginBottom: 6 }}>
+                                                        {job.skills.slice(0, 3).map((skill, sIdx) => (
+                                                            <span
+                                                                key={sIdx}
+                                                                style={{
+                                                                    fontSize: 10,
+                                                                    padding: '2px 6px',
+                                                                    borderRadius: 6,
+                                                                    background: isDark ? '#21262d' : '#f1f5f9',
+                                                                    color: textMain,
+                                                                    border: '1px solid ' + cardBorder,
+                                                                    fontWeight: 600
+                                                                }}
+                                                            >
+                                                                {skill}
+                                                            </span>
+                                                        ))}
+                                                        {job.skills.length > 3 && (
+                                                            <span style={{
+                                                                fontSize: 10,
+                                                                padding: '2px 5px',
+                                                                borderRadius: 6,
+                                                                background: isDark ? 'rgba(88,166,255,0.1)' : '#eff6ff',
+                                                                color: '#58a6ff',
+                                                                fontWeight: 700
+                                                            }}>
+                                                                +{job.skills.length - 3}
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                )}
                                             </div>
 
-                                            {/* Action buttons */}
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                                            {/* Bottom Action buttons */}
+                                            <div style={{ borderTop: '1px solid ' + cardBorder, paddingTop: 10 }}>
                                                 {isAdmin ? (
-                                                    <>
-                                                        <button
-                                                            onClick={() => handleToggleJobStatus(job.id, job.status)}
-                                                            title="Toggle Open / Closed status"
-                                                            style={{
-                                                                padding: '7px 12px',
-                                                                borderRadius: 8,
-                                                                fontSize: 12,
-                                                                fontWeight: 700,
-                                                                background: isJobOpen ? 'rgba(248,81,73,0.15)' : 'rgba(63,185,80,0.15)',
-                                                                color: isJobOpen ? '#f85149' : '#3fb950',
-                                                                border: '1px solid ' + (isJobOpen ? 'rgba(248,81,73,0.3)' : 'rgba(63,185,80,0.3)'),
-                                                                cursor: 'pointer'
-                                                            }}
-                                                        >
-                                                            {isJobOpen ? 'Close Position' : 'Re-open'}
-                                                        </button>
+                                                    <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
                                                         <button
                                                             onClick={() => {
                                                                 setSelectedJob(job);
@@ -1723,23 +2023,43 @@ function JobsView({ user, showNotify, theme }) {
                                                                 setIsApplyModalOpen(true);
                                                             }}
                                                             style={{
-                                                                padding: '7px 14px',
+                                                                flex: 1,
+                                                                padding: '7px 8px',
                                                                 borderRadius: 8,
                                                                 fontWeight: 700,
-                                                                fontSize: 12,
+                                                                fontSize: 11,
                                                                 background: '#1f6feb',
                                                                 color: '#ffffff',
                                                                 border: 'none',
+                                                                cursor: 'pointer',
+                                                                whiteSpace: 'nowrap',
+                                                                overflow: 'hidden',
+                                                                textOverflow: 'ellipsis'
+                                                            }}
+                                                        >
+                                                            ⚙️ Manage ({job.applicants_count || 0})
+                                                        </button>
+                                                        <button
+                                                            onClick={() => handleToggleJobStatus(job.id, job.status)}
+                                                            title="Toggle Open / Closed status"
+                                                            style={{
+                                                                padding: '7px 8px',
+                                                                borderRadius: 8,
+                                                                fontSize: 11,
+                                                                fontWeight: 700,
+                                                                background: isJobOpen ? 'rgba(248,81,73,0.15)' : 'rgba(63,185,80,0.15)',
+                                                                color: isJobOpen ? '#f85149' : '#3fb950',
+                                                                border: '1px solid ' + (isJobOpen ? 'rgba(248,81,73,0.3)' : 'rgba(63,185,80,0.3)'),
                                                                 cursor: 'pointer'
                                                             }}
                                                         >
-                                                            ⚙️ Manage & Applicants ({job.applicants_count || 0})
+                                                            {isJobOpen ? 'Close' : 'Re-open'}
                                                         </button>
                                                         <button
                                                             onClick={() => handleDeleteJob(job.id, job.title)}
                                                             title="Delete Job Posting"
                                                             style={{
-                                                                padding: '7px 10px',
+                                                                padding: '7px 8px',
                                                                 borderRadius: 8,
                                                                 fontSize: 12,
                                                                 background: 'rgba(248,81,73,0.1)',
@@ -1750,67 +2070,69 @@ function JobsView({ user, showNotify, theme }) {
                                                         >
                                                             🗑️
                                                         </button>
-                                                    </>
+                                                    </div>
                                                 ) : (
-                                                    <>
-                                                        {hasApplied && (
-                                                            <span style={{
-                                                                padding: '6px 14px',
-                                                                borderRadius: 20,
-                                                                fontSize: 12,
-                                                                fontWeight: 800,
-                                                                background: 'rgba(63,185,80,0.15)',
-                                                                color: '#3fb950',
-                                                                border: '1px solid rgba(63,185,80,0.4)'
-                                                            }}>
-                                                                ✓ Applied
-                                                            </span>
+                                                    <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                                                        {hasApplied ? (
+                                                            <>
+                                                                <span style={{
+                                                                    padding: '6px 10px',
+                                                                    borderRadius: 8,
+                                                                    fontSize: 11,
+                                                                    fontWeight: 800,
+                                                                    background: 'rgba(63,185,80,0.15)',
+                                                                    color: '#3fb950',
+                                                                    border: '1px solid rgba(63,185,80,0.3)',
+                                                                    display: 'flex',
+                                                                    alignItems: 'center',
+                                                                    gap: 4
+                                                                }}>
+                                                                    ✓ Applied
+                                                                </span>
+                                                                <button
+                                                                    onClick={() => { setSelectedJob(job); setIsApplyModalOpen(true); }}
+                                                                    style={{
+                                                                        flex: 1,
+                                                                        padding: '7px 10px',
+                                                                        borderRadius: 8,
+                                                                        fontWeight: 700,
+                                                                        fontSize: 12,
+                                                                        background: 'transparent',
+                                                                        color: '#58a6ff',
+                                                                        border: '1px solid #1f6feb',
+                                                                        cursor: 'pointer'
+                                                                    }}
+                                                                >
+                                                                    Details
+                                                                </button>
+                                                            </>
+                                                        ) : (
+                                                            <button
+                                                                onClick={() => { setSelectedJob(job); setIsApplyModalOpen(true); }}
+                                                                style={{
+                                                                    width: '100%',
+                                                                    padding: '8px 12px',
+                                                                    borderRadius: 8,
+                                                                    fontWeight: 700,
+                                                                    fontSize: 12,
+                                                                    background: '#1f6feb',
+                                                                    color: '#ffffff',
+                                                                    border: 'none',
+                                                                    cursor: 'pointer',
+                                                                    display: 'flex',
+                                                                    alignItems: 'center',
+                                                                    justifyContent: 'center',
+                                                                    gap: 6
+                                                                }}
+                                                            >
+                                                                <span>View & Apply</span>
+                                                                <span>→</span>
+                                                            </button>
                                                         )}
-                                                        <button
-                                                            onClick={() => { setSelectedJob(job); setIsApplyModalOpen(true); }}
-                                                            style={{
-                                                                padding: '8px 18px',
-                                                                borderRadius: 10,
-                                                                fontWeight: 700,
-                                                                fontSize: 13,
-                                                                background: hasApplied ? 'transparent' : '#1f6feb',
-                                                                color: hasApplied ? '#58a6ff' : '#ffffff',
-                                                                border: hasApplied ? '1px solid #1f6feb' : 'none',
-                                                                cursor: 'pointer'
-                                                            }}
-                                                        >
-                                                            {hasApplied ? 'View Details' : 'View & Apply →'}
-                                                        </button>
-                                                    </>
+                                                    </div>
                                                 )}
                                             </div>
                                         </div>
-
-                                        <p style={{ margin: 0, fontSize: 13, color: textMuted, lineHeight: 1.5 }}>
-                                            {job.description}
-                                        </p>
-
-                                        {/* Skills pills */}
-                                        {job.skills && job.skills.length > 0 && (
-                                            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>
-                                                <span style={{ fontSize: 11, fontWeight: 700, color: textMuted }}>Skills:</span>
-                                                {job.skills.map((skill, sIdx) => (
-                                                    <span
-                                                        key={sIdx}
-                                                        style={{
-                                                            fontSize: 11,
-                                                            padding: '2px 8px',
-                                                            borderRadius: 6,
-                                                            background: isDark ? '#21262d' : '#f1f5f9',
-                                                            color: textMain,
-                                                            border: '1px solid ' + cardBorder
-                                                        }}
-                                                    >
-                                                        {skill}
-                                                    </span>
-                                                ))}
-                                            </div>
-                                        )}
                                     </div>
                                 );
                             })}
@@ -2066,6 +2388,57 @@ function JobsView({ user, showNotify, theme }) {
             {isApplyModalOpen && selectedJob && (
                 <Modal onClose={() => setIsApplyModalOpen(false)} title={selectedJob.title}>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 16, maxHeight: '72vh', overflowY: 'auto', paddingRight: 4 }}>
+                        {/* Top Representative Job Banner */}
+                        <div style={{
+                            width: '100%',
+                            height: 170,
+                            borderRadius: 12,
+                            overflow: 'hidden',
+                            position: 'relative',
+                            background: isDark ? '#21262d' : '#e2e8f0',
+                            border: '1px solid ' + cardBorder
+                        }}>
+                            <img
+                                src={selectedJob.image_url || getRoleFallbackImage(selectedJob.role)}
+                                alt={selectedJob.title}
+                                onError={(e) => {
+                                    e.currentTarget.onerror = null;
+                                    e.currentTarget.src = getRoleFallbackImage(selectedJob.role);
+                                }}
+                                style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                            />
+                            <div style={{
+                                position: 'absolute',
+                                top: 12,
+                                right: 12,
+                                padding: '4px 12px',
+                                borderRadius: 12,
+                                fontSize: 11,
+                                fontWeight: 800,
+                                background: selectedJob.status === 'open' ? 'rgba(35, 134, 54, 0.95)' : 'rgba(218, 54, 51, 0.95)',
+                                color: '#ffffff',
+                                boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
+                                backdropFilter: 'blur(4px)'
+                            }}>
+                                {selectedJob.status === 'open' ? '🟢 OPEN POSITION' : '🔴 POSITION CLOSED'}
+                            </div>
+                            <div style={{
+                                position: 'absolute',
+                                bottom: 12,
+                                left: 12,
+                                padding: '4px 12px',
+                                borderRadius: 10,
+                                fontSize: 12,
+                                fontWeight: 800,
+                                background: 'rgba(15, 23, 42, 0.88)',
+                                color: '#58a6ff',
+                                border: '1px solid rgba(88, 166, 255, 0.3)',
+                                backdropFilter: 'blur(6px)'
+                            }}>
+                                🎯 {selectedJob.role}
+                            </div>
+                        </div>
+
                         <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap', borderBottom: '1px solid ' + cardBorder, paddingBottom: 12 }}>
                             <span style={{ fontWeight: 800, color: textMain, fontSize: 15 }}>🏢 {selectedJob.company}</span>
                             <span style={{ fontSize: 13, color: textMuted }}>📍 {selectedJob.location}</span>
@@ -2459,6 +2832,108 @@ function JobsView({ user, showNotify, theme }) {
                             />
                         </div>
 
+                        {/* Job Image Selection & Upload with Quick Presets */}
+                        <div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+                                <label style={{ fontSize: 12, fontWeight: 700, color: textMuted }}>
+                                    Job Banner Image (Stored Locally in Folder & Database)
+                                </label>
+                                <span style={{ fontSize: 11, color: '#3fb950', fontWeight: 700 }}>
+                                    📁 Local Storage
+                                </span>
+                            </div>
+                            <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                                <input
+                                    type="text"
+                                    value={newImageUrl}
+                                    onChange={e => setNewImageUrl(e.target.value)}
+                                    placeholder="Local path (/uploads/jobs/...) or external URL to auto-download..."
+                                    style={{ flex: 1, padding: 9, borderRadius: 8, border: '1px solid ' + cardBorder, background: inputBg, color: textMain, fontSize: 13, outline: 'none' }}
+                                />
+                                <label style={{
+                                    padding: '8px 12px',
+                                    borderRadius: 8,
+                                    border: '1px solid ' + cardBorder,
+                                    background: isDark ? '#21262d' : '#f1f5f9',
+                                    color: textMain,
+                                    cursor: uploadingJobImage ? 'wait' : 'pointer',
+                                    fontSize: 12,
+                                    fontWeight: 700,
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: 6,
+                                    whiteSpace: 'nowrap'
+                                }}>
+                                    {uploadingJobImage ? 'Uploading...' : '📁 Upload File'}
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        style={{ display: 'none' }}
+                                        disabled={uploadingJobImage}
+                                        onChange={handleJobImageUpload}
+                                    />
+                                </label>
+                                {newImageUrl && (
+                                    <button
+                                        type="button"
+                                        onClick={() => setNewImageUrl('')}
+                                        style={{ padding: '8px 12px', borderRadius: 8, border: '1px solid ' + cardBorder, background: 'transparent', color: textMuted, cursor: 'pointer', fontSize: 12 }}
+                                    >
+                                        Clear
+                                    </button>
+                                )}
+                            </div>
+
+                            {/* Preset pills for quick image selection */}
+                            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 8, alignItems: 'center' }}>
+                                <span style={{ fontSize: 11, color: textMuted, fontWeight: 700 }}>Quick Local Presets:</span>
+                                {Object.keys(ROLE_DEFAULT_IMAGES).map(roleKey => (
+                                    <button
+                                        type="button"
+                                        key={roleKey}
+                                        onClick={() => setNewImageUrl(ROLE_DEFAULT_IMAGES[roleKey])}
+                                        style={{
+                                            padding: '3px 8px',
+                                            borderRadius: 6,
+                                            fontSize: 10,
+                                            fontWeight: 700,
+                                            background: newImageUrl === ROLE_DEFAULT_IMAGES[roleKey] ? '#1f6feb' : (isDark ? '#21262d' : '#f1f5f9'),
+                                            color: newImageUrl === ROLE_DEFAULT_IMAGES[roleKey] ? '#ffffff' : textMuted,
+                                            border: '1px solid ' + (newImageUrl === ROLE_DEFAULT_IMAGES[roleKey] ? '#1f6feb' : cardBorder),
+                                            cursor: 'pointer'
+                                        }}
+                                    >
+                                        {roleKey}
+                                    </button>
+                                ))}
+                            </div>
+
+                            {/* Live Thumbnail Preview */}
+                            {newImageUrl && (
+                                <div style={{ marginTop: 8, borderRadius: 8, overflow: 'hidden', height: 90, border: '1px solid ' + cardBorder, position: 'relative' }}>
+                                    <img
+                                        src={newImageUrl}
+                                        alt="Preview"
+                                        onError={e => { e.currentTarget.style.display = 'none'; }}
+                                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                    />
+                                    <span style={{
+                                        position: 'absolute',
+                                        top: 6,
+                                        right: 6,
+                                        fontSize: 10,
+                                        fontWeight: 800,
+                                        padding: '2px 6px',
+                                        borderRadius: 6,
+                                        background: 'rgba(0,0,0,0.7)',
+                                        color: '#ffffff'
+                                    }}>
+                                        Image Preview
+                                    </span>
+                                </div>
+                            )}
+                        </div>
+
                         <button
                             type="submit"
                             disabled={creatingJob}
@@ -2486,7 +2961,15 @@ function JobsView({ user, showNotify, theme }) {
 
 // REPOS VIEW (USERS ONLY)
 // ══════════════════════════════════════════════════════════════════════════════
-function ReposView({ user, repositories = [], onSelectRepo, onOpenCreateRepo, showNotify }) {
+function ReposView({ user, repositories = [], onSelectRepo, onOpenCreateRepo, showNotify, theme }) {
+    const isDark = theme !== 'light';
+    const cardBg = isDark ? '#161b22' : '#ffffff';
+    const cardBorder = isDark ? '#30363d' : '#d0d7de';
+    const textMain = isDark ? '#e6edf3' : '#1f2328';
+    const textMuted = isDark ? '#8b949e' : '#57606a';
+    const inputBg = isDark ? '#0d1117' : '#ffffff';
+    const shadow = isDark ? '0 8px 24px rgba(0,0,0,0.3)' : '0 1px 3px rgba(31, 35, 40, 0.08)';
+
     const [search, setSearch] = useState('');
     const [filter, setFilter] = useState('all');
     const isAdmin = Boolean(user && (user.role === 'admin' || user.role_type === 'admin'));
@@ -2506,7 +2989,6 @@ function ReposView({ user, repositories = [], onSelectRepo, onOpenCreateRepo, sh
         try {
             await apiCall(`/repositories/${repo.id}/visibility`, 'PUT', { visibility: newVis });
             if (showNotify) showNotify(`Repository '${repo.name}' is now ${newVis.toUpperCase()}!`);
-            // Trigger refresh
             window.dispatchEvent(new CustomEvent('refreshRepos'));
         } catch (err) {
             if (showNotify) showNotify(err.message, 'error');
@@ -2526,115 +3008,276 @@ function ReposView({ user, repositories = [], onSelectRepo, onOpenCreateRepo, sh
     };
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-            {/* Header */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
+        <div style={{ maxWidth: 1360, margin: '0 auto', width: '100%', display: 'flex', flexDirection: 'column', gap: 24 }}>
+            <style>{`
+                .codehub-jobs-grid {
+                    display: grid;
+                    grid-template-columns: repeat(4, minmax(0, 1fr));
+                    gap: 16px;
+                }
+                @media (max-width: 1200px) {
+                    .codehub-jobs-grid {
+                        grid-template-columns: repeat(3, minmax(0, 1fr));
+                    }
+                }
+                @media (max-width: 860px) {
+                    .codehub-jobs-grid {
+                        grid-template-columns: repeat(2, minmax(0, 1fr));
+                    }
+                }
+                @media (max-width: 560px) {
+                    .codehub-jobs-grid {
+                        grid-template-columns: 1fr;
+                    }
+                }
+                .codehub-job-card {
+                    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+                }
+                .codehub-job-card:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 8px 24px rgba(0,0,0,0.12) !important;
+                }
+                .codehub-job-card:hover .codehub-job-img {
+                    transform: scale(1.04);
+                }
+            `}</style>
+            {/* Header banner */}
+            <div style={{
+                background: isDark
+                    ? (isAdmin ? 'linear-gradient(135deg, #1f1035, #161b22)' : 'linear-gradient(135deg, #0d1f47, #161b22)')
+                    : (isAdmin ? 'linear-gradient(135deg, #f5f0ff, #f0fdf4)' : 'linear-gradient(135deg, #e0f2fe, #f0fdf4)'),
+                border: '1px solid ' + (isAdmin ? (isDark ? 'rgba(210,168,255,0.4)' : '#e9d5ff') : (isDark ? cardBorder : '#bae6fd')),
+                borderRadius: 16,
+                padding: '28px 32px',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                flexWrap: 'wrap',
+                gap: 16,
+                boxShadow: shadow
+            }}>
                 <div>
-                    <h2 style={{ fontWeight: 800, fontSize: 22, color: '#e6edf3', margin: 0 }}>
-                        {isAdmin ? '🛡️ Platform Repositories Management (Admin)' : (user ? 'My Repositories' : '🌐 Explore Public Repositories')}
-                    </h2>
-                    <p style={{ margin: '4px 0 0', fontSize: 13, color: '#8b949e' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
+                        <span style={{ fontSize: 28 }}>{isAdmin ? '🛡️' : '📁'}</span>
+                        <h1 style={{ margin: 0, fontSize: 24, fontWeight: 900, color: textMain }}>
+                            {isAdmin ? 'Platform Repositories Management (Admin)' : (user ? 'My Repositories' : 'Explore Public Repositories')}
+                        </h1>
+                    </div>
+                    <p style={{ margin: 0, fontSize: 14, color: textMuted, maxWidth: 680, lineHeight: 1.5 }}>
                         {isAdmin
                             ? 'Administrator Console: Manage all code repositories across the ecosystem. Moderate visibility and remove repositories. Admins do not create repos.'
-                            : 'Personal and open-source software repositories linked to Google Drive storage.'}
+                            : 'Personal and open-source software repositories linked live to Google Drive storage.'}
                     </p>
                 </div>
                 {!isAdmin && user && (
-                    <button onClick={onOpenCreateRepo} disabled={!user.is_verified}
-                        style={{ padding: '9px 18px', borderRadius: 8, fontWeight: 700, fontSize: 13, background: user.is_verified ? '#238636' : '#21262d', color: user.is_verified ? '#fff' : '#8b949e', border: 'none', cursor: user.is_verified ? 'pointer' : 'not-allowed' }}>
+                    <button
+                        onClick={onOpenCreateRepo}
+                        disabled={!user.is_verified}
+                        style={{
+                            padding: '11px 22px',
+                            borderRadius: 14,
+                            fontWeight: 800,
+                            fontSize: 13,
+                            background: user.is_verified ? 'linear-gradient(135deg, #238636, #2ea043)' : (isDark ? '#21262d' : '#e2e8f0'),
+                            color: user.is_verified ? '#fff' : textMuted,
+                            border: 'none',
+                            cursor: user.is_verified ? 'pointer' : 'not-allowed',
+                            boxShadow: user.is_verified ? '0 4px 14px rgba(35,134,54,0.35)' : 'none'
+                        }}
+                    >
                         + New Repository
                     </button>
                 )}
             </div>
 
             {/* Filters */}
-            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-                <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search repositories by name..." style={{ flex: 1, minWidth: 200, padding: '8px 14px', borderRadius: 8, border: '1px solid #30363d', background: '#161b22', color: '#e6edf3', fontSize: 13 }} />
-                {['all', 'public', 'private'].map(f => (
-                    <button key={f} onClick={() => setFilter(f)} style={{ padding: '8px 16px', borderRadius: 8, fontSize: 12, fontWeight: 700, textTransform: 'capitalize', background: filter === f ? '#1f6feb' : '#21262d', color: filter === f ? '#fff' : '#8b949e', border: 'none', cursor: 'pointer' }}>
-                        {f}
-                    </button>
-                ))}
+            <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'center' }}>
+                <input
+                    value={search}
+                    onChange={e => setSearch(e.target.value)}
+                    placeholder="Search repositories by name..."
+                    style={{
+                        flex: 1,
+                        minWidth: 220,
+                        padding: '10px 16px',
+                        borderRadius: 12,
+                        border: `1px solid ${cardBorder}`,
+                        background: inputBg,
+                        color: textMain,
+                        fontSize: 13,
+                        boxShadow: isDark ? 'none' : '0 1px 2px rgba(31,35,40,0.04)'
+                    }}
+                />
+                <div style={{ display: 'flex', gap: 8 }}>
+                    {['all', 'public', 'private'].map(f => {
+                        const active = filter === f;
+                        return (
+                            <button
+                                key={f}
+                                onClick={() => setFilter(f)}
+                                style={{
+                                    padding: '8px 18px',
+                                    borderRadius: 20,
+                                    fontSize: 12,
+                                    fontWeight: 700,
+                                    textTransform: 'capitalize',
+                                    background: active ? (isDark ? '#1f6feb' : '#e0f2fe') : (isDark ? '#21262d' : '#ffffff'),
+                                    color: active ? (isDark ? '#fff' : '#0969da') : textMuted,
+                                    border: active ? (isDark ? 'none' : '1px solid #bae6fd') : (isDark ? '1px solid #30363d' : '1px solid #d0d7de'),
+                                    cursor: 'pointer',
+                                    boxShadow: isDark ? 'none' : '0 1px 2px rgba(31,35,40,0.04)'
+                                }}
+                            >
+                                {f}
+                            </button>
+                        );
+                    })}
+                </div>
             </div>
 
             {/* Grid */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(300px,1fr))', gap: 16 }}>
-                {displayed.map(repo => (
-                    <div key={repo.id} onClick={() => onSelectRepo(repo.id)} style={{ background: '#161b22', border: '1px solid #21262d', borderRadius: 12, padding: '20px 18px', cursor: 'pointer', transition: 'all 0.2s', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: 12 }}
-                        onMouseEnter={e => { e.currentTarget.style.borderColor = '#58a6ff'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
-                        onMouseLeave={e => { e.currentTarget.style.borderColor = '#21262d'; e.currentTarget.style.transform = 'translateY(0)'; }}>
-                        <div>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8, gap: 8 }}>
-                                <span style={{ fontWeight: 800, fontSize: 15, color: '#58a6ff' }}>📦 {repo.name}</span>
-                                <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 20, fontWeight: 700, textTransform: 'uppercase', background: repo.visibility === 'public' ? 'rgba(63,185,80,0.15)' : 'rgba(210,168,255,0.15)', color: repo.visibility === 'public' ? '#3fb950' : '#d2a8ff', border: `1px solid ${repo.visibility === 'public' ? 'rgba(63,185,80,0.3)' : 'rgba(210,168,255,0.3)'}` }}>
-                                    {repo.visibility}
-                                </span>
-                            </div>
-                            {repo.owner_name && (
-                                <div style={{ fontSize: 11, color: '#8b949e', marginBottom: 8 }}>
-                                    👤 Owner: <strong style={{ color: '#c9d1d9' }}>@{repo.owner_name}</strong>
-                                </div>
-                            )}
-                            <p style={{ fontSize: 12, color: '#8b949e', margin: '0 0 10px', lineHeight: 1.5 }}>
-                                {repo.description || 'No description provided.'}
-                            </p>
-                        </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 18 }}>
+                {displayed.map(repo => {
+                    const isPub = repo.visibility === 'public';
+                    const badgeBg = isPub ? (isDark ? 'rgba(63,185,80,0.15)' : '#dcfce7') : (isDark ? 'rgba(210,168,255,0.15)' : '#f3e8ff');
+                    const badgeText = isPub ? (isDark ? '#3fb950' : '#15803d') : (isDark ? '#d2a8ff' : '#7c3aed');
+                    const badgeBorder = isPub ? (isDark ? 'rgba(63,185,80,0.3)' : '#bbf7d0') : (isDark ? 'rgba(210,168,255,0.3)' : '#e9d5ff');
 
-                        <div>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: '#8b949e', borderTop: '1px solid #21262d', paddingTop: 10, marginBottom: isAdmin ? 10 : 0 }}>
-                                <span>🌿 {repo.branch_count || 1} branches</span>
-                                <span>📦 {repo.commit_count || 1} commits</span>
-                                <span style={{ color: '#58a6ff', fontWeight: 600 }}>☁️ Drive</span>
+                    return (
+                        <div
+                            key={repo.id}
+                            onClick={() => onSelectRepo(repo.id)}
+                            style={{
+                                background: cardBg,
+                                border: `1px solid ${cardBorder}`,
+                                borderRadius: 16,
+                                padding: '22px 20px',
+                                cursor: 'pointer',
+                                transition: 'all 0.2s',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                justifyContent: 'space-between',
+                                gap: 14,
+                                boxShadow: shadow
+                            }}
+                            onMouseEnter={e => {
+                                e.currentTarget.style.borderColor = '#0969da';
+                                e.currentTarget.style.transform = 'translateY(-2px)';
+                                e.currentTarget.style.boxShadow = isDark ? '0 12px 28px rgba(0,0,0,0.45)' : '0 6px 18px rgba(9,105,218,0.12)';
+                            }}
+                            onMouseLeave={e => {
+                                e.currentTarget.style.borderColor = cardBorder;
+                                e.currentTarget.style.transform = 'translateY(0)';
+                                e.currentTarget.style.boxShadow = shadow;
+                            }}
+                        >
+                            <div>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 10, gap: 8 }}>
+                                    <span style={{ fontWeight: 800, fontSize: 16, color: isDark ? '#58a6ff' : '#0969da' }}>📦 {repo.name}</span>
+                                    <span style={{
+                                        fontSize: 10,
+                                        padding: '3px 10px',
+                                        borderRadius: 20,
+                                        fontWeight: 800,
+                                        textTransform: 'uppercase',
+                                        background: badgeBg,
+                                        color: badgeText,
+                                        border: `1px solid ${badgeBorder}`
+                                    }}>
+                                        {repo.visibility}
+                                    </span>
+                                </div>
+                                {repo.owner_name && (
+                                    <div style={{ fontSize: 12, color: textMuted, marginBottom: 8 }}>
+                                        👤 Owner: <strong style={{ color: textMain }}>@{repo.owner_name}</strong>
+                                    </div>
+                                )}
+                                <p style={{ fontSize: 13, color: textMuted, margin: '0 0 10px', lineHeight: 1.5 }}>
+                                    {repo.description || 'No description provided.'}
+                                </p>
                             </div>
 
-                            {/* Admin Management Controls */}
-                            {isAdmin && (
-                                <div style={{ display: 'flex', gap: 8, borderTop: '1px solid #21262d', paddingTop: 10 }}>
-                                    <button
-                                        type="button"
-                                        onClick={(e) => handleToggleVisibility(e, repo)}
-                                        title="Toggle Public / Private"
-                                        style={{
-                                            flex: 1,
-                                            padding: '6px 10px',
-                                            borderRadius: 6,
-                                            background: '#21262d',
-                                            border: '1px solid #30363d',
-                                            color: '#e6edf3',
-                                            fontSize: 11,
-                                            fontWeight: 700,
-                                            cursor: 'pointer'
-                                        }}
-                                    >
-                                        {repo.visibility === 'public' ? '🔒 Make Private' : '🌐 Make Public'}
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={(e) => handleDeleteRepo(e, repo)}
-                                        title="Delete Repository"
-                                        style={{
-                                            padding: '6px 12px',
-                                            borderRadius: 6,
-                                            background: 'rgba(248,81,73,0.12)',
-                                            border: '1px solid rgba(248,81,73,0.3)',
-                                            color: '#f85149',
-                                            fontSize: 11,
-                                            fontWeight: 700,
-                                            cursor: 'pointer'
-                                        }}
-                                    >
-                                        🗑️ Delete
-                                    </button>
+                            <div>
+                                <div style={{
+                                    display: 'flex',
+                                    justifyContent: 'space-between',
+                                    fontSize: 12,
+                                    color: textMuted,
+                                    borderTop: `1px solid ${isDark ? '#21262d' : '#f0f2f5'}`,
+                                    paddingTop: 12,
+                                    marginBottom: isAdmin ? 12 : 0
+                                }}>
+                                    <span>🌿 {repo.branch_count || 1} branches</span>
+                                    <span>📦 {repo.commit_count || 1} commits</span>
+                                    <span style={{ color: isDark ? '#58a6ff' : '#0969da', fontWeight: 600 }}>☁️ Drive</span>
                                 </div>
-                            )}
+
+                                {/* Admin Management Controls */}
+                                {isAdmin && (
+                                    <div style={{ display: 'flex', gap: 8, borderTop: `1px solid ${isDark ? '#21262d' : '#f0f2f5'}`, paddingTop: 10 }}>
+                                        <button
+                                            type="button"
+                                            onClick={(e) => handleToggleVisibility(e, repo)}
+                                            title="Toggle Public / Private"
+                                            style={{
+                                                flex: 1,
+                                                padding: '7px 12px',
+                                                borderRadius: 8,
+                                                background: isDark ? '#21262d' : '#f6f8fa',
+                                                border: `1px solid ${cardBorder}`,
+                                                color: textMain,
+                                                fontSize: 11,
+                                                fontWeight: 700,
+                                                cursor: 'pointer'
+                                            }}
+                                        >
+                                            {repo.visibility === 'public' ? '🔒 Make Private' : '🌐 Make Public'}
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={(e) => handleDeleteRepo(e, repo)}
+                                            title="Delete Repository"
+                                            style={{
+                                                padding: '7px 14px',
+                                                borderRadius: 8,
+                                                background: isDark ? 'rgba(248,81,73,0.12)' : '#fee2e2',
+                                                border: `1px solid ${isDark ? 'rgba(248,81,73,0.3)' : '#fecaca'}`,
+                                                color: isDark ? '#f85149' : '#b91c1c',
+                                                fontSize: 11,
+                                                fontWeight: 700,
+                                                cursor: 'pointer'
+                                            }}
+                                        >
+                                            🗑️ Delete
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
                         </div>
-                    </div>
-                ))}
+                    );
+                })}
                 {displayed.length === 0 && (
-                    <div style={{ gridColumn: '1/-1', textAlign: 'center', padding: 60, color: '#8b949e' }}>
+                    <div style={{ gridColumn: '1/-1', textAlign: 'center', padding: 60, color: textMuted, background: cardBg, borderRadius: 16, border: `1px solid ${cardBorder}` }}>
                         <div style={{ fontSize: 40, marginBottom: 12 }}>📭</div>
-                        <p>No repositories found{search ? ` matching "${search}"` : ''}.</p>
-                        {user && user.is_verified && !isAdmin && <button onClick={onOpenCreateRepo} style={{ marginTop: 12, color: '#58a6ff', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}>Create your first repository →</button>}
+                        <p style={{ margin: 0, fontSize: 15, fontWeight: 600, color: textMain }}>No repositories found{search ? ` matching "${search}"` : ''}.</p>
+                        {user && user.is_verified && !isAdmin && (
+                            <button
+                                onClick={onOpenCreateRepo}
+                                style={{
+                                    marginTop: 14,
+                                    padding: '8px 18px',
+                                    borderRadius: 10,
+                                    background: isDark ? '#21262d' : '#e0f2fe',
+                                    border: `1px solid ${isDark ? '#30363d' : '#bae6fd'}`,
+                                    color: isDark ? '#58a6ff' : '#0969da',
+                                    fontWeight: 700,
+                                    fontSize: 13,
+                                    cursor: 'pointer'
+                                }}
+                            >
+                                Create your first repository →
+                            </button>
+                        )}
                     </div>
                 )}
             </div>
@@ -4220,7 +4863,16 @@ function RegisterView({ onSuccess, onSwitchLogin, onBack }) {
 // ══════════════════════════════════════════════════════════════════════════════
 // REPO DETAIL VIEW
 // ══════════════════════════════════════════════════════════════════════════════
-function RepoDetailView({ repoId, user, onBack, showNotify }) {
+function RepoDetailView({ repoId, user, onBack, showNotify, theme }) {
+    const isDark = theme !== 'light';
+    const cardBg = isDark ? '#161b22' : '#ffffff';
+    const cardBorder = isDark ? '#30363d' : '#d0d7de';
+    const textMain = isDark ? '#e6edf3' : '#1f2328';
+    const textMuted = isDark ? '#8b949e' : '#57606a';
+    const inputBg = isDark ? '#0d1117' : '#ffffff';
+    const innerBg = isDark ? '#0d1117' : '#f6f8fa';
+    const shadow = isDark ? '0 8px 24px rgba(0,0,0,0.3)' : '0 1px 3px rgba(31, 35, 40, 0.08)';
+
     const [repo, setRepo] = useState(null);
     const [branches, setBranches] = useState([]);
     const [activeBranchId, setActiveBranchId] = useState(null);
@@ -4301,33 +4953,124 @@ function RepoDetailView({ repoId, user, onBack, showNotify }) {
         catch (err) { showNotify(err.message, 'error'); }
     };
 
-    if (!repo) return <div style={{ textAlign: 'center', padding: 60, color: '#8b949e' }}>Loading repository...</div>;
+    if (!repo) {
+        return (
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '80px 20px', gap: 14 }}>
+                <div style={{ width: 44, height: 44, border: '3px solid rgba(88, 166, 255, 0.2)', borderTopColor: '#58a6ff', borderRadius: '50%', animation: 'codehubSpin 0.75s linear infinite' }} />
+                <div style={{ fontWeight: 700, fontSize: 15, color: textMain }}>Loading repository workspace…</div>
+                <div style={{ fontSize: 12, color: textMuted }}>Fetching tree, branches, and version history</div>
+            </div>
+        );
+    }
     const isOwnerOrAdmin = user && (user.role === 'admin' || user.id == repo.user_id);
-
-    const tabStyle = (active) => ({ paddingBottom: 12, fontSize: 14, fontWeight: 700, color: active ? '#58a6ff' : '#8b949e', background: 'none', border: 'none', borderBottom: `2px solid ${active ? '#58a6ff' : 'transparent'}`, cursor: 'pointer' });
+    const isPub = repo.visibility === 'public';
+    const badgeBg = isPub ? (isDark ? 'rgba(63,185,80,0.15)' : '#dcfce7') : (isDark ? 'rgba(210,168,255,0.15)' : '#f3e8ff');
+    const badgeText = isPub ? (isDark ? '#3fb950' : '#15803d') : (isDark ? '#d2a8ff' : '#7c3aed');
+    const badgeBorder = isPub ? (isDark ? 'rgba(63,185,80,0.3)' : '#bbf7d0') : (isDark ? 'rgba(210,168,255,0.3)' : '#e9d5ff');
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-            {/* Header */}
-            <div>
-                <button onClick={onBack} style={{ background: 'none', border: 'none', color: '#58a6ff', cursor: 'pointer', fontSize: 13, marginBottom: 10 }}>← Back</button>
+        <div style={{ maxWidth: 1100, margin: '0 auto', width: '100%', display: 'flex', flexDirection: 'column', gap: 22 }}>
+            {/* Header banner */}
+            <div style={{
+                background: isDark
+                    ? 'linear-gradient(135deg, #0d1f47, #161b22)'
+                    : 'linear-gradient(135deg, #e0f2fe, #f0fdf4)',
+                border: '1px solid ' + (isDark ? cardBorder : '#bae6fd'),
+                borderRadius: 16,
+                padding: '24px 28px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 14,
+                boxShadow: shadow
+            }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10 }}>
+                    <button
+                        onClick={onBack}
+                        style={{
+                            background: isDark ? '#21262d' : '#ffffff',
+                            border: `1px solid ${cardBorder}`,
+                            color: isDark ? '#58a6ff' : '#0969da',
+                            padding: '6px 14px',
+                            borderRadius: 20,
+                            cursor: 'pointer',
+                            fontSize: 12,
+                            fontWeight: 700,
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: 6,
+                            boxShadow: isDark ? 'none' : '0 1px 2px rgba(31,35,40,0.04)'
+                        }}
+                    >
+                        ← Back to Repositories
+                    </button>
+                    {isOwnerOrAdmin && (
+                        <button
+                            onClick={handleDeleteRepo}
+                            style={{
+                                padding: '7px 16px',
+                                borderRadius: 10,
+                                fontSize: 12,
+                                fontWeight: 700,
+                                background: isDark ? 'rgba(248,81,73,0.1)' : '#fee2e2',
+                                color: isDark ? '#f85149' : '#b91c1c',
+                                border: `1px solid ${isDark ? 'rgba(248,81,73,0.3)' : '#fecaca'}`,
+                                cursor: 'pointer'
+                            }}
+                        >
+                            🗑️ Delete Repo
+                        </button>
+                    )}
+                </div>
+
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 12 }}>
                     <div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                            <h1 style={{ fontWeight: 900, fontSize: 24, color: '#e6edf3' }}>{repo.name}</h1>
-                            <span style={{ fontSize: 11, padding: '3px 10px', borderRadius: 20, fontWeight: 700, textTransform: 'uppercase', background: 'rgba(88,166,255,0.1)', color: '#58a6ff', border: '1px solid rgba(88,166,255,0.3)' }}>{repo.visibility}</span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+                            <h1 style={{ fontWeight: 900, fontSize: 24, color: textMain, margin: 0 }}>📦 {repo.name}</h1>
+                            <span style={{
+                                fontSize: 11,
+                                padding: '3px 10px',
+                                borderRadius: 20,
+                                fontWeight: 800,
+                                textTransform: 'uppercase',
+                                background: badgeBg,
+                                color: badgeText,
+                                border: `1px solid ${badgeBorder}`
+                            }}>
+                                {repo.visibility}
+                            </span>
                         </div>
-                        <p style={{ fontSize: 13, color: '#8b949e' }}>{repo.description}</p>
-                        <p style={{ fontSize: 11, color: '#3fb950', fontFamily: 'monospace' }}>☁️ Drive: {repo.google_drive_folder_id}</p>
+                        <p style={{ fontSize: 13, color: textMuted, margin: '6px 0 0' }}>{repo.description || 'No description provided.'}</p>
+                        <p style={{ fontSize: 12, color: isDark ? '#3fb950' : '#15803d', fontFamily: 'monospace', margin: '4px 0 0' }}>
+                            ☁️ Drive Storage ID: {repo.google_drive_folder_id}
+                        </p>
                     </div>
-                    {isOwnerOrAdmin && <button onClick={handleDeleteRepo} style={{ padding: '8px 16px', borderRadius: 8, fontSize: 12, fontWeight: 700, background: 'rgba(248,81,73,0.1)', color: '#f85149', border: '1px solid rgba(248,81,73,0.3)', cursor: 'pointer' }}>🗑️ Delete Repo</button>}
                 </div>
             </div>
 
             {/* Tabs */}
-            <div style={{ display: 'flex', gap: 24, borderBottom: '1px solid #21262d' }}>
-                <button style={tabStyle(activeTab === 'code')} onClick={() => setActiveTab('code')}>📁 Code</button>
-                <button style={tabStyle(activeTab === 'issues_prs')} onClick={() => setActiveTab('issues_prs')}>🔀 Issues & PRs ({itemsList.length})</button>
+            <div style={{ display: 'flex', gap: 10 }}>
+                {[['code', '📁 Code Tree'], ['issues_prs', `🔀 Issues & PRs (${itemsList.length})`]].map(([k, label]) => {
+                    const active = activeTab === k;
+                    return (
+                        <button
+                            key={k}
+                            onClick={() => setActiveTab(k)}
+                            style={{
+                                padding: '8px 18px',
+                                borderRadius: 20,
+                                fontSize: 13,
+                                fontWeight: 700,
+                                background: active ? (isDark ? '#1f6feb' : '#e0f2fe') : (isDark ? '#21262d' : '#ffffff'),
+                                color: active ? (isDark ? '#fff' : '#0969da') : textMuted,
+                                border: active ? (isDark ? 'none' : '1px solid #bae6fd') : (isDark ? '1px solid #30363d' : '1px solid #d0d7de'),
+                                cursor: 'pointer',
+                                boxShadow: isDark ? 'none' : '0 1px 2px rgba(31,35,40,0.04)'
+                            }}
+                        >
+                            {label}
+                        </button>
+                    );
+                })}
             </div>
 
             {activeTab === 'code' ? (
@@ -4335,117 +5078,526 @@ function RepoDetailView({ repoId, user, onBack, showNotify }) {
                     {/* Branch bar */}
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10 }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                            <span style={{ fontSize: 12, color: '#8b949e' }}>Branch:</span>
-                            <select value={activeBranchId || ''} onChange={e => { setActiveBranchId(Number(e.target.value)); setSelectedFile(null); }}
-                                style={{ padding: '6px 12px', borderRadius: 8, border: '1px solid #30363d', background: '#161b22', color: '#58a6ff', fontSize: 12, fontWeight: 700 }}>
+                            <span style={{ fontSize: 12, color: textMuted, fontWeight: 600 }}>Branch:</span>
+                            <select
+                                value={activeBranchId || ''}
+                                onChange={e => { setActiveBranchId(Number(e.target.value)); setSelectedFile(null); }}
+                                style={{
+                                    padding: '7px 14px',
+                                    borderRadius: 10,
+                                    border: `1px solid ${cardBorder}`,
+                                    background: inputBg,
+                                    color: isDark ? '#58a6ff' : '#0969da',
+                                    fontSize: 12,
+                                    fontWeight: 700
+                                }}
+                            >
                                 {branches.map(b => <option key={b.id} value={b.id}>🌿 {b.branch_name}</option>)}
                             </select>
-                            {isOwnerOrAdmin && <button onClick={() => setIsNewBranchOpen(true)} style={{ padding: '5px 12px', borderRadius: 6, fontSize: 12, border: '1px solid #30363d', background: '#21262d', color: '#e6edf3', cursor: 'pointer' }}>+ Branch</button>}
+                            {isOwnerOrAdmin && (
+                                <button
+                                    onClick={() => setIsNewBranchOpen(true)}
+                                    style={{
+                                        padding: '7px 14px',
+                                        borderRadius: 10,
+                                        fontSize: 12,
+                                        fontWeight: 700,
+                                        border: `1px solid ${cardBorder}`,
+                                        background: isDark ? '#21262d' : '#f6f8fa',
+                                        color: textMain,
+                                        cursor: 'pointer'
+                                    }}
+                                >
+                                    + Branch
+                                </button>
+                            )}
                         </div>
-                        {isOwnerOrAdmin && user?.role !== 'admin' && <button onClick={() => { setEditFileName('new_file.js'); setEditFileContent('// Write code here\n'); setIsEditingFile(true); }} style={{ padding: '7px 16px', borderRadius: 8, fontSize: 12, fontWeight: 700, background: '#238636', color: '#fff', border: 'none', cursor: 'pointer' }}>+ Add File</button>}
+                        {isOwnerOrAdmin && user?.role !== 'admin' && (
+                            <button
+                                onClick={() => { setEditFileName('new_file.js'); setEditFileContent('// Write code here\n'); setIsEditingFile(true); }}
+                                style={{
+                                    padding: '8px 18px',
+                                    borderRadius: 10,
+                                    fontSize: 12,
+                                    fontWeight: 700,
+                                    background: 'linear-gradient(135deg, #238636, #2ea043)',
+                                    color: '#fff',
+                                    border: 'none',
+                                    cursor: 'pointer',
+                                    boxShadow: '0 2px 8px rgba(35,134,54,0.3)'
+                                }}
+                            >
+                                + Add File
+                            </button>
+                        )}
                     </div>
 
                     {isNewBranchOpen && (
-                        <form onSubmit={handleCreateBranch} style={{ display: 'flex', gap: 10, padding: '12px 16px', background: '#161b22', borderRadius: 10, border: '1px solid #30363d' }}>
-                            <input required placeholder="feature/my-feature" value={newBranchName} onChange={e => setNewBranchName(e.target.value)} style={{ flex: 1, padding: '8px 12px', borderRadius: 6, border: '1px solid #30363d', background: '#0d1117', color: '#e6edf3', fontSize: 12 }} />
-                            <button type="submit" style={{ padding: '8px 16px', borderRadius: 6, background: '#1f6feb', color: '#fff', fontWeight: 700, fontSize: 12, border: 'none', cursor: 'pointer' }}>Create</button>
-                            <button type="button" onClick={() => setIsNewBranchOpen(false)} style={{ fontSize: 12, color: '#8b949e', background: 'none', border: 'none', cursor: 'pointer' }}>Cancel</button>
+                        <form
+                            onSubmit={handleCreateBranch}
+                            style={{
+                                display: 'flex',
+                                gap: 10,
+                                padding: '14px 18px',
+                                background: cardBg,
+                                borderRadius: 12,
+                                border: `1px solid ${cardBorder}`,
+                                boxShadow: shadow
+                            }}
+                        >
+                            <input
+                                required
+                                placeholder="feature/my-feature"
+                                value={newBranchName}
+                                onChange={e => setNewBranchName(e.target.value)}
+                                style={{
+                                    flex: 1,
+                                    padding: '8px 14px',
+                                    borderRadius: 8,
+                                    border: `1px solid ${cardBorder}`,
+                                    background: inputBg,
+                                    color: textMain,
+                                    fontSize: 12
+                                }}
+                            />
+                            <button
+                                type="submit"
+                                style={{
+                                    padding: '8px 18px',
+                                    borderRadius: 8,
+                                    background: '#1f6feb',
+                                    color: '#fff',
+                                    fontWeight: 700,
+                                    fontSize: 12,
+                                    border: 'none',
+                                    cursor: 'pointer'
+                                }}
+                            >
+                                Create
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setIsNewBranchOpen(false)}
+                                style={{ fontSize: 12, color: textMuted, background: 'none', border: 'none', cursor: 'pointer' }}
+                            >
+                                Cancel
+                            </button>
                         </form>
                     )}
 
-                    <div style={{ display: 'grid', gridTemplateColumns: '200px 1fr', gap: 16 }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: '220px 1fr', gap: 16 }}>
                         {/* File tree */}
-                        <div style={{ background: '#161b22', border: '1px solid #21262d', borderRadius: 10, padding: 16 }}>
-                            <div style={{ fontSize: 11, fontWeight: 700, color: '#8b949e', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 12 }}>Files</div>
-                            {files.map(f => (
-                                <div key={f.id} onClick={() => loadFileContent(f.id)} style={{ padding: '7px 10px', borderRadius: 6, cursor: 'pointer', fontSize: 12, fontFamily: 'monospace', marginBottom: 4, background: selectedFile?.id === f.id ? 'rgba(88,166,255,0.15)' : 'transparent', color: selectedFile?.id === f.id ? '#58a6ff' : '#8b949e', border: selectedFile?.id === f.id ? '1px solid rgba(88,166,255,0.3)' : '1px solid transparent' }}>
-                                    📄 {f.file_path}
-                                </div>
-                            ))}
-                            {files.length === 0 && <p style={{ fontSize: 12, color: '#8b949e' }}>No files yet.</p>}
+                        <div style={{
+                            background: cardBg,
+                            border: `1px solid ${cardBorder}`,
+                            borderRadius: 14,
+                            padding: 16,
+                            boxShadow: shadow
+                        }}>
+                            <div style={{ fontSize: 11, fontWeight: 800, color: textMuted, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 12 }}>Files</div>
+                            {files.map(f => {
+                                const isSel = selectedFile?.id === f.id;
+                                return (
+                                    <div
+                                        key={f.id}
+                                        onClick={() => loadFileContent(f.id)}
+                                        style={{
+                                            padding: '8px 12px',
+                                            borderRadius: 8,
+                                            cursor: 'pointer',
+                                            fontSize: 12,
+                                            fontFamily: 'monospace',
+                                            marginBottom: 4,
+                                            background: isSel ? (isDark ? 'rgba(88,166,255,0.15)' : '#e0f2fe') : 'transparent',
+                                            color: isSel ? (isDark ? '#58a6ff' : '#0969da') : textMuted,
+                                            border: isSel ? `1px solid ${isDark ? 'rgba(88,166,255,0.3)' : '#bae6fd'}` : '1px solid transparent',
+                                            fontWeight: isSel ? 700 : 500
+                                        }}
+                                    >
+                                        📄 {f.file_path}
+                                    </div>
+                                );
+                            })}
+                            {files.length === 0 && <p style={{ fontSize: 12, color: textMuted }}>No files yet.</p>}
                         </div>
 
                         {/* Editor/viewer */}
                         <div>
                             {isEditingFile ? (
-                                <form onSubmit={handleSaveFile} style={{ display: 'flex', flexDirection: 'column', gap: 10, background: '#161b22', border: '1px solid #21262d', borderRadius: 10, padding: 16 }}>
+                                <form
+                                    onSubmit={handleSaveFile}
+                                    style={{
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        gap: 12,
+                                        background: cardBg,
+                                        border: `1px solid ${cardBorder}`,
+                                        borderRadius: 14,
+                                        padding: 18,
+                                        boxShadow: shadow
+                                    }}
+                                >
                                     <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-                                        <input value={editFileName} onChange={e => setEditFileName(e.target.value)} style={{ flex: 1, padding: '7px 12px', borderRadius: 6, border: '1px solid #30363d', background: '#0d1117', color: '#58a6ff', fontSize: 12, fontFamily: 'monospace', fontWeight: 700 }} />
-                                        <button type="button" onClick={() => setIsEditingFile(false)} style={{ fontSize: 12, color: '#8b949e', background: 'none', border: 'none', cursor: 'pointer' }}>Cancel</button>
-                                        <button type="submit" style={{ padding: '7px 16px', borderRadius: 6, background: '#238636', color: '#fff', fontWeight: 700, fontSize: 12, border: 'none', cursor: 'pointer' }}>Commit & Push</button>
+                                        <input
+                                            value={editFileName}
+                                            onChange={e => setEditFileName(e.target.value)}
+                                            style={{
+                                                flex: 1,
+                                                padding: '8px 14px',
+                                                borderRadius: 8,
+                                                border: `1px solid ${cardBorder}`,
+                                                background: inputBg,
+                                                color: isDark ? '#58a6ff' : '#0969da',
+                                                fontSize: 12,
+                                                fontFamily: 'monospace',
+                                                fontWeight: 700
+                                            }}
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setIsEditingFile(false)}
+                                            style={{ fontSize: 12, color: textMuted, background: 'none', border: 'none', cursor: 'pointer' }}
+                                        >
+                                            Cancel
+                                        </button>
+                                        <button
+                                            type="submit"
+                                            style={{
+                                                padding: '8px 18px',
+                                                borderRadius: 8,
+                                                background: 'linear-gradient(135deg, #238636, #2ea043)',
+                                                color: '#fff',
+                                                fontWeight: 700,
+                                                fontSize: 12,
+                                                border: 'none',
+                                                cursor: 'pointer'
+                                            }}
+                                        >
+                                            Commit & Push
+                                        </button>
                                     </div>
-                                    <textarea rows="18" value={editFileContent} onChange={e => setEditFileContent(e.target.value)} style={{ padding: 16, borderRadius: 8, background: '#010409', color: '#7ee787', fontFamily: 'monospace', fontSize: 12, border: '1px solid #30363d', lineHeight: 1.6 }} />
-                                    <input placeholder="Commit message..." value={commitMessage} onChange={e => setCommitMessage(e.target.value)} style={{ padding: '8px 12px', borderRadius: 6, border: '1px solid #30363d', background: '#0d1117', color: '#e6edf3', fontSize: 12 }} />
+                                    <textarea
+                                        rows="18"
+                                        value={editFileContent}
+                                        onChange={e => setEditFileContent(e.target.value)}
+                                        style={{
+                                            padding: 16,
+                                            borderRadius: 8,
+                                            background: isDark ? '#010409' : '#f6f8fa',
+                                            color: isDark ? '#7ee787' : '#1f2328',
+                                            fontFamily: 'monospace',
+                                            fontSize: 12,
+                                            border: `1px solid ${cardBorder}`,
+                                            lineHeight: 1.6
+                                        }}
+                                    />
+                                    <input
+                                        placeholder="Commit message..."
+                                        value={commitMessage}
+                                        onChange={e => setCommitMessage(e.target.value)}
+                                        style={{
+                                            padding: '8px 14px',
+                                            borderRadius: 8,
+                                            border: `1px solid ${cardBorder}`,
+                                            background: inputBg,
+                                            color: textMain,
+                                            fontSize: 12
+                                        }}
+                                    />
                                 </form>
                             ) : selectedFile ? (
-                                <div style={{ background: '#161b22', border: '1px solid #21262d', borderRadius: 10, overflow: 'hidden' }}>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 16px', background: '#0d1117', borderBottom: '1px solid #21262d' }}>
-                                        <span style={{ fontFamily: 'monospace', fontSize: 12, color: '#58a6ff', fontWeight: 700 }}>📄 {selectedFile.file_path}</span>
-                                        {isOwnerOrAdmin && user?.role !== 'admin' && <button onClick={() => { setEditFileName(selectedFile.file_path); setEditFileContent(fileContent); setIsEditingFile(true); }} style={{ padding: '5px 12px', borderRadius: 6, fontSize: 11, fontWeight: 700, background: 'rgba(88,166,255,0.1)', color: '#58a6ff', border: '1px solid rgba(88,166,255,0.3)', cursor: 'pointer' }}>✏️ Edit</button>}
+                                <div style={{
+                                    background: cardBg,
+                                    border: `1px solid ${cardBorder}`,
+                                    borderRadius: 14,
+                                    overflow: 'hidden',
+                                    boxShadow: shadow
+                                }}>
+                                    <div style={{
+                                        display: 'flex',
+                                        justifyContent: 'space-between',
+                                        alignItems: 'center',
+                                        padding: '12px 18px',
+                                        background: innerBg,
+                                        borderBottom: `1px solid ${cardBorder}`
+                                    }}>
+                                        <span style={{ fontFamily: 'monospace', fontSize: 13, color: isDark ? '#58a6ff' : '#0969da', fontWeight: 700 }}>📄 {selectedFile.file_path}</span>
+                                        {isOwnerOrAdmin && user?.role !== 'admin' && (
+                                            <button
+                                                onClick={() => { setEditFileName(selectedFile.file_path); setEditFileContent(fileContent); setIsEditingFile(true); }}
+                                                style={{
+                                                    padding: '6px 14px',
+                                                    borderRadius: 8,
+                                                    fontSize: 11,
+                                                    fontWeight: 700,
+                                                    background: isDark ? 'rgba(88,166,255,0.1)' : '#e0f2fe',
+                                                    color: isDark ? '#58a6ff' : '#0969da',
+                                                    border: `1px solid ${isDark ? 'rgba(88,166,255,0.3)' : '#bae6fd'}`,
+                                                    cursor: 'pointer'
+                                                }}
+                                            >
+                                                ✏️ Edit
+                                            </button>
+                                        )}
                                     </div>
-                                    <pre style={{ padding: 16, background: '#010409', color: '#e6edf3', fontFamily: 'monospace', fontSize: 12, overflow: 'auto', maxHeight: 420, margin: 0, lineHeight: 1.6 }}><code>{fileContent}</code></pre>
+                                    <pre style={{
+                                        padding: 18,
+                                        background: isDark ? '#010409' : '#f6f8fa',
+                                        color: textMain,
+                                        fontFamily: 'monospace',
+                                        fontSize: 12,
+                                        overflow: 'auto',
+                                        maxHeight: 420,
+                                        margin: 0,
+                                        lineHeight: 1.6
+                                    }}><code>{fileContent}</code></pre>
                                     {fileHistory.length > 0 && (
-                                        <div style={{ padding: 16, borderTop: '1px solid #21262d' }}>
-                                            <div style={{ fontSize: 11, fontWeight: 700, color: '#8b949e', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 10 }}>⏳ Version History</div>
+                                        <div style={{ padding: 18, borderTop: `1px solid ${cardBorder}` }}>
+                                            <div style={{ fontSize: 11, fontWeight: 800, color: textMuted, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 10 }}>⏳ Version History</div>
                                             {fileHistory.map(vh => (
-                                                <div key={vh.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 12px', borderRadius: 6, marginBottom: 6, background: '#0d1117', border: '1px solid #21262d' }}>
+                                                <div
+                                                    key={vh.id}
+                                                    style={{
+                                                        display: 'flex',
+                                                        justifyContent: 'space-between',
+                                                        alignItems: 'center',
+                                                        padding: '10px 14px',
+                                                        borderRadius: 8,
+                                                        marginBottom: 6,
+                                                        background: innerBg,
+                                                        border: `1px solid ${cardBorder}`
+                                                    }}
+                                                >
                                                     <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                                                        <span style={{ padding: '2px 8px', borderRadius: 4, background: 'rgba(88,166,255,0.15)', color: '#58a6ff', fontFamily: 'monospace', fontSize: 11, fontWeight: 700 }}>v{vh.version_number}</span>
-                                                        <span style={{ fontSize: 12 }}>{vh.commit_message}</span>
+                                                        <span style={{
+                                                            padding: '2px 8px',
+                                                            borderRadius: 4,
+                                                            background: isDark ? 'rgba(88,166,255,0.15)' : '#e0f2fe',
+                                                            color: isDark ? '#58a6ff' : '#0969da',
+                                                            fontFamily: 'monospace',
+                                                            fontSize: 11,
+                                                            fontWeight: 700
+                                                        }}>v{vh.version_number}</span>
+                                                        <span style={{ fontSize: 12, color: textMain }}>{vh.commit_message}</span>
                                                     </div>
-                                                    {isOwnerOrAdmin && user?.role !== 'admin' && <button onClick={() => handleRollback(vh.version_number)} style={{ padding: '4px 12px', borderRadius: 6, fontSize: 11, fontWeight: 700, background: 'rgba(227,179,65,0.15)', color: '#e3b341', border: '1px solid rgba(227,179,65,0.3)', cursor: 'pointer' }}>⏪ Rollback</button>}
+                                                    {isOwnerOrAdmin && user?.role !== 'admin' && (
+                                                        <button
+                                                            onClick={() => handleRollback(vh.version_number)}
+                                                            style={{
+                                                                padding: '4px 12px',
+                                                                borderRadius: 6,
+                                                                fontSize: 11,
+                                                                fontWeight: 700,
+                                                                background: isDark ? 'rgba(227,179,65,0.15)' : '#fef9c3',
+                                                                color: isDark ? '#e3b341' : '#a16207',
+                                                                border: `1px solid ${isDark ? 'rgba(227,179,65,0.3)' : '#fef08a'}`,
+                                                                cursor: 'pointer'
+                                                            }}
+                                                        >
+                                                            ⏪ Rollback
+                                                        </button>
+                                                    )}
                                                 </div>
                                             ))}
                                         </div>
                                     )}
                                 </div>
-                            ) : <div style={{ textAlign: 'center', padding: 60, color: '#8b949e' }}>Select a file to view its contents.</div>}
+                            ) : (
+                                <div style={{ textAlign: 'center', padding: 60, color: textMuted, background: cardBg, borderRadius: 14, border: `1px solid ${cardBorder}` }}>
+                                    Select a file to view its contents.
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
             ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <h3 style={{ fontWeight: 700, fontSize: 16, color: '#e6edf3' }}>Issues & Pull Requests</h3>
-                        {user?.is_verified && <button onClick={() => setIsNewItemOpen(true)} style={{ padding: '8px 16px', borderRadius: 8, fontWeight: 700, fontSize: 12, background: '#238636', color: '#fff', border: 'none', cursor: 'pointer' }}>+ New Issue / PR</button>}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <h3 style={{ fontWeight: 800, fontSize: 16, color: textMain, margin: 0 }}>Issues & Pull Requests</h3>
+                        {user?.is_verified && (
+                            <button
+                                onClick={() => setIsNewItemOpen(true)}
+                                style={{
+                                    padding: '8px 18px',
+                                    borderRadius: 10,
+                                    fontWeight: 700,
+                                    fontSize: 12,
+                                    background: 'linear-gradient(135deg, #238636, #2ea043)',
+                                    color: '#fff',
+                                    border: 'none',
+                                    cursor: 'pointer',
+                                    boxShadow: '0 2px 8px rgba(35,134,54,0.3)'
+                                }}
+                            >
+                                + New Issue / PR
+                            </button>
+                        )}
                     </div>
                     {isNewItemOpen && (
-                        <form onSubmit={handleCreateItem} style={{ background: '#161b22', border: '1px solid #30363d', borderRadius: 10, padding: 20, display: 'flex', flexDirection: 'column', gap: 12 }}>
+                        <form
+                            onSubmit={handleCreateItem}
+                            style={{
+                                background: cardBg,
+                                border: `1px solid ${cardBorder}`,
+                                borderRadius: 14,
+                                padding: 20,
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: 14,
+                                boxShadow: shadow
+                            }}
+                        >
                             <div style={{ display: 'flex', gap: 16 }}>
                                 {[['issue', '🐞 Issue'], ['pull_request', '🔀 Pull Request']].map(([val, lbl]) => (
-                                    <label key={val} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
+                                    <label key={val} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 700, cursor: 'pointer', color: textMain }}>
                                         <input type="radio" checked={itemType === val} onChange={() => setItemType(val)} /> {lbl}
                                     </label>
                                 ))}
                             </div>
-                            <input required placeholder="Title" value={itemTitle} onChange={e => setItemTitle(e.target.value)} style={{ padding: '9px 14px', borderRadius: 8, border: '1px solid #30363d', background: '#0d1117', color: '#e6edf3', fontSize: 13 }} />
-                            <textarea rows="3" placeholder="Description..." value={itemDesc} onChange={e => setItemDesc(e.target.value)} style={{ padding: '9px 14px', borderRadius: 8, border: '1px solid #30363d', background: '#0d1117', color: '#e6edf3', fontSize: 13 }} />
+                            <input
+                                required
+                                placeholder="Title"
+                                value={itemTitle}
+                                onChange={e => setItemTitle(e.target.value)}
+                                style={{
+                                    padding: '10px 14px',
+                                    borderRadius: 8,
+                                    border: `1px solid ${cardBorder}`,
+                                    background: inputBg,
+                                    color: textMain,
+                                    fontSize: 13
+                                }}
+                            />
+                            <textarea
+                                rows="3"
+                                placeholder="Description..."
+                                value={itemDesc}
+                                onChange={e => setItemDesc(e.target.value)}
+                                style={{
+                                    padding: '10px 14px',
+                                    borderRadius: 8,
+                                    border: `1px solid ${cardBorder}`,
+                                    background: inputBg,
+                                    color: textMain,
+                                    fontSize: 13
+                                }}
+                            />
                             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
-                                <button type="button" onClick={() => setIsNewItemOpen(false)} style={{ fontSize: 13, color: '#8b949e', background: 'none', border: 'none', cursor: 'pointer' }}>Cancel</button>
-                                <button type="submit" style={{ padding: '8px 18px', borderRadius: 8, fontWeight: 700, fontSize: 13, background: '#1f6feb', color: '#fff', border: 'none', cursor: 'pointer' }}>Submit</button>
+                                <button
+                                    type="button"
+                                    onClick={() => setIsNewItemOpen(false)}
+                                    style={{ fontSize: 13, color: textMuted, background: 'none', border: 'none', cursor: 'pointer' }}
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    style={{
+                                        padding: '8px 20px',
+                                        borderRadius: 8,
+                                        fontWeight: 700,
+                                        fontSize: 13,
+                                        background: '#1f6feb',
+                                        color: '#fff',
+                                        border: 'none',
+                                        cursor: 'pointer'
+                                    }}
+                                >
+                                    Submit
+                                </button>
                             </div>
                         </form>
                     )}
-                    {itemsList.map(item => (
-                        <div key={item.id} style={{ background: '#161b22', border: '1px solid #21262d', borderRadius: 10, padding: '16px 18px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
-                            <div>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-                                    <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 12, fontWeight: 700, textTransform: 'uppercase', background: item.type === 'pull_request' ? 'rgba(210,168,255,0.15)' : 'rgba(63,185,80,0.15)', color: item.type === 'pull_request' ? '#d2a8ff' : '#3fb950' }}>{item.type === 'pull_request' ? 'PR' : 'Issue'} #{item.id}</span>
-                                    <span style={{ fontWeight: 700, fontSize: 14 }}>{item.title}</span>
-                                    <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 6, background: item.status === 'open' ? 'rgba(63,185,80,0.1)' : 'rgba(139,148,158,0.1)', color: item.status === 'open' ? '#3fb950' : '#8b949e' }}>{item.status}</span>
+                    {itemsList.map(item => {
+                        const isPr = item.type === 'pull_request';
+                        const badgeBg = isPr ? (isDark ? 'rgba(210,168,255,0.15)' : '#f3e8ff') : (isDark ? 'rgba(63,185,80,0.15)' : '#dcfce7');
+                        const badgeText = isPr ? (isDark ? '#d2a8ff' : '#7c3aed') : (isDark ? '#3fb950' : '#15803d');
+                        return (
+                            <div
+                                key={item.id}
+                                style={{
+                                    background: cardBg,
+                                    border: `1px solid ${cardBorder}`,
+                                    borderRadius: 14,
+                                    padding: '18px 20px',
+                                    display: 'flex',
+                                    justifyContent: 'space-between',
+                                    alignItems: 'flex-start',
+                                    gap: 14,
+                                    boxShadow: shadow
+                                }}
+                            >
+                                <div>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+                                        <span style={{
+                                            fontSize: 10,
+                                            padding: '3px 8px',
+                                            borderRadius: 12,
+                                            fontWeight: 800,
+                                            textTransform: 'uppercase',
+                                            background: badgeBg,
+                                            color: badgeText
+                                        }}>
+                                            {isPr ? 'PR' : 'Issue'} #{item.id}
+                                        </span>
+                                        <span style={{ fontWeight: 800, fontSize: 15, color: textMain }}>{item.title}</span>
+                                        <span style={{
+                                            fontSize: 10,
+                                            padding: '2px 8px',
+                                            borderRadius: 6,
+                                            background: item.status === 'open' ? (isDark ? 'rgba(63,185,80,0.1)' : '#dcfce7') : (isDark ? 'rgba(139,148,158,0.1)' : '#f6f8fa'),
+                                            color: item.status === 'open' ? (isDark ? '#3fb950' : '#15803d') : textMuted
+                                        }}>
+                                            {item.status}
+                                        </span>
+                                    </div>
+                                    <p style={{ fontSize: 13, color: textMuted, margin: '4px 0 6px' }}>{item.description}</p>
+                                    <p style={{ fontSize: 11, color: textMuted, margin: 0 }}>By {item.creator_email} • {item.created_at}</p>
                                 </div>
-                                <p style={{ fontSize: 12, color: '#8b949e' }}>{item.description}</p>
-                                <p style={{ fontSize: 11, color: '#6e7681' }}>By {item.creator_email} • {item.created_at}</p>
+                                {isOwnerOrAdmin && item.status === 'open' && (
+                                    <div style={{ display: 'flex', gap: 8 }}>
+                                        {isPr && (
+                                            <button
+                                                onClick={() => handleUpdateItemStatus(item.id, 'merged')}
+                                                style={{
+                                                    padding: '6px 14px',
+                                                    borderRadius: 8,
+                                                    fontSize: 11,
+                                                    fontWeight: 700,
+                                                    background: isDark ? '#3d1f6e' : '#f3e8ff',
+                                                    color: isDark ? '#d2a8ff' : '#7c3aed',
+                                                    border: `1px solid ${isDark ? '#6e40c9' : '#e9d5ff'}`,
+                                                    cursor: 'pointer'
+                                                }}
+                                            >
+                                                Merge
+                                            </button>
+                                        )}
+                                        <button
+                                            onClick={() => handleUpdateItemStatus(item.id, 'closed')}
+                                            style={{
+                                                padding: '6px 14px',
+                                                borderRadius: 8,
+                                                fontSize: 11,
+                                                fontWeight: 700,
+                                                background: isDark ? '#21262d' : '#f6f8fa',
+                                                color: textMuted,
+                                                border: `1px solid ${cardBorder}`,
+                                                cursor: 'pointer'
+                                            }}
+                                        >
+                                            Close
+                                        </button>
+                                    </div>
+                                )}
                             </div>
-                            {isOwnerOrAdmin && item.status === 'open' && (
-                                <div style={{ display: 'flex', gap: 8 }}>
-                                    {item.type === 'pull_request' && <button onClick={() => handleUpdateItemStatus(item.id, 'merged')} style={{ padding: '6px 14px', borderRadius: 6, fontSize: 11, fontWeight: 700, background: '#3d1f6e', color: '#d2a8ff', border: '1px solid #6e40c9', cursor: 'pointer' }}>Merge</button>}
-                                    <button onClick={() => handleUpdateItemStatus(item.id, 'closed')} style={{ padding: '6px 14px', borderRadius: 6, fontSize: 11, fontWeight: 700, background: '#21262d', color: '#8b949e', border: '1px solid #30363d', cursor: 'pointer' }}>Close</button>
-                                </div>
-                            )}
+                        );
+                    })}
+                    {itemsList.length === 0 && (
+                        <div style={{ textAlign: 'center', padding: 40, color: textMuted, background: cardBg, borderRadius: 14, border: `1px solid ${cardBorder}` }}>
+                            No issues or PRs yet.
                         </div>
-                    ))}
-                    {itemsList.length === 0 && <div style={{ textAlign: 'center', padding: 40, color: '#8b949e' }}>No issues or PRs yet.</div>}
+                    )}
                 </div>
             )}
         </div>
@@ -4455,7 +5607,16 @@ function RepoDetailView({ repoId, user, onBack, showNotify }) {
 // ══════════════════════════════════════════════════════════════════════════════
 // ADMIN COCKPIT VIEW
 // ══════════════════════════════════════════════════════════════════════════════
-function AdminCockpitView({ user, onBack, showNotify }) {
+function AdminCockpitView({ user, onBack, showNotify, theme }) {
+    const isDark = theme !== 'light';
+    const cardBg = isDark ? '#161b22' : '#ffffff';
+    const cardBorder = isDark ? '#30363d' : '#d0d7de';
+    const textMain = isDark ? '#e6edf3' : '#1f2328';
+    const textMuted = isDark ? '#8b949e' : '#57606a';
+    const inputBg = isDark ? '#0d1117' : '#ffffff';
+    const innerBg = isDark ? '#0d1117' : '#f6f8fa';
+    const shadow = isDark ? '0 8px 24px rgba(0,0,0,0.3)' : '0 1px 3px rgba(31, 35, 40, 0.08)';
+
     const [metrics, setMetrics] = useState(null);
     const [usersList, setUsersList] = useState([]);
     const [actionRequests, setActionRequests] = useState([]);
@@ -4473,7 +5634,6 @@ function AdminCockpitView({ user, onBack, showNotify }) {
             setMetrics(m.metrics);
             setUsersList(u.users || []);
             setActionRequests(r.requests || []);
-            console.log('admin/audit-logs response:', l.logs);
             setAuditLogs(l.logs || []);
         } catch (err) { showNotify(err.message, 'error'); }
     };
@@ -4494,40 +5654,100 @@ function AdminCockpitView({ user, onBack, showNotify }) {
     };
 
     const tabs = [
-        { key: 'metrics', label: '📊 Metrics' },
-        { key: 'users', label: `👥 Users (${usersList.length})` },
-        { key: 'deletions', label: `🚨 Deletions (${actionRequests.filter(r => r.status === 'pending').length})` },
-        { key: 'logs', label: `📜 Audit Logs (${auditLogs.length})` },
+        { key: 'metrics', label: '📊 Platform Metrics' },
+        { key: 'users', label: `👥 User Management (${usersList.length})` },
+        { key: 'deletions', label: `🚨 Purge Requests (${actionRequests.filter(r => r.status === 'pending').length})` },
+        { key: 'logs', label: `📜 Security Audit (${auditLogs.length})` },
     ];
-    const tabStyle = (active) => ({ paddingBottom: 12, fontSize: 13, fontWeight: 700, color: active ? '#d2a8ff' : '#8b949e', background: 'none', border: 'none', borderBottom: `2px solid ${active ? '#d2a8ff' : 'transparent'}`, cursor: 'pointer' });
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-            <div>
-                <button onClick={onBack} style={{ background: 'none', border: 'none', color: '#58a6ff', cursor: 'pointer', fontSize: 13, marginBottom: 10 }}>← Back to Dashboard</button>
-                <h1 style={{ fontWeight: 900, fontSize: 24, color: '#d2a8ff', margin: 0 }}>🛡️ Administrator Cockpit</h1>
-                <p style={{ fontSize: 13, color: '#8b949e' }}>Manage users, roles, deletion requests, and audit logs.</p>
+        <div style={{ maxWidth: 1100, margin: '0 auto', width: '100%', display: 'flex', flexDirection: 'column', gap: 22 }}>
+            {/* Header banner */}
+            <div style={{
+                background: isDark
+                    ? 'linear-gradient(135deg, #1f1035, #161b22)'
+                    : 'linear-gradient(135deg, #f5f0ff, #f0fdf4)',
+                border: '1px solid ' + (isDark ? 'rgba(210,168,255,0.4)' : '#e9d5ff'),
+                borderRadius: 16,
+                padding: '24px 28px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 12,
+                boxShadow: shadow
+            }}>
+                <div>
+                    <button
+                        onClick={onBack}
+                        style={{
+                            background: isDark ? '#21262d' : '#ffffff',
+                            border: `1px solid ${cardBorder}`,
+                            color: isDark ? '#d2a8ff' : '#7c3aed',
+                            padding: '6px 14px',
+                            borderRadius: 20,
+                            cursor: 'pointer',
+                            fontSize: 12,
+                            fontWeight: 700,
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: 6,
+                            marginBottom: 10,
+                            boxShadow: isDark ? 'none' : '0 1px 2px rgba(31,35,40,0.04)'
+                        }}
+                    >
+                        ← Back to Dashboard
+                    </button>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                        <span style={{ fontSize: 26 }}>🛡️</span>
+                        <h1 style={{ fontWeight: 900, fontSize: 24, color: isDark ? '#d2a8ff' : '#7c3aed', margin: 0 }}>
+                            Administrator Cockpit
+                        </h1>
+                    </div>
+                    <p style={{ fontSize: 13, color: textMuted, margin: '6px 0 0' }}>
+                        Manage users, account statuses, developer roles, account deletion requests, and real-time security audit telemetry.
+                    </p>
+                </div>
             </div>
 
             {/* Tabs */}
-            <div style={{ display: 'flex', gap: 20, borderBottom: '1px solid #21262d' }}>
-                {tabs.map(t => <button key={t.key} style={tabStyle(activeTab === t.key)} onClick={() => setActiveTab(t.key)}>{t.label}</button>)}
+            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+                {tabs.map(t => {
+                    const active = activeTab === t.key;
+                    return (
+                        <button
+                            key={t.key}
+                            onClick={() => setActiveTab(t.key)}
+                            style={{
+                                padding: '8px 18px',
+                                borderRadius: 20,
+                                fontSize: 12,
+                                fontWeight: 700,
+                                background: active ? (isDark ? '#3d1f6e' : '#f3e8ff') : (isDark ? '#21262d' : '#ffffff'),
+                                color: active ? (isDark ? '#d2a8ff' : '#7c3aed') : textMuted,
+                                border: active ? (isDark ? '1px solid #6e40c9' : '1px solid #e9d5ff') : (isDark ? '1px solid #30363d' : '1px solid #d0d7de'),
+                                cursor: 'pointer',
+                                boxShadow: isDark ? 'none' : '0 1px 2px rgba(31,35,40,0.04)'
+                            }}
+                        >
+                            {t.label}
+                        </button>
+                    );
+                })}
             </div>
 
             {/* Metrics */}
             {activeTab === 'metrics' && metrics && (
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(160px,1fr))', gap: 14 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(180px,1fr))', gap: 14 }}>
                     {[
-                        { label: 'Total Users', value: metrics.total_users, sub: `${metrics.active_users} active`, color: '#58a6ff' },
-                        { label: 'Unverified', value: metrics.unverified_users, sub: 'Need verification', color: '#e3b341' },
-                        { label: 'Repositories', value: metrics.total_repositories, sub: `${metrics.public_repositories} public`, color: '#3fb950' },
-                        { label: 'Total Commits', value: metrics.total_commits, sub: `${metrics.total_files} files`, color: '#79c0ff' },
-                        { label: 'Pending Purges', value: metrics.pending_deletions, sub: 'Needs review', color: '#f85149' },
+                        { label: 'Total Users', value: metrics.total_users, sub: `${metrics.active_users} active`, color: isDark ? '#58a6ff' : '#0969da' },
+                        { label: 'Unverified', value: metrics.unverified_users, sub: 'Need verification', color: isDark ? '#e3b341' : '#a16207' },
+                        { label: 'Repositories', value: metrics.total_repositories, sub: `${metrics.public_repositories} public`, color: isDark ? '#3fb950' : '#15803d' },
+                        { label: 'Total Commits', value: metrics.total_commits, sub: `${metrics.total_files} files`, color: isDark ? '#79c0ff' : '#0284c7' },
+                        { label: 'Pending Purges', value: metrics.pending_deletions, sub: 'Needs review', color: isDark ? '#f85149' : '#b91c1c' },
                     ].map((s, i) => (
-                        <div key={i} style={{ background: '#161b22', border: '1px solid #21262d', borderRadius: 12, padding: '20px 18px' }}>
-                            <div style={{ fontSize: 11, color: '#8b949e', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 6 }}>{s.label}</div>
+                        <div key={i} style={{ background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: 16, padding: '22px 20px', boxShadow: shadow }}>
+                            <div style={{ fontSize: 11, color: textMuted, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8, fontWeight: 700 }}>{s.label}</div>
                             <div style={{ fontSize: 28, fontWeight: 900, color: s.color }}>{s.value}</div>
-                            <div style={{ fontSize: 11, color: '#8b949e', marginTop: 4 }}>{s.sub}</div>
+                            <div style={{ fontSize: 12, color: textMuted, marginTop: 4 }}>{s.sub}</div>
                         </div>
                     ))}
                 </div>
@@ -4535,47 +5755,81 @@ function AdminCockpitView({ user, onBack, showNotify }) {
 
             {/* Users */}
             {activeTab === 'users' && (
-                <div style={{ overflowX: 'auto' }}>
-                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
-                        <thead>
-                            <tr style={{ background: '#161b22', borderBottom: '2px solid #21262d' }}>
-                                {['User', 'Role', 'Status', 'Verified', 'Repos', 'Actions'].map(h => <th key={h} style={{ padding: '10px 14px', textAlign: 'left', fontWeight: 700, color: '#8b949e', textTransform: 'uppercase', fontSize: 11, letterSpacing: 1 }}>{h}</th>)}
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {usersList.map(u => (
-                                <tr key={u.id} style={{ borderBottom: '1px solid #21262d' }}>
-                                    <td style={{ padding: '12px 14px' }}>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                                            <UserAvatar user={u} size={32} />
-                                            <div>
-                                                <div style={{ fontWeight: 700, color: '#e6edf3' }}>{u.full_name || u.email}</div>
-                                                <div style={{ fontSize: 11, color: '#58a6ff', fontFamily: 'monospace' }}>{u.username && `@${u.username} • `}{u.email}</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td style={{ padding: '12px 14px' }}>
-                                        <select value={u.role_type} onChange={e => handleUpdateUserRole(u.id, e.target.value)} style={{ padding: '4px 8px', borderRadius: 6, border: '1px solid #30363d', background: '#0d1117', color: u.role_type === 'admin' ? '#d2a8ff' : '#58a6ff', fontSize: 11, fontWeight: 700 }}>
-                                            <option value="user">user</option>
-                                            <option value="admin">admin</option>
-                                        </select>
-                                    </td>
-                                    <td style={{ padding: '12px 14px' }}>
-                                        <span style={{ fontSize: 11, padding: '3px 8px', borderRadius: 6, fontWeight: 700, background: u.account_status === 'active' ? 'rgba(63,185,80,0.15)' : 'rgba(248,81,73,0.15)', color: u.account_status === 'active' ? '#3fb950' : '#f85149' }}>{u.account_status}</span>
-                                    </td>
-                                    <td style={{ padding: '12px 14px', color: u.email_verified_status ? '#3fb950' : '#e3b341' }}>{u.email_verified_status ? '✅' : '⏳'}</td>
-                                    <td style={{ padding: '12px 14px', fontFamily: 'monospace' }}>{u.repo_count}</td>
-                                    <td style={{ padding: '12px 14px' }}>
-                                        <div style={{ display: 'flex', gap: 6 }}>
-                                            {u.account_status !== 'suspended' ? <button onClick={() => handleUpdateUserStatus(u.id, 'suspended')} style={{ padding: '4px 10px', borderRadius: 6, fontSize: 10, fontWeight: 700, background: 'rgba(227,179,65,0.15)', color: '#e3b341', border: '1px solid rgba(227,179,65,0.3)', cursor: 'pointer' }}>Suspend</button>
-                                                : <button onClick={() => handleUpdateUserStatus(u.id, 'active')} style={{ padding: '4px 10px', borderRadius: 6, fontSize: 10, fontWeight: 700, background: 'rgba(63,185,80,0.15)', color: '#3fb950', border: '1px solid rgba(63,185,80,0.3)', cursor: 'pointer' }}>Activate</button>}
-                                            {u.account_status !== 'blocked' && <button onClick={() => handleUpdateUserStatus(u.id, 'blocked')} style={{ padding: '4px 10px', borderRadius: 6, fontSize: 10, fontWeight: 700, background: 'rgba(248,81,73,0.15)', color: '#f85149', border: '1px solid rgba(248,81,73,0.3)', cursor: 'pointer' }}>Block</button>}
-                                        </div>
-                                    </td>
+                <div style={{ background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: 16, overflow: 'hidden', boxShadow: shadow }}>
+                    <div style={{ overflowX: 'auto' }}>
+                        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
+                            <thead>
+                                <tr style={{ background: innerBg, borderBottom: `2px solid ${cardBorder}` }}>
+                                    {['User', 'Role', 'Status', 'Verified', 'Repos', 'Actions'].map(h => (
+                                        <th key={h} style={{ padding: '12px 16px', textAlign: 'left', fontWeight: 800, color: textMuted, textTransform: 'uppercase', fontSize: 11, letterSpacing: 1 }}>{h}</th>
+                                    ))}
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                {usersList.map(u => (
+                                    <tr key={u.id} style={{ borderBottom: `1px solid ${isDark ? '#21262d' : '#f0f2f5'}` }}>
+                                        <td style={{ padding: '14px 16px' }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                                                <UserAvatar user={u} size={32} />
+                                                <div>
+                                                    <div style={{ fontWeight: 700, color: textMain }}>{u.full_name || u.email}</div>
+                                                    <div style={{ fontSize: 11, color: isDark ? '#58a6ff' : '#0969da', fontFamily: 'monospace' }}>{u.username && `@${u.username} • `}{u.email}</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td style={{ padding: '14px 16px' }}>
+                                            <select
+                                                value={u.role_type}
+                                                onChange={e => handleUpdateUserRole(u.id, e.target.value)}
+                                                style={{
+                                                    padding: '5px 10px',
+                                                    borderRadius: 8,
+                                                    border: `1px solid ${cardBorder}`,
+                                                    background: inputBg,
+                                                    color: u.role_type === 'admin' ? (isDark ? '#d2a8ff' : '#7c3aed') : (isDark ? '#58a6ff' : '#0969da'),
+                                                    fontSize: 11,
+                                                    fontWeight: 700
+                                                }}
+                                            >
+                                                <option value="user">user</option>
+                                                <option value="admin">admin</option>
+                                            </select>
+                                        </td>
+                                        <td style={{ padding: '14px 16px' }}>
+                                            <span style={{
+                                                fontSize: 11,
+                                                padding: '3px 10px',
+                                                borderRadius: 12,
+                                                fontWeight: 800,
+                                                background: u.account_status === 'active'
+                                                    ? (isDark ? 'rgba(63,185,80,0.15)' : '#dcfce7')
+                                                    : (isDark ? 'rgba(248,81,73,0.15)' : '#fee2e2'),
+                                                color: u.account_status === 'active'
+                                                    ? (isDark ? '#3fb950' : '#15803d')
+                                                    : (isDark ? '#f85149' : '#b91c1c')
+                                            }}>
+                                                {u.account_status}
+                                            </span>
+                                        </td>
+                                        <td style={{ padding: '14px 16px', color: u.email_verified_status ? '#3fb950' : '#e3b341' }}>{u.email_verified_status ? '✅' : '⏳'}</td>
+                                        <td style={{ padding: '14px 16px', fontFamily: 'monospace', color: textMain }}>{u.repo_count}</td>
+                                        <td style={{ padding: '14px 16px' }}>
+                                            <div style={{ display: 'flex', gap: 6 }}>
+                                                {u.account_status !== 'suspended' ? (
+                                                    <button onClick={() => handleUpdateUserStatus(u.id, 'suspended')} style={{ padding: '5px 12px', borderRadius: 6, fontSize: 11, fontWeight: 700, background: isDark ? 'rgba(227,179,65,0.15)' : '#fef9c3', color: isDark ? '#e3b341' : '#a16207', border: `1px solid ${isDark ? 'rgba(227,179,65,0.3)' : '#fef08a'}`, cursor: 'pointer' }}>Suspend</button>
+                                                ) : (
+                                                    <button onClick={() => handleUpdateUserStatus(u.id, 'active')} style={{ padding: '5px 12px', borderRadius: 6, fontSize: 11, fontWeight: 700, background: isDark ? 'rgba(63,185,80,0.15)' : '#dcfce7', color: isDark ? '#3fb950' : '#15803d', border: `1px solid ${isDark ? 'rgba(63,185,80,0.3)' : '#bbf7d0'}`, cursor: 'pointer' }}>Activate</button>
+                                                )}
+                                                {u.account_status !== 'blocked' && (
+                                                    <button onClick={() => handleUpdateUserStatus(u.id, 'blocked')} style={{ padding: '5px 12px', borderRadius: 6, fontSize: 11, fontWeight: 700, background: isDark ? 'rgba(248,81,73,0.15)' : '#fee2e2', color: isDark ? '#f85149' : '#b91c1c', border: `1px solid ${isDark ? 'rgba(248,81,73,0.3)' : '#fecaca'}`, cursor: 'pointer' }}>Block</button>
+                                                )}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             )}
 
@@ -4583,21 +5837,21 @@ function AdminCockpitView({ user, onBack, showNotify }) {
             {activeTab === 'deletions' && (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                     {actionRequests.map(r => (
-                        <div key={r.id} style={{ background: '#161b22', border: '1px solid #21262d', borderRadius: 10, padding: '16px 18px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+                        <div key={r.id} style={{ background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: 14, padding: '18px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, flexWrap: 'wrap', boxShadow: shadow }}>
                             <div>
-                                <div style={{ fontWeight: 700, color: '#f85149', marginBottom: 4 }}>{r.user_email}</div>
-                                <div style={{ fontSize: 12, color: '#8b949e' }}>Reason: "{r.reason_text}"</div>
-                                <div style={{ fontSize: 11, color: '#6e7681', marginTop: 4 }}>Submitted: {r.created_at} • Status: <span style={{ color: r.status === 'pending' ? '#e3b341' : r.status === 'approved' ? '#f85149' : '#8b949e' }}>{r.status}</span></div>
+                                <div style={{ fontWeight: 800, color: '#f85149', marginBottom: 4, fontSize: 14 }}>{r.user_email}</div>
+                                <div style={{ fontSize: 13, color: textMuted }}>Reason: "{r.reason_text}"</div>
+                                <div style={{ fontSize: 11, color: textMuted, marginTop: 4 }}>Submitted: {r.created_at} • Status: <span style={{ fontWeight: 700, color: r.status === 'pending' ? '#e3b341' : r.status === 'approved' ? '#f85149' : '#8b949e' }}>{r.status}</span></div>
                             </div>
                             {r.status === 'pending' && (
                                 <div style={{ display: 'flex', gap: 8 }}>
-                                    <button onClick={() => handleProcessRequest(r.id, 'approved')} style={{ padding: '7px 16px', borderRadius: 8, fontSize: 12, fontWeight: 700, background: '#3d0b0b', color: '#f85149', border: '1px solid rgba(248,81,73,0.4)', cursor: 'pointer' }}>Approve & Delete</button>
-                                    <button onClick={() => handleProcessRequest(r.id, 'rejected')} style={{ padding: '7px 16px', borderRadius: 8, fontSize: 12, fontWeight: 700, background: '#21262d', color: '#8b949e', border: '1px solid #30363d', cursor: 'pointer' }}>Reject</button>
+                                    <button onClick={() => handleProcessRequest(r.id, 'approved')} style={{ padding: '8px 18px', borderRadius: 8, fontSize: 12, fontWeight: 700, background: isDark ? '#3d0b0b' : '#fee2e2', color: isDark ? '#f85149' : '#b91c1c', border: `1px solid ${isDark ? 'rgba(248,81,73,0.4)' : '#fecaca'}`, cursor: 'pointer' }}>Approve & Delete</button>
+                                    <button onClick={() => handleProcessRequest(r.id, 'rejected')} style={{ padding: '8px 18px', borderRadius: 8, fontSize: 12, fontWeight: 700, background: isDark ? '#21262d' : '#f6f8fa', color: textMuted, border: `1px solid ${cardBorder}`, cursor: 'pointer' }}>Reject</button>
                                 </div>
                             )}
                         </div>
                     ))}
-                    {actionRequests.length === 0 && <div style={{ textAlign: 'center', padding: 40, color: '#8b949e' }}>No deletion requests.</div>}
+                    {actionRequests.length === 0 && <div style={{ textAlign: 'center', padding: 40, color: textMuted, background: cardBg, borderRadius: 14, border: `1px solid ${cardBorder}` }}>No deletion requests.</div>}
                 </div>
             )}
 
@@ -4606,24 +5860,23 @@ function AdminCockpitView({ user, onBack, showNotify }) {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                     {Array.isArray(auditLogs) && auditLogs.length > 0 ? (
                         auditLogs.map((l, i) => {
-                            // defensive: ensure we don't render a raw object as a child
                             const actionType = l && typeof l === 'object' ? (l.action_type || l.actionType || '') : String(l || '');
                             const actorEmail = l && typeof l === 'object' ? (l.actor_email || l.actorEmail || '') : '';
                             const timestamp = l && typeof l === 'object' ? (l.timestamp || l.created_at || '') : '';
                             const description = l && typeof l === 'object' ? (typeof l.description === 'string' ? l.description : JSON.stringify(l.description)) : '';
                             return (
-                                <div key={i} style={{ background: '#161b22', border: '1px solid #21262d', borderRadius: 8, padding: '10px 14px', fontSize: 12 }}>
+                                <div key={i} style={{ background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: 10, padding: '12px 16px', fontSize: 12, boxShadow: shadow }}>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                                        <span style={{ padding: '2px 8px', borderRadius: 4, background: 'rgba(88,166,255,0.15)', color: '#58a6ff', fontSize: 10, fontWeight: 700 }}>{actionType}</span>
-                                        <span style={{ color: '#8b949e' }}>{actorEmail}</span>
-                                        <span style={{ color: '#6e7681', marginLeft: 'auto' }}>{timestamp}</span>
+                                        <span style={{ padding: '2px 8px', borderRadius: 6, background: isDark ? 'rgba(88,166,255,0.15)' : '#e0f2fe', color: isDark ? '#58a6ff' : '#0969da', fontSize: 10, fontWeight: 800 }}>{actionType}</span>
+                                        <span style={{ color: textMain, fontWeight: 600 }}>{actorEmail}</span>
+                                        <span style={{ color: textMuted, marginLeft: 'auto', fontSize: 11 }}>{timestamp}</span>
                                     </div>
-                                    <div style={{ color: '#8b949e' }}>{description}</div>
+                                    <div style={{ color: textMuted }}>{description}</div>
                                 </div>
                             );
                         })
                     ) : (
-                        <div style={{ textAlign: 'center', padding: 40, color: '#8b949e' }}>No audit logs.</div>
+                        <div style={{ textAlign: 'center', padding: 40, color: textMuted, background: cardBg, borderRadius: 14, border: `1px solid ${cardBorder}` }}>No audit logs.</div>
                     )}
                 </div>
             )}
@@ -4642,7 +5895,17 @@ function DashboardView({
   onOpenDeleteAccount,
   onOpenAdmin,
   onNavFeed,
+  theme,
 }) {
+  const isDark = theme !== 'light';
+  const cardBg = isDark ? '#161b22' : '#ffffff';
+  const cardBorder = isDark ? '#30363d' : '#d0d7de';
+  const textMain = isDark ? '#e6edf3' : '#1f2328';
+  const textMuted = isDark ? '#8b949e' : '#57606a';
+  const inputBg = isDark ? '#0d1117' : '#ffffff';
+  const innerBg = isDark ? '#0d1117' : '#f6f8fa';
+  const shadow = isDark ? '0 8px 24px rgba(0,0,0,0.3)' : '0 1px 3px rgba(31, 35, 40, 0.08)';
+
   const [dashData, setDashData] = useState(user ? { user } : null);
   const [fetchError, setFetchError] = useState('');
   const [featuredJobs, setFeaturedJobs] = useState([]);
@@ -4678,15 +5941,17 @@ function DashboardView({
   if (!user) {
     return (
       <div style={{ textAlign: 'center', padding: 60 }}>
-        <p style={{ color: '#8b949e', fontSize: 16 }}>Please sign in to access your dashboard.</p>
+        <p style={{ color: textMuted, fontSize: 16 }}>Please sign in to access your dashboard.</p>
       </div>
     );
   }
 
   if (!dashData && !fetchError) {
     return (
-      <div style={{ textAlign: 'center', padding: 60, color: '#8b949e' }}>
-        Loading dashboard data…
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '80px 20px', gap: 14 }}>
+        <div style={{ width: 44, height: 44, border: '3px solid rgba(88, 166, 255, 0.2)', borderTopColor: '#58a6ff', borderRadius: '50%', animation: 'codehubSpin 0.75s linear infinite' }} />
+        <div style={{ fontWeight: 700, fontSize: 15, color: textMain }}>Loading dashboard data…</div>
+        <div style={{ fontSize: 12, color: textMuted }}>Fetching real-time metrics and repository telemetry</div>
       </div>
     );
   }
@@ -4701,8 +5966,10 @@ function DashboardView({
       
       {/* ── Welcome Banner ── */}
       <div style={{
-        background: 'linear-gradient(135deg, #0d1f47 0%, #161240 50%, #1a0d40 100%)',
-        border: '1px solid #1f4280',
+        background: isDark
+          ? (isAdmin ? 'linear-gradient(135deg, #1f1035, #161b22)' : 'linear-gradient(135deg, #0d1f47 0%, #161240 50%, #1a0d40 100%)')
+          : (isAdmin ? 'linear-gradient(135deg, #f5f0ff, #f0fdf4)' : 'linear-gradient(135deg, #e0f2fe, #f0fdf4)'),
+        border: '1px solid ' + (isAdmin ? (isDark ? '#6e40c9' : '#e9d5ff') : (isDark ? '#1f4280' : '#bae6fd')),
         borderRadius: 20,
         padding: '30px 34px',
         display: 'flex',
@@ -4710,30 +5977,39 @@ function DashboardView({
         alignItems: 'center',
         flexWrap: 'wrap',
         gap: 20,
-        boxShadow: '0 12px 32px rgba(0,0,0,0.35)'
+        boxShadow: shadow
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
           <UserAvatar user={profile || user} size={64} />
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', marginBottom: 6 }}>
-              <h1 style={{ fontWeight: 900, fontSize: 24, color: '#e6edf3', margin: 0 }}>
+              <h1 style={{ fontWeight: 900, fontSize: 24, color: textMain, margin: 0 }}>
                 Good {new Date().getHours() < 12 ? 'morning' : new Date().getHours() < 18 ? 'afternoon' : 'evening'}, {(profile?.full_name || profile?.username || profile?.email || user?.full_name || user?.username || user?.email)}! 👋
               </h1>
               <span style={{
                 fontSize: 11, padding: '3px 10px', borderRadius: 20, fontWeight: 800,
-                background: isAdmin ? 'rgba(210,168,255,0.2)' : 'rgba(88,166,255,0.2)',
-                color: isAdmin ? '#d2a8ff' : '#79c0ff',
-                border: `1px solid ${isAdmin ? 'rgba(210,168,255,0.4)' : 'rgba(88,166,255,0.4)'}`
+                background: isAdmin
+                  ? (isDark ? 'rgba(210,168,255,0.2)' : '#f3e8ff')
+                  : (isDark ? 'rgba(88,166,255,0.2)' : '#e0f2fe'),
+                color: isAdmin
+                  ? (isDark ? '#d2a8ff' : '#7c3aed')
+                  : (isDark ? '#79c0ff' : '#0284c7'),
+                border: `1px solid ${isAdmin ? (isDark ? 'rgba(210,168,255,0.4)' : '#e9d5ff') : (isDark ? 'rgba(88,166,255,0.4)' : '#bae6fd')}`
               }}>
                 {isAdmin ? 'ADMINISTRATOR' : 'DEVELOPER'}
               </span>
               {user.is_verified && (
-                <span style={{ fontSize: 11, padding: '3px 10px', borderRadius: 20, fontWeight: 700, background: 'rgba(63,185,80,0.15)', color: '#3fb950', border: '1px solid rgba(63,185,80,0.3)' }}>
+                <span style={{
+                  fontSize: 11, padding: '3px 10px', borderRadius: 20, fontWeight: 700,
+                  background: isDark ? 'rgba(63,185,80,0.15)' : '#dcfce7',
+                  color: isDark ? '#3fb950' : '#15803d',
+                  border: `1px solid ${isDark ? 'rgba(63,185,80,0.3)' : '#bbf7d0'}`
+                }}>
                   ✅ Verified
                 </span>
               )}
             </div>
-            <p style={{ color: '#8b949e', fontSize: 13, margin: 0 }}>
+            <p style={{ color: textMuted, fontSize: 13, margin: 0 }}>
               {isAdmin ? 'System Administrator Portal — Platform Management, User Moderation & Security Logs' : "Welcome to your active CodeHub developer environment. Everything is up to date."}
             </p>
           </div>
@@ -4746,8 +6022,8 @@ function DashboardView({
               disabled={!user.is_verified}
               style={{
                 padding: '11px 22px', borderRadius: 14, fontWeight: 800, fontSize: 13,
-                background: user.is_verified ? 'linear-gradient(135deg, #238636, #2ea043)' : '#21262d',
-                color: user.is_verified ? '#fff' : '#8b949e',
+                background: user.is_verified ? 'linear-gradient(135deg, #238636, #2ea043)' : (isDark ? '#21262d' : '#e2e8f0'),
+                color: user.is_verified ? '#fff' : textMuted,
                 cursor: user.is_verified ? 'pointer' : 'not-allowed', border: 'none',
                 boxShadow: user.is_verified ? '0 4px 16px rgba(35,134,54,0.35)' : 'none'
               }}
@@ -4760,8 +6036,8 @@ function DashboardView({
               onClick={onOpenAdmin}
               style={{
                 padding: '11px 22px', borderRadius: 14, fontWeight: 800, fontSize: 13,
-                background: 'linear-gradient(135deg, #3d1f6e, #532b9b)',
-                color: '#d2a8ff', border: '1px solid #6e40c9', cursor: 'pointer',
+                background: isDark ? 'linear-gradient(135deg, #3d1f6e, #532b9b)' : 'linear-gradient(135deg, #7c3aed, #6d28d9)',
+                color: '#fff', border: 'none', cursor: 'pointer',
                 boxShadow: '0 4px 16px rgba(110,64,201,0.35)'
               }}
             >
@@ -4775,30 +6051,30 @@ function DashboardView({
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 14 }}>
         {(isAdmin
           ? [
-              { label: 'Total Users', value: stats.total_users ?? 0, icon: '👥', color: '#58a6ff', sub: `${stats.active_users ?? 0} active` },
-              { label: 'Total Repositories', value: stats.total_repositories ?? 0, icon: '📁', color: '#3fb950', sub: `${stats.public_repositories ?? 0} public` },
-              { label: 'Total Commits', value: stats.total_commits ?? 0, icon: '📦', color: '#79c0ff', sub: `${stats.total_files ?? 0} files` },
-              { label: 'Community Posts', value: stats.total_feed_posts ?? 0, icon: '📰', color: '#d2a8ff', sub: 'Active stream' },
-              { label: 'Pending Purges', value: stats.pending_deletions ?? 0, icon: '🚨', color: '#f85149', sub: 'Review needed' },
-              { label: 'System Access', value: 'Overriding', icon: '⚡', color: '#e3b341', sub: 'Full privilege' },
+              { label: 'Total Users', value: stats.total_users ?? 0, icon: '👥', color: isDark ? '#58a6ff' : '#0969da', sub: `${stats.active_users ?? 0} active` },
+              { label: 'Total Repositories', value: stats.total_repositories ?? 0, icon: '📁', color: isDark ? '#3fb950' : '#15803d', sub: `${stats.public_repositories ?? 0} public` },
+              { label: 'Total Commits', value: stats.total_commits ?? 0, icon: '📦', color: isDark ? '#79c0ff' : '#0284c7', sub: `${stats.total_files ?? 0} files` },
+              { label: 'Community Posts', value: stats.total_feed_posts ?? 0, icon: '📰', color: isDark ? '#d2a8ff' : '#7c3aed', sub: 'Active stream' },
+              { label: 'Pending Purges', value: stats.pending_deletions ?? 0, icon: '🚨', color: isDark ? '#f85149' : '#b91c1c', sub: 'Review needed' },
+              { label: 'System Access', value: 'Overriding', icon: '⚡', color: isDark ? '#e3b341' : '#a16207', sub: 'Full privilege' },
             ]
           : [
-              { label: 'Repositories', value: stats.repositories ?? userRepos.length, icon: '📁', color: '#58a6ff', sub: 'Hosted projects' },
-              { label: 'Total Commits', value: stats.commits ?? 0, icon: '📦', color: '#3fb950', sub: 'Pushed versions' },
-              { label: 'Issues & PRs', value: (stats.issues ?? 0) + (stats.pull_requests ?? 0), icon: '🔀', color: '#d2a8ff', sub: `${stats.pull_requests ?? 0} PRs, ${stats.issues ?? 0} issues` },
-              { label: 'Community Feed', value: stats.feed_posts ?? 0, icon: '📰', color: '#79c0ff', sub: `${stats.likes_received ?? 0} likes received` },
-              { label: 'Drive Storage', value: `${storageMB} MB`, icon: '☁️', color: '#e3b341', sub: `${stats.files_stored ?? 0} files synced` },
-              { label: 'Account Tier', value: user.role?.toUpperCase(), icon: '👤', color: '#58a6ff', sub: user.is_verified ? 'Verified access' : 'Unverified' },
+              { label: 'Repositories', value: stats.repositories ?? userRepos.length, icon: '📁', color: isDark ? '#58a6ff' : '#0969da', sub: 'Hosted projects' },
+              { label: 'Total Commits', value: stats.commits ?? 0, icon: '📦', color: isDark ? '#3fb950' : '#15803d', sub: 'Pushed versions' },
+              { label: 'Issues & PRs', value: (stats.issues ?? 0) + (stats.pull_requests ?? 0), icon: '🔀', color: isDark ? '#d2a8ff' : '#7c3aed', sub: `${stats.pull_requests ?? 0} PRs, ${stats.issues ?? 0} issues` },
+              { label: 'Community Feed', value: stats.feed_posts ?? 0, icon: '📰', color: isDark ? '#79c0ff' : '#0284c7', sub: `${stats.likes_received ?? 0} likes received` },
+              { label: 'Drive Storage', value: `${storageMB} MB`, icon: '☁️', color: isDark ? '#e3b341' : '#a16207', sub: `${stats.files_stored ?? 0} files synced` },
+              { label: 'Account Tier', value: user.role?.toUpperCase(), icon: '👤', color: isDark ? '#58a6ff' : '#0969da', sub: user.is_verified ? 'Verified access' : 'Unverified' },
             ]
         ).map((s, i) => (
-          <div key={i} style={{ background: '#161b22', border: '1px solid #21262d', borderRadius: 16, padding: '20px 18px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+          <div key={i} style={{ background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: 16, padding: '20px 18px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', boxShadow: shadow }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
               <span style={{ fontSize: 24 }}>{s.icon}</span>
-              <span style={{ fontSize: 11, color: '#8b949e', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 700 }}>{s.label}</span>
+              <span style={{ fontSize: 11, color: textMuted, textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 700 }}>{s.label}</span>
             </div>
             <div>
               <div style={{ fontSize: 24, fontWeight: 900, color: s.color }}>{s.value}</div>
-              <div style={{ fontSize: 11, color: '#8b949e', marginTop: 4 }}>{s.sub}</div>
+              <div style={{ fontSize: 11, color: textMuted, marginTop: 4 }}>{s.sub}</div>
             </div>
           </div>
         ))}
@@ -4807,54 +6083,54 @@ function DashboardView({
       {/* ── Developer Profile & Cloud Sync Summary ── */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
         {/* Developer Info Card */}
-        <div style={{ background: '#161b22', border: '1px solid #21262d', borderRadius: 16, padding: '22px 24px', display: 'flex', flexDirection: 'column', gap: 14 }}>
+        <div style={{ background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: 16, padding: '22px 24px', display: 'flex', flexDirection: 'column', gap: 14, boxShadow: shadow }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <h3 style={{ fontWeight: 800, fontSize: 15, color: '#e6edf3', margin: 0 }}>👤 Developer Identity</h3>
+            <h3 style={{ fontWeight: 800, fontSize: 15, color: textMain, margin: 0 }}>👤 Developer Identity</h3>
             <button
               onClick={() => window.dispatchEvent(new CustomEvent('navTo', { detail: 'settings' }))}
-              style={{ background: 'none', border: 'none', color: '#58a6ff', fontSize: 12, cursor: 'pointer', fontWeight: 700 }}>
+              style={{ background: 'none', border: 'none', color: isDark ? '#58a6ff' : '#0969da', fontSize: 12, cursor: 'pointer', fontWeight: 700 }}>
               Edit Profile →
             </button>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
             <div>
-              <div style={{ fontSize: 11, color: '#8b949e', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 700 }}>Username</div>
-              <div style={{ fontSize: 13, fontWeight: 700, color: '#58a6ff', fontFamily: 'monospace' }}>@{profile?.username || 'not_set'}</div>
+              <div style={{ fontSize: 11, color: textMuted, textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 700 }}>Username</div>
+              <div style={{ fontSize: 13, fontWeight: 700, color: isDark ? '#58a6ff' : '#0969da', fontFamily: 'monospace' }}>@{profile?.username || 'not_set'}</div>
             </div>
             <div>
-              <div style={{ fontSize: 11, color: '#8b949e', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 700 }}>Organization</div>
-              <div style={{ fontSize: 13, fontWeight: 600, color: '#e6edf3' }}>{profile?.organization || 'Independent'}</div>
+              <div style={{ fontSize: 11, color: textMuted, textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 700 }}>Organization</div>
+              <div style={{ fontSize: 13, fontWeight: 600, color: textMain }}>{profile?.organization || 'Independent'}</div>
             </div>
             <div>
-              <div style={{ fontSize: 11, color: '#8b949e', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 700 }}>Location</div>
-              <div style={{ fontSize: 13, fontWeight: 600, color: '#e6edf3' }}>{profile?.location || 'Remote / Worldwide'}</div>
+              <div style={{ fontSize: 11, color: textMuted, textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 700 }}>Location</div>
+              <div style={{ fontSize: 13, fontWeight: 600, color: textMain }}>{profile?.location || 'Remote / Worldwide'}</div>
             </div>
             <div>
-              <div style={{ fontSize: 11, color: '#8b949e', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 700 }}>Website</div>
-              <div style={{ fontSize: 13, fontWeight: 600, color: '#58a6ff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                {profile?.website_url ? <a href={profile.website_url} target="_blank" rel="noreferrer" style={{ color: '#58a6ff', textDecoration: 'none' }}>{profile.website_url.replace(/^https?:\/\//, '')}</a> : '—'}
+              <div style={{ fontSize: 11, color: textMuted, textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 700 }}>Website</div>
+              <div style={{ fontSize: 13, fontWeight: 600, color: isDark ? '#58a6ff' : '#0969da', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                {profile?.website_url ? <a href={profile.website_url} target="_blank" rel="noreferrer" style={{ color: isDark ? '#58a6ff' : '#0969da', textDecoration: 'none' }}>{profile.website_url.replace(/^https?:\/\//, '')}</a> : '—'}
               </div>
             </div>
           </div>
           {profile?.bio && (
-            <div style={{ background: '#0d1117', border: '1px solid #21262d', borderRadius: 12, padding: '10px 14px', fontSize: 12, color: '#8b949e', lineHeight: 1.5 }}>
+            <div style={{ background: innerBg, border: `1px solid ${cardBorder}`, borderRadius: 12, padding: '10px 14px', fontSize: 12, color: textMuted, lineHeight: 1.5 }}>
               "{profile.bio}"
             </div>
           )}
         </div>
 
         {/* Cloud Sync Status Card */}
-        <div style={{ background: '#161b22', border: '1px solid #21262d', borderRadius: 16, padding: '22px 24px', display: 'flex', flexDirection: 'column', gap: 14 }}>
+        <div style={{ background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: 16, padding: '22px 24px', display: 'flex', flexDirection: 'column', gap: 14, boxShadow: shadow }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <h3 style={{ fontWeight: 800, fontSize: 15, color: '#e6edf3', margin: 0 }}>☁️ Cloud Drive Sync & Health</h3>
-            <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 12, background: 'rgba(63,185,80,0.15)', color: '#3fb950', fontWeight: 700 }}>Connected</span>
+            <h3 style={{ fontWeight: 800, fontSize: 15, color: textMain, margin: 0 }}>☁️ Cloud Drive Sync & Health</h3>
+            <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 12, background: isDark ? 'rgba(63,185,80,0.15)' : '#dcfce7', color: isDark ? '#3fb950' : '#15803d', fontWeight: 700 }}>Connected</span>
           </div>
-          <p style={{ fontSize: 12, color: '#8b949e', margin: 0, lineHeight: 1.5 }}>
+          <p style={{ fontSize: 12, color: textMuted, margin: 0, lineHeight: 1.5 }}>
             Automated Google Drive version sync active. All commits create real-time snapshot files in isolated repository cloud folders.
           </p>
-          <div style={{ background: '#0d1117', border: '1px solid #21262d', borderRadius: 12, padding: '12px 14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 12 }}>
-            <span style={{ color: '#8b949e' }}>Storage Used</span>
-            <span style={{ fontWeight: 800, color: '#58a6ff' }}>{storageMB} MB / 15 GB Free Quota</span>
+          <div style={{ background: innerBg, border: `1px solid ${cardBorder}`, borderRadius: 12, padding: '12px 14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 12 }}>
+            <span style={{ color: textMuted }}>Storage Used</span>
+            <span style={{ fontWeight: 800, color: isDark ? '#58a6ff' : '#0969da' }}>{storageMB} MB / 15 GB Free Quota</span>
           </div>
           <div style={{ display: 'flex', gap: 10 }}>
             <button
@@ -4864,7 +6140,7 @@ function DashboardView({
             </button>
             <button
               onClick={onNavFeed}
-              style={{ flex: 1, padding: '8px 14px', borderRadius: 12, fontSize: 12, fontWeight: 700, background: '#21262d', color: '#58a6ff', border: '1px solid #30363d', cursor: 'pointer' }}>
+              style={{ flex: 1, padding: '8px 14px', borderRadius: 12, fontSize: 12, fontWeight: 700, background: isDark ? '#21262d' : '#f6f8fa', color: isDark ? '#58a6ff' : '#0969da', border: `1px solid ${cardBorder}`, cursor: 'pointer' }}>
               📰 Feed Updates
             </button>
           </div>
@@ -4872,8 +6148,8 @@ function DashboardView({
       </div>
 
       {/* ── Quick Actions Bar ── */}
-      <div style={{ background: '#161b22', border: '1px solid #21262d', borderRadius: 16, padding: '22px 24px' }}>
-        <h3 style={{ fontWeight: 800, fontSize: 15, marginBottom: 16, color: '#e6edf3' }}>⚡ Developer Quick Launch</h3>
+      <div style={{ background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: 16, padding: '22px 24px', boxShadow: shadow }}>
+        <h3 style={{ fontWeight: 800, fontSize: 15, marginBottom: 16, color: textMain }}>⚡ Developer Quick Launch</h3>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: 12 }}>
           {[
             { icon: '💼', label: isAdmin ? 'Manage Jobs' : 'Explore Jobs', action: () => window.dispatchEvent(new CustomEvent('navTo', { detail: 'jobs' })) },
@@ -4893,17 +6169,18 @@ function DashboardView({
               key={i}
               onClick={qa.action}
               style={{
-                padding: '14px 10px', borderRadius: 14, background: '#0d1117',
-                border: '1px solid #30363d', color: '#e6edf3', fontSize: 12, fontWeight: 700,
+                padding: '14px 10px', borderRadius: 14, background: innerBg,
+                border: `1px solid ${cardBorder}`, color: textMain, fontSize: 12, fontWeight: 700,
                 cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8,
                 transition: 'all 0.2s',
+                boxShadow: isDark ? 'none' : '0 1px 2px rgba(31,35,40,0.04)'
               }}
               onMouseEnter={e => {
-                e.currentTarget.style.borderColor = '#58a6ff';
+                e.currentTarget.style.borderColor = '#0969da';
                 e.currentTarget.style.transform = 'translateY(-2px)';
               }}
               onMouseLeave={e => {
-                e.currentTarget.style.borderColor = '#30363d';
+                e.currentTarget.style.borderColor = cardBorder;
                 e.currentTarget.style.transform = 'translateY(0)';
               }}
             >
@@ -4916,13 +6193,13 @@ function DashboardView({
 
       {/* ── Recommended Tech Jobs & Careers (Developer Dashboard) ── */}
       {!isAdmin && (
-        <div style={{ background: '#161b22', border: '1px solid #21262d', borderRadius: 16, padding: '22px 24px' }}>
+        <div style={{ background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: 16, padding: '22px 24px', boxShadow: shadow }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, flexWrap: 'wrap', gap: 10 }}>
             <div>
-              <h3 style={{ fontWeight: 800, fontSize: 16, color: '#e6edf3', margin: 0 }}>
+              <h3 style={{ fontWeight: 800, fontSize: 16, color: textMain, margin: 0 }}>
                 💼 Recommended Tech Jobs & Career Opportunities
               </h3>
-              <p style={{ margin: '4px 0 0', fontSize: 12, color: '#8b949e' }}>
+              <p style={{ margin: '4px 0 0', fontSize: 12, color: textMuted }}>
                 Active open positions curated across engineering disciplines. Click to view full details and apply.
               </p>
             </div>
@@ -4930,10 +6207,10 @@ function DashboardView({
               onClick={() => window.dispatchEvent(new CustomEvent('navTo', { detail: 'jobs' }))}
               style={{
                 padding: '8px 16px',
-                borderRadius: 10,
-                background: '#21262d',
-                border: '1px solid #30363d',
-                color: '#58a6ff',
+                borderRadius: 20,
+                background: isDark ? '#21262d' : '#e0f2fe',
+                border: `1px solid ${isDark ? '#30363d' : '#bae6fd'}`,
+                color: isDark ? '#58a6ff' : '#0969da',
                 fontSize: 12,
                 fontWeight: 700,
                 cursor: 'pointer'
@@ -4944,9 +6221,9 @@ function DashboardView({
           </div>
 
           {jobsLoading ? (
-            <div style={{ textAlign: 'center', padding: 24, color: '#8b949e', fontSize: 13 }}>Loading opportunities...</div>
+            <div style={{ textAlign: 'center', padding: 24, color: textMuted, fontSize: 13 }}>Loading opportunities...</div>
           ) : featuredJobs.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: 24, color: '#8b949e', fontSize: 13, background: '#0d1117', borderRadius: 12, border: '1px solid #21262d' }}>
+            <div style={{ textAlign: 'center', padding: 24, color: textMuted, fontSize: 13, background: innerBg, borderRadius: 12, border: `1px solid ${cardBorder}` }}>
               No open job postings available right now. Check back soon!
             </div>
           ) : (
@@ -4956,33 +6233,34 @@ function DashboardView({
                   key={job.id}
                   onClick={() => window.dispatchEvent(new CustomEvent('navTo', { detail: 'jobs' }))}
                   style={{
-                    background: '#0d1117',
-                    border: '1px solid #21262d',
-                    borderRadius: 12,
+                    background: innerBg,
+                    border: `1px solid ${cardBorder}`,
+                    borderRadius: 14,
                     padding: 16,
                     cursor: 'pointer',
                     display: 'flex',
                     flexDirection: 'column',
                     justifyContent: 'space-between',
                     gap: 12,
-                    transition: 'all 0.2s'
+                    transition: 'all 0.2s',
+                    boxShadow: isDark ? 'none' : '0 1px 2px rgba(31,35,40,0.04)'
                   }}
-                  onMouseEnter={e => { e.currentTarget.style.borderColor = '#58a6ff'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
-                  onMouseLeave={e => { e.currentTarget.style.borderColor = '#21262d'; e.currentTarget.style.transform = 'translateY(0)'; }}
+                  onMouseEnter={e => { e.currentTarget.style.borderColor = '#0969da'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
+                  onMouseLeave={e => { e.currentTarget.style.borderColor = cardBorder; e.currentTarget.style.transform = 'translateY(0)'; }}
                 >
                   <div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
-                      <span style={{ fontWeight: 800, fontSize: 14, color: '#e6edf3' }}>{job.title}</span>
-                      <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 10, background: 'rgba(63,185,80,0.15)', color: '#3fb950', fontWeight: 700, textTransform: 'uppercase' }}>
+                      <span style={{ fontWeight: 800, fontSize: 14, color: textMain }}>{job.title}</span>
+                      <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 10, background: isDark ? 'rgba(63,185,80,0.15)' : '#dcfce7', color: isDark ? '#3fb950' : '#15803d', fontWeight: 700, textTransform: 'uppercase' }}>
                         {job.job_type}
                       </span>
                     </div>
-                    <div style={{ fontSize: 12, color: '#58a6ff', marginTop: 4 }}>🏢 {job.company}</div>
-                    <div style={{ fontSize: 11, color: '#8b949e', marginTop: 2 }}>📍 {job.location} · 💰 {job.salary_range}</div>
+                    <div style={{ fontSize: 12, color: isDark ? '#58a6ff' : '#0969da', marginTop: 4 }}>🏢 {job.company}</div>
+                    <div style={{ fontSize: 11, color: textMuted, marginTop: 2 }}>📍 {job.location} · 💰 {job.salary_range}</div>
                   </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid #21262d', paddingTop: 10 }}>
-                    <span style={{ fontSize: 11, color: '#8b949e' }}>{job.skills && job.skills.slice(0, 2).join(' · ')}</span>
-                    <span style={{ fontSize: 12, color: '#58a6ff', fontWeight: 700 }}>Apply Now →</span>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: `1px solid ${isDark ? '#21262d' : '#e2e8f0'}`, paddingTop: 10 }}>
+                    <span style={{ fontSize: 11, color: textMuted }}>{job.skills && job.skills.slice(0, 2).join(' · ')}</span>
+                    <span style={{ fontSize: 12, color: isDark ? '#58a6ff' : '#0969da', fontWeight: 700 }}>Apply Now →</span>
                   </div>
                 </div>
               ))}
@@ -4994,29 +6272,29 @@ function DashboardView({
       {/* ── Lower Grid: Repositories & Activity ── */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 20 }}>
         {isAdmin ? (
-          <div style={{ background: '#161b22', border: '1px solid #21262d', borderRadius: 16, padding: '22px 24px' }}>
+          <div style={{ background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: 16, padding: '22px 24px', boxShadow: shadow }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-              <h3 style={{ fontWeight: 800, fontSize: 15, color: '#e6edf3', margin: 0 }}>📰 Community Feed Moderation</h3>
-              <button onClick={onNavFeed} style={{ background: 'none', border: 'none', color: '#58a6ff', fontSize: 12, cursor: 'pointer', fontWeight: 700 }}>
+              <h3 style={{ fontWeight: 800, fontSize: 15, color: textMain, margin: 0 }}>📰 Community Feed Moderation</h3>
+              <button onClick={onNavFeed} style={{ background: 'none', border: 'none', color: isDark ? '#58a6ff' : '#0969da', fontSize: 12, cursor: 'pointer', fontWeight: 700 }}>
                 Open Feed →
               </button>
             </div>
-            <p style={{ fontSize: 13, color: '#8b949e', lineHeight: 1.5, marginBottom: 16 }}>
+            <p style={{ fontSize: 13, color: textMuted, lineHeight: 1.5, marginBottom: 16 }}>
               Review technical updates and snippets shared across the developer ecosystem. Administrators have overriding deletion and moderation authority.
             </p>
             <button
               onClick={onNavFeed}
-              style={{ padding: '9px 18px', borderRadius: 12, background: '#21262d', border: '1px solid #30363d', color: '#58a6ff', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}
+              style={{ padding: '9px 18px', borderRadius: 12, background: isDark ? '#21262d' : '#f6f8fa', border: `1px solid ${cardBorder}`, color: isDark ? '#58a6ff' : '#0969da', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}
             >
               View Community Stream
             </button>
           </div>
         ) : (
-          <div style={{ background: '#161b22', border: '1px solid #21262d', borderRadius: 16, padding: '22px 24px' }}>
+          <div style={{ background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: 16, padding: '22px 24px', boxShadow: shadow }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-              <h3 style={{ fontWeight: 800, fontSize: 15, marginBottom: 0, color: '#e6edf3' }}>📁 Active Repositories</h3>
+              <h3 style={{ fontWeight: 800, fontSize: 15, marginBottom: 0, color: textMain }}>📁 Active Repositories</h3>
               {user.is_verified && (
-                <button onClick={onOpenCreateRepo} style={{ background: 'none', border: 'none', color: '#58a6ff', fontSize: 12, cursor: 'pointer', fontWeight: 700 }}>
+                <button onClick={onOpenCreateRepo} style={{ background: 'none', border: 'none', color: isDark ? '#58a6ff' : '#0969da', fontSize: 12, cursor: 'pointer', fontWeight: 700 }}>
                   + New
                 </button>
               )}
@@ -5028,31 +6306,32 @@ function DashboardView({
                   onClick={() => onSelectRepo(r.id)}
                   style={{
                     padding: '12px 14px', borderRadius: 12, cursor: 'pointer',
-                    border: '1px solid #21262d', background: '#0d1117',
+                    border: `1px solid ${cardBorder}`, background: innerBg,
                     display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                    transition: 'all 0.2s'
+                    transition: 'all 0.2s',
+                    boxShadow: isDark ? 'none' : '0 1px 2px rgba(31,35,40,0.04)'
                   }}
                   onMouseEnter={e => {
-                    e.currentTarget.style.borderColor = '#58a6ff';
+                    e.currentTarget.style.borderColor = '#0969da';
                     e.currentTarget.style.transform = 'translateY(-1px)';
                   }}
                   onMouseLeave={e => {
-                    e.currentTarget.style.borderColor = '#21262d';
+                    e.currentTarget.style.borderColor = cardBorder;
                     e.currentTarget.style.transform = 'translateY(0)';
                   }}
                 >
                   <div>
-                    <div style={{ fontWeight: 800, fontSize: 13, color: '#58a6ff' }}>📦 {r.name}</div>
-                    <div style={{ fontSize: 11, color: '#8b949e', marginTop: 3 }}>{r.description || 'No description provided'}</div>
+                    <div style={{ fontWeight: 800, fontSize: 13, color: isDark ? '#58a6ff' : '#0969da' }}>📦 {r.name}</div>
+                    <div style={{ fontSize: 11, color: textMuted, marginTop: 3 }}>{r.description || 'No description provided'}</div>
                   </div>
-                  <div style={{ display: 'flex', gap: 8, fontSize: 11, color: '#8b949e' }}>
+                  <div style={{ display: 'flex', gap: 8, fontSize: 11, color: textMuted }}>
                     <span>🌿 {r.branch_count || 1}</span>
                     <span>📦 {r.commit_count || 1}</span>
                   </div>
                 </div>
               ))}
               {recentRepos.length === 0 && (
-                <div style={{ textAlign: 'center', padding: 30, color: '#8b949e', fontSize: 13 }}>
+                <div style={{ textAlign: 'center', padding: 30, color: textMuted, fontSize: 13 }}>
                   No repositories yet. Create your first code workspace!
                 </div>
               )}
@@ -5061,10 +6340,10 @@ function DashboardView({
         )}
 
         {/* Right Panel – Recent System & Workspace Activity */}
-        <div style={{ background: '#161b22', border: '1px solid #21262d', borderRadius: 16, padding: '22px 24px' }}>
-          <h3 style={{ fontWeight: 800, fontSize: 15, color: '#e6edf3', marginBottom: 14 }}>📊 Recent Activity Stream</h3>
+        <div style={{ background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: 16, padding: '22px 24px', boxShadow: shadow }}>
+          <h3 style={{ fontWeight: 800, fontSize: 15, color: textMain, marginBottom: 14 }}>📊 Recent Activity Stream</h3>
           {activity.length === 0 ? (
-            <p style={{ color: '#8b949e', fontSize: 13 }}>No recent activity recorded.</p>
+            <p style={{ color: textMuted, fontSize: 13 }}>No recent activity recorded.</p>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               {activity.slice(0, 7).map((a, i) => {
@@ -5072,12 +6351,12 @@ function DashboardView({
                 const timestamp = a && typeof a === 'object' ? (a.timestamp || a.created_at || '') : '';
                 const description = a && typeof a === 'object' ? (typeof a.description === 'string' ? a.description : JSON.stringify(a.description)) : String(a || '');
                 return (
-                  <div key={i} style={{ padding: '10px 12px', background: '#0d1117', border: '1px solid #21262d', borderRadius: 10, fontSize: 12 }}>
+                  <div key={i} style={{ padding: '10px 14px', background: innerBg, border: `1px solid ${cardBorder}`, borderRadius: 10, fontSize: 12 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 3 }}>
-                      <span style={{ fontSize: 10, fontWeight: 800, padding: '2px 8px', borderRadius: 10, background: 'rgba(88,166,255,0.15)', color: '#58a6ff' }}>{actionType || 'EVENT'}</span>
-                      <span style={{ marginLeft: 'auto', color: '#6e7681', fontSize: 11 }}>{timestamp}</span>
+                      <span style={{ fontSize: 10, fontWeight: 800, padding: '2px 8px', borderRadius: 10, background: isDark ? 'rgba(88,166,255,0.15)' : '#e0f2fe', color: isDark ? '#58a6ff' : '#0969da' }}>{actionType || 'EVENT'}</span>
+                      <span style={{ marginLeft: 'auto', color: textMuted, fontSize: 11 }}>{timestamp}</span>
                     </div>
-                    <div style={{ color: '#c9d1d9', lineHeight: 1.4 }}>{description}</div>
+                    <div style={{ color: textMain, lineHeight: 1.4 }}>{description}</div>
                   </div>
                 );
               })}

@@ -14,44 +14,42 @@ class DashboardController {
     try {
       const user = req.user;
 
-      // Recent repos
-      const recentRepos = await Repository.find({ user_id: user.id })
-        .sort({ created_at: -1 })
-        .limit(6)
-        .lean();
+      // Execute primary queries concurrently in parallel
+      const [recentRepos, activity, repoCount, commitCount, issueCount, pullCount, feedCount, userPostIds, userRepoIds, profile] = await Promise.all([
+        Repository.find({ user_id: user.id }).sort({ created_at: -1 }).limit(6).lean(),
+        AdminSystemActivityLog.find({ user_id: user.id }).sort({ timestamp: -1 }).limit(10).lean(),
+        Repository.countDocuments({ user_id: user.id }),
+        RepositoryCommit.countDocuments({ user_id: user.id }),
+        IssueAndPull.countDocuments({ creator_id: user.id, type: 'issue' }),
+        IssueAndPull.countDocuments({ creator_id: user.id, type: 'pull_request' }),
+        FeedPost.countDocuments({ user_id: user.id }),
+        FeedPost.find({ user_id: user.id }, { id: 1 }).lean().then(posts => posts.map(p => p.id)),
+        Repository.find({ user_id: user.id }, { id: 1 }).lean().then(repos => repos.map(r => r.id)),
+        User.findOne({ id: user.id }).lean()
+      ]);
 
-      // Enrich repos with counts
+      // Enrich recentRepos and secondary metrics in parallel batch
+      const recentRepoIds = recentRepos.map(r => r.id);
+      const [likesReceived, files, branchCounts, commitCounts, fileCounts] = await Promise.all([
+        FeedLike.countDocuments({ post_id: { $in: userPostIds } }),
+        RepositoryFile.find({ repo_id: { $in: userRepoIds } }, { size: 1 }).lean(),
+        Branch.aggregate([{ $match: { repo_id: { $in: recentRepoIds } } }, { $group: { _id: '$repo_id', count: { $sum: 1 } } }]),
+        RepositoryCommit.aggregate([{ $match: { repo_id: { $in: recentRepoIds } } }, { $group: { _id: '$repo_id', count: { $sum: 1 } } }]),
+        RepositoryFile.aggregate([{ $match: { repo_id: { $in: recentRepoIds } } }, { $group: { _id: '$repo_id', count: { $sum: 1 } } }])
+      ]);
+
+      const branchMap = {}; branchCounts.forEach(b => { branchMap[b._id] = b.count; });
+      const commitMap = {}; commitCounts.forEach(c => { commitMap[c._id] = c.count; });
+      const fileMap = {}; fileCounts.forEach(f => { fileMap[f._id] = f.count; });
+
       for (const r of recentRepos) {
-        r.branch_count = await Branch.countDocuments({ repo_id: r.id });
-        r.commit_count = await RepositoryCommit.countDocuments({ repo_id: r.id });
-        r.file_count = await RepositoryFile.countDocuments({ repo_id: r.id });
+        r.branch_count = branchMap[r.id] || 0;
+        r.commit_count = commitMap[r.id] || 0;
+        r.file_count = fileMap[r.id] || 0;
       }
 
-      // Recent activity
-      const activity = await AdminSystemActivityLog.find({ user_id: user.id })
-        .sort({ timestamp: -1 })
-        .limit(10)
-        .lean();
-
-      // Counts
-      const repoCount = await Repository.countDocuments({ user_id: user.id });
-      const commitCount = await RepositoryCommit.countDocuments({ user_id: user.id });
-      const issueCount = await IssueAndPull.countDocuments({ creator_id: user.id, type: 'issue' });
-      const pullCount = await IssueAndPull.countDocuments({ creator_id: user.id, type: 'pull_request' });
-      const feedCount = await FeedPost.countDocuments({ user_id: user.id });
-
-      // Likes received on user's feed posts
-      const userPostIds = (await FeedPost.find({ user_id: user.id }, { id: 1 }).lean()).map(p => p.id);
-      const likesReceived = await FeedLike.countDocuments({ post_id: { $in: userPostIds } });
-
-      // Storage usage
-      const userRepoIds = (await Repository.find({ user_id: user.id }, { id: 1 }).lean()).map(r => r.id);
-      const files = await RepositoryFile.find({ repo_id: { $in: userRepoIds } }, { size: 1 }).lean();
       const totalFiles = files.length;
       const totalSize = files.reduce((acc, f) => acc + (f.size || 0), 0);
-
-      // Fresh profile
-      const profile = await User.findOne({ id: user.id }).lean();
 
       res.json({
         success: true,
@@ -99,26 +97,40 @@ class DashboardController {
     try {
       const adminUser = req.user;
 
-      const totalUsers = await User.countDocuments();
-      const activeUsers = await User.countDocuments({ account_status: 'active' });
-      const verifiedUsers = await User.countDocuments({ email_verified_status: true });
-      const unverifiedUsers = await User.countDocuments({ email_verified_status: false });
-      const totalRepos = await Repository.countDocuments();
-      const publicRepos = await Repository.countDocuments({ visibility: 'public' });
-      const privateRepos = await Repository.countDocuments({ visibility: 'private' });
-      const totalCommits = await RepositoryCommit.countDocuments();
-      const totalFiles = await RepositoryFile.countDocuments();
-      const totalFeedPosts = await FeedPost.countDocuments();
-      const pendingDeletions = await AdminAccountActionRequest.countDocuments({ status: 'pending' });
-
-      // Recent system logs with actor email
-      const recentLogsRaw = await AdminSystemActivityLog.find()
-        .sort({ timestamp: -1 })
-        .limit(15)
-        .lean();
+      // Execute all metrics and lookups in parallel
+      const [
+        totalUsers,
+        activeUsers,
+        verifiedUsers,
+        unverifiedUsers,
+        totalRepos,
+        publicRepos,
+        privateRepos,
+        totalCommits,
+        totalFiles,
+        totalFeedPosts,
+        pendingDeletions,
+        recentLogsRaw,
+        users,
+        recentUsers
+      ] = await Promise.all([
+        User.countDocuments(),
+        User.countDocuments({ account_status: 'active' }),
+        User.countDocuments({ email_verified_status: true }),
+        User.countDocuments({ email_verified_status: false }),
+        Repository.countDocuments(),
+        Repository.countDocuments({ visibility: 'public' }),
+        Repository.countDocuments({ visibility: 'private' }),
+        RepositoryCommit.countDocuments(),
+        RepositoryFile.countDocuments(),
+        FeedPost.countDocuments(),
+        AdminAccountActionRequest.countDocuments({ status: 'pending' }),
+        AdminSystemActivityLog.find().sort({ timestamp: -1 }).limit(15).lean(),
+        User.find({}, { id: 1, email: 1 }).lean(),
+        User.find().sort({ created_at: -1 }).limit(6).lean()
+      ]);
 
       const userMap = {};
-      const users = await User.find({}, { id: 1, email: 1 }).lean();
       users.forEach(u => { userMap[u.id] = u.email; });
 
       const recentLogs = recentLogsRaw.map(l => ({
@@ -127,12 +139,6 @@ class DashboardController {
         timestamp: l.timestamp,
         actor_email: userMap[l.user_id] || `User #${l.user_id}`
       }));
-
-      // Recent users
-      const recentUsers = await User.find()
-        .sort({ created_at: -1 })
-        .limit(6)
-        .lean();
 
       res.json({
         success: true,

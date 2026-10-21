@@ -1,8 +1,19 @@
+const path = require('path');
+const fs = require('fs');
+const formidable = require('formidable');
 const Job = require('../models/Job');
 const JobApplication = require('../models/JobApplication');
 const User = require('../models/User');
 const { getNextSequence } = require('../models/Counter');
 const ActivityLogger = require('../services/activityLogger');
+const {
+  STORAGE_DIR,
+  PUBLIC_DIR,
+  downloadAndSaveImage,
+  saveImageBuffer,
+  generateJobBannerSVG,
+  ROLE_COLORS
+} = require('../services/jobImageService');
 
 class JobController {
   // GET /api/jobs - list/search jobs with filters
@@ -44,7 +55,8 @@ class JobController {
         query = query.sort({ created_at: -1 });
       }
 
-      const jobs = await query.limit(100).lean();
+      const limit = parseInt(req.query.limit, 10) || 300;
+      const jobs = await query.limit(limit).lean();
 
       // Enrich with poster info
       const posterIds = [...new Set(jobs.map(j => j.posted_by_user_id))];
@@ -95,6 +107,69 @@ class JobController {
     }
   }
 
+  // POST /api/jobs/upload-image - upload custom job image file (Admin only)
+  static async uploadImage(req, res) {
+    try {
+      // 1. Support JSON base64 uploads directly
+      if (req.body && req.body.image && typeof req.body.image === 'string' && req.body.image.startsWith('data:image/')) {
+        const matches = req.body.image.match(/^data:image\/([a-zA-Z0-9]+);base64,(.+)$/);
+        if (matches) {
+          const ext = matches[1] === 'jpeg' ? 'jpg' : matches[1];
+          const filename = `job_upload_${Date.now()}_${Math.random().toString(36).substring(2, 8)}.${ext}`;
+          const buffer = Buffer.from(matches[2], 'base64');
+          const localUrl = saveImageBuffer(buffer, filename);
+          return res.json({
+            success: true,
+            message: 'Job image uploaded and stored successfully!',
+            filename,
+            image_url: localUrl
+          });
+        }
+      }
+
+      // 2. Support Multipart Form uploads via formidable
+      const form = formidable({
+        uploadDir: STORAGE_DIR,
+        keepExtensions: true,
+        maxFileSize: 10 * 1024 * 1024,
+        filename: (name, ext, part) => {
+          const extension = ext || path.extname(part.originalFilename || '') || '.jpg';
+          return `job_upload_${Date.now()}_${Math.random().toString(36).substring(2, 8)}${extension}`;
+        }
+      });
+
+      form.parse(req, (err, fields, files) => {
+        if (err) {
+          return res.status(400).json({ error: err.message || 'Image upload failed.' });
+        }
+
+        const uploadedFile = files.image || files.file;
+        const fileObj = Array.isArray(uploadedFile) ? uploadedFile[0] : uploadedFile;
+
+        if (!fileObj) {
+          return res.status(400).json({ error: 'No image file provided in request.' });
+        }
+
+        const savedFilename = path.basename(fileObj.filepath);
+        const publicPath = path.join(PUBLIC_DIR, savedFilename);
+        try {
+          fs.copyFileSync(fileObj.filepath, publicPath);
+        } catch (copyErr) {}
+
+        const localUrl = `/uploads/jobs/${savedFilename}`;
+        res.json({
+          success: true,
+          message: 'Job image uploaded and stored successfully!',
+          filename: savedFilename,
+          image_url: localUrl
+        });
+      });
+    } catch (err) {
+      console.error('[Job Image Upload Error]', err);
+      res.status(500).json({ error: err.message });
+    }
+  }
+
   // POST /api/jobs - create a new job posting (Admin only)
   static async createJob(req, res) {
     try {
@@ -108,24 +183,55 @@ class JobController {
       const title = (input.title || '').trim();
       const company = (input.company || '').trim();
       const description = (input.description || '').trim();
+      const role = input.role || 'Full Stack';
 
       if (!title || !company || !description) {
         return res.status(422).json({ error: 'Title, company, and description are required.' });
       }
 
       const jobId = await getNextSequence('jobs');
+      let finalImageUrl = (input.image_url || '').trim();
+
+      // Download and store image locally in folder if external URL or base64
+      if (finalImageUrl.startsWith('data:image/')) {
+        try {
+          const matches = finalImageUrl.match(/^data:image\/([a-zA-Z0-9]+);base64,(.+)$/);
+          if (matches) {
+            const ext = matches[1] === 'jpeg' ? 'jpg' : matches[1];
+            const buffer = Buffer.from(matches[2], 'base64');
+            const filename = `job_${jobId}_custom.${ext}`;
+            finalImageUrl = saveImageBuffer(buffer, filename);
+          }
+        } catch (b64Err) {
+          console.warn('[Job Create] Base64 parse failed:', b64Err.message);
+        }
+      } else if (finalImageUrl.startsWith('http://') || finalImageUrl.startsWith('https://')) {
+        try {
+          const filename = `job_${jobId}_custom.jpg`;
+          finalImageUrl = await downloadAndSaveImage(finalImageUrl, filename, { title, company, role });
+        } catch (dlErr) {
+          console.warn('[Job Create] Image download failed, using local fallback:', dlErr.message);
+          finalImageUrl = `/uploads/jobs/role_${role.toLowerCase().replace(/[^a-z0-9]+/g, '_')}.jpg`;
+        }
+      } else if (!finalImageUrl || !finalImageUrl.startsWith('/uploads/jobs/')) {
+        // Fallback to role local image stored in folder
+        const roleSlug = role.toLowerCase().replace(/[^a-z0-9]+/g, '_');
+        finalImageUrl = `/uploads/jobs/role_${roleSlug}.jpg`;
+      }
+
       const job = await Job.create({
         id: jobId,
         title,
         company,
         location: (input.location || 'Remote').trim(),
         type: input.type || 'Full-time',
-        role: input.role || 'Full Stack',
+        role,
         experienceLevel: input.experienceLevel || 'Mid Level',
         salary: (input.salary || '').trim() || '$100k - $140k / yr',
         description,
         requirements: Array.isArray(input.requirements) ? input.requirements : [],
         skills: Array.isArray(input.skills) ? input.skills : [],
+        image_url: finalImageUrl,
         posted_by_user_id: user.id,
         poster_name: user.full_name || user.username || 'CodeHub Administrator',
         poster_email: user.email || '',
@@ -138,7 +244,7 @@ class JobController {
 
       res.status(201).json({
         success: true,
-        message: 'Job posted successfully!',
+        message: 'Job posted and image saved to local folder successfully!',
         job: job.toObject()
       });
     } catch (err) {

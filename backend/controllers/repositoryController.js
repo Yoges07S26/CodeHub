@@ -28,17 +28,34 @@ class RepositoryController {
           .sort({ created_at: -1 }).lean();
       }
 
-      // Fetch owner emails
+      // Fetch owner emails, branch counts, and commit counts in parallel batches
       const userIds = [...new Set(repos.map(r => r.user_id))];
-      const users = await User.find({ id: { $in: userIds } }, { id: 1, email: 1, username: 1, full_name: 1 }).lean();
+      const repoIds = repos.map(r => r.id);
+
+      const [users, branchCounts, commitCounts] = await Promise.all([
+        User.find({ id: { $in: userIds } }, { id: 1, email: 1, username: 1, full_name: 1 }).lean(),
+        Branch.aggregate([
+          { $match: { repo_id: { $in: repoIds } } },
+          { $group: { _id: '$repo_id', count: { $sum: 1 } } }
+        ]),
+        RepositoryCommit.aggregate([
+          { $match: { repo_id: { $in: repoIds } } },
+          { $group: { _id: '$repo_id', count: { $sum: 1 } } }
+        ])
+      ]);
+
       const userMap = {};
       users.forEach(u => { userMap[u.id] = u.username || u.full_name || u.email; });
+      const branchMap = {};
+      branchCounts.forEach(b => { branchMap[b._id] = b.count; });
+      const commitMap = {};
+      commitCounts.forEach(c => { commitMap[c._id] = c.count; });
 
       for (const r of repos) {
         r.owner_email = userMap[r.user_id] || '';
         r.owner_name = userMap[r.user_id] || 'Developer';
-        r.branch_count = await Branch.countDocuments({ repo_id: r.id });
-        r.commit_count = await RepositoryCommit.countDocuments({ repo_id: r.id });
+        r.branch_count = branchMap[r.id] || 0;
+        r.commit_count = commitMap[r.id] || 0;
       }
 
       res.json({ success: true, repositories: repos });
@@ -158,11 +175,12 @@ class RepositoryController {
         }
       }
 
-      const owner = await User.findOne({ id: repo.user_id }, { email: 1 }).lean();
+      const [owner, branches, totalCommits] = await Promise.all([
+        User.findOne({ id: repo.user_id }, { email: 1 }).lean(),
+        Branch.find({ repo_id: repoId }).sort({ id: 1 }).lean(),
+        RepositoryCommit.countDocuments({ repo_id: repoId })
+      ]);
       repo.owner_email = owner ? owner.email : '';
-
-      const branches = await Branch.find({ repo_id: repoId }).sort({ id: 1 }).lean();
-      const totalCommits = await RepositoryCommit.countDocuments({ repo_id: repoId });
 
       res.json({
         success: true,

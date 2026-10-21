@@ -26,8 +26,16 @@ class FileController {
         .sort({ file_path: 1 })
         .lean();
 
+      const fileIds = files.map(f => f.id);
+      const versionCounts = await FileVersionHistory.aggregate([
+        { $match: { file_id: { $in: fileIds } } },
+        { $group: { _id: '$file_id', count: { $sum: 1 } } }
+      ]);
+      const versionMap = {};
+      versionCounts.forEach(v => { versionMap[v._id] = v.count; });
+
       for (const f of files) {
-        f.version_count = await FileVersionHistory.countDocuments({ file_id: f.id });
+        f.version_count = versionMap[f.id] || 0;
       }
 
       res.json({
@@ -45,12 +53,14 @@ class FileController {
       const repoId = Number(req.params.id);
       const fileId = Number(req.params.fileId);
 
-      const file = await RepositoryFile.findOne({ id: fileId, repo_id: repoId }).lean();
+      const [file, repo] = await Promise.all([
+        RepositoryFile.findOne({ id: fileId, repo_id: repoId }).lean(),
+        Repository.findOne({ id: repoId }).lean()
+      ]);
+
       if (!file) {
         return res.status(404).json({ error: 'File not found.' });
       }
-
-      const repo = await Repository.findOne({ id: repoId }).lean();
       if (!repo) {
         return res.status(404).json({ error: 'Repository not found.' });
       }

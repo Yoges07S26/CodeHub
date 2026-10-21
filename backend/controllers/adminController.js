@@ -10,17 +10,29 @@ const ActivityLogger = require('../services/activityLogger');
 class AdminController {
   static async dashboardMetrics(req, res) {
     try {
-      const totalUsers = await User.countDocuments();
-      const activeUsers = await User.countDocuments({ account_status: 'active' });
-      const unverifiedUsers = await User.countDocuments({ email_verified_status: false });
-      const totalRepos = await Repository.countDocuments();
-      const publicRepos = await Repository.countDocuments({ visibility: 'public' });
-      const totalCommits = await RepositoryCommit.countDocuments();
-      const totalFiles = await RepositoryFile.countDocuments();
+      const [
+        totalUsers,
+        activeUsers,
+        unverifiedUsers,
+        totalRepos,
+        publicRepos,
+        totalCommits,
+        totalFiles,
+        files,
+        pendingDeletions
+      ] = await Promise.all([
+        User.countDocuments(),
+        User.countDocuments({ account_status: 'active' }),
+        User.countDocuments({ email_verified_status: false }),
+        Repository.countDocuments(),
+        Repository.countDocuments({ visibility: 'public' }),
+        RepositoryCommit.countDocuments(),
+        RepositoryFile.countDocuments(),
+        RepositoryFile.find({}, { size: 1 }).lean(),
+        AdminAccountActionRequest.countDocuments({ status: 'pending' })
+      ]);
 
-      const files = await RepositoryFile.find({}, { size: 1 }).lean();
       const aggregateSize = files.reduce((acc, f) => acc + (f.size || 0), 0);
-      const pendingDeletions = await AdminAccountActionRequest.countDocuments({ status: 'pending' });
 
       res.json({
         success: true,
@@ -43,10 +55,18 @@ class AdminController {
 
   static async listUsers(req, res) {
     try {
-      const users = await User.find().sort({ id: -1 }).lean();
+      const [users, repoCounts] = await Promise.all([
+        User.find().sort({ id: -1 }).lean(),
+        Repository.aggregate([
+          { $group: { _id: '$user_id', count: { $sum: 1 } } }
+        ])
+      ]);
+
+      const repoMap = {};
+      repoCounts.forEach(c => { repoMap[c._id] = c.count; });
 
       for (const u of users) {
-        u.repo_count = await Repository.countDocuments({ user_id: u.id });
+        u.repo_count = repoMap[u.id] || 0;
       }
 
       res.json({ success: true, users });

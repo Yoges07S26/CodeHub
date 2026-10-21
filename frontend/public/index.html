@@ -127,11 +127,71 @@
         [data-theme="light"] [style*="background: #0d1117"],
         [data-theme="light"] [style*="background:#0d1117"],
         [data-theme="light"] [style*="background-color: #0d1117"],
-        [data-theme="light"] [style*="background-color:#0d1117"] {
+        [data-theme="light"] [style*="background-color:#0d1117"],
+        [data-theme="light"] [style*="background: rgba(22,27,34"],
+        [data-theme="light"] [style*="background:rgba(22,27,34"],
+        [data-theme="light"] [style*="rgb(22, 27, 34)"],
+        [data-theme="light"] [style*="rgb(13, 17, 23)"],
+        [data-theme="light"] [style*="rgb(33, 38, 45)"] {
             background: #ffffff !important;
             border-color: #d0d7de !important;
             color: #1f2328 !important;
             box-shadow: 0 1px 3px rgba(31, 35, 40, 0.08) !important;
+        }
+
+        /* Hero banner gradients in light mode matching Jobs format */
+        [data-theme="light"] [style*="linear-gradient(135deg, #0d1f47"],
+        [data-theme="light"] [style*="linear-gradient(135deg,#0d1f47"],
+        [data-theme="light"] [style*="linear-gradient(135deg, #1f1035"],
+        [data-theme="light"] [style*="linear-gradient(135deg,#1f1035"],
+        [data-theme="light"] [style*="rgb(13, 31, 71)"],
+        [data-theme="light"] [style*="rgb(31, 16, 53)"],
+        [data-theme="light"] [style*="rgb(22, 18, 64)"],
+        [data-theme="light"] [style*="rgb(26, 13, 64)"] {
+            background: linear-gradient(135deg, #e0f2fe, #f0fdf4) !important;
+            border-color: #bae6fd !important;
+            color: #1f2328 !important;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05) !important;
+        }
+
+        [data-theme="light"] [style*="linear-gradient(135deg,#060b14"] {
+            background: linear-gradient(135deg, #f0fdf4 0%, #e0f2fe 55%, #f5f0ff 100%) !important;
+        }
+
+        /* Status & Category Pills in light mode matching Jobs format */
+        [data-theme="light"] [style*="background: rgba(63,185,80"],
+        [data-theme="light"] [style*="background:rgba(63,185,80"] {
+            background: #dcfce7 !important;
+            color: #15803d !important;
+            border-color: #86efac !important;
+        }
+
+        [data-theme="light"] [style*="background: rgba(88,166,255"],
+        [data-theme="light"] [style*="background:rgba(88,166,255"] {
+            background: #e0f2fe !important;
+            color: #0284c7 !important;
+            border-color: #bae6fd !important;
+        }
+
+        [data-theme="light"] [style*="background: rgba(210,168,255"],
+        [data-theme="light"] [style*="background:rgba(210,168,255"] {
+            background: #f3e8ff !important;
+            color: #7c3aed !important;
+            border-color: #d8b4fe !important;
+        }
+
+        [data-theme="light"] [style*="background: rgba(227,179,65"],
+        [data-theme="light"] [style*="background:rgba(227,179,65"] {
+            background: #fef9c3 !important;
+            color: #a16207 !important;
+            border-color: #fde047 !important;
+        }
+
+        [data-theme="light"] [style*="background: rgba(248,81,73"],
+        [data-theme="light"] [style*="background:rgba(248,81,73"] {
+            background: #fee2e2 !important;
+            color: #b91c1c !important;
+            border-color: #fca5a5 !important;
         }
 
         /* Secondary containers & toolbars in light mode */
@@ -288,9 +348,21 @@
     </style>
 </head>
 <body>
-    <div id="root"></div>
+    <div id="root">
+        <div id="app-skeleton-loader" style="min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #090d16; color: #f8fafc; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+            <div style="position: relative; width: 68px; height: 68px; margin-bottom: 22px; display: flex; align-items: center; justify-content: center;">
+                <div style="position: absolute; inset: 0; border: 3px solid rgba(96, 165, 250, 0.15); border-top-color: #60a5fa; border-radius: 50%; animation: codehubSpin 0.75s linear infinite;"></div>
+                <img src="logo.png" alt="CodeHub" style="width: 38px; height: 38px; object-fit: contain; border-radius: 8px;" onerror="this.style.display='none'">
+            </div>
+            <div style="font-weight: 800; font-size: 17px; letter-spacing: -0.01em; color: #f8fafc; margin-bottom: 6px;">CodeHub</div>
+            <div style="font-size: 13px; color: #94a3b8; font-weight: 500;">Starting local server workspace...</div>
+            <style>
+                @keyframes codehubSpin { to { transform: rotate(360deg); } }
+            </style>
+        </div>
+    </div>
 
-    <!-- Production bundle -->
-    <script src="app.js"></script>
+    <!-- Production bundle with cache-busting parameter -->
+    <script src="app.js?v=20261021_jobs4col_images"></script>
 </body>
 </html>
