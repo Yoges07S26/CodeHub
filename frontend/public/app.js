@@ -94,6 +94,7 @@
     const [user, setUser] = useState(getStoredUser);
     const [currentView, setCurrentView] = useState(user ? "dashboard" : "landing");
     const [selectedRepoId, setSelectedRepoId] = useState(null);
+    const [selectedJobId, setSelectedJobId] = useState(null);
     const [notification, setNotification] = useState(null);
     useEffect(() => {
       if (user && (currentView === "landing" || currentView === "login" || currentView === "register")) {
@@ -225,7 +226,29 @@
         setIsAiLoading(false);
       }
     };
-    const navTo = (view) => setCurrentView(view);
+    const navTo = (view, extra = {}) => {
+      if (extra && extra.jobId) {
+        setSelectedJobId(extra.jobId);
+      }
+      if (extra && extra.repoId) {
+        setSelectedRepoId(extra.repoId);
+      }
+      setCurrentView(view);
+    };
+    useEffect(() => {
+      const handleNavTo = (e) => {
+        const detail = e.detail;
+        if (typeof detail === "string") {
+          setCurrentView(detail);
+        } else if (detail && typeof detail === "object") {
+          if (detail.jobId) setSelectedJobId(detail.jobId);
+          if (detail.repoId) setSelectedRepoId(detail.repoId);
+          if (detail.view) setCurrentView(detail.view);
+        }
+      };
+      window.addEventListener("navTo", handleNavTo);
+      return () => window.removeEventListener("navTo", handleNavTo);
+    }, []);
     const isAuthOrLanding = currentView === "landing" || currentView === "login" || currentView === "register";
     return /* @__PURE__ */ React.createElement("div", { className: "min-h-screen flex flex-col", style: { margin: 0, padding: 0, width: "100%", minHeight: "100vh", background: theme === "dark" ? "#0d1117" : "#f6f8fa", color: theme === "dark" ? "#e6edf3" : "#1f2328", boxSizing: "border-box" } }, !isAuthOrLanding && /* @__PURE__ */ React.createElement("header", { style: {
       background: theme === "dark" ? "#161b22" : "#ffffff",
@@ -312,10 +335,33 @@
         onExploreNext: () => navTo(user?.role === "admin" ? "feed" : "repos"),
         theme
       }
-    ), currentView === "feed" && /* @__PURE__ */ React.createElement(FeedView, { user, showNotify, theme }), currentView === "jobs" && /* @__PURE__ */ React.createElement(JobsView, { user, showNotify, theme }), currentView === "dashboard" && /* @__PURE__ */ React.createElement(DashboardView, { user, repositories, onSelectRepo: (id) => {
-      setSelectedRepoId(id);
-      navTo("repo_detail");
-    }, onOpenCreateRepo: () => setIsCreateRepoOpen(true), onOpenDeleteAccount: () => setIsDeleteAccountOpen(true), onOpenAdmin: () => navTo("admin_cockpit"), onNavFeed: () => navTo("feed"), theme }), currentView === "repos" && /* @__PURE__ */ React.createElement(ReposView, { user, repositories, onSelectRepo: (id) => {
+    ), currentView === "feed" && /* @__PURE__ */ React.createElement(FeedView, { user, showNotify, theme }), currentView === "jobs" && /* @__PURE__ */ React.createElement(
+      JobsView,
+      {
+        user,
+        showNotify,
+        theme,
+        initialJobId: selectedJobId,
+        onClearInitialJob: () => setSelectedJobId(null)
+      }
+    ), currentView === "dashboard" && /* @__PURE__ */ React.createElement(
+      DashboardView,
+      {
+        user,
+        repositories,
+        onSelectRepo: (id) => {
+          setSelectedRepoId(id);
+          navTo("repo_detail");
+        },
+        onOpenCreateRepo: () => setIsCreateRepoOpen(true),
+        onOpenDeleteAccount: () => setIsDeleteAccountOpen(true),
+        onOpenAdmin: () => navTo("admin_cockpit"),
+        onNavFeed: () => navTo("feed"),
+        onNavJobs: (jobId) => navTo("jobs", { jobId }),
+        onNavView: (view, extra) => navTo(view, extra),
+        theme
+      }
+    ), currentView === "repos" && /* @__PURE__ */ React.createElement(ReposView, { user, repositories, onSelectRepo: (id) => {
       setSelectedRepoId(id);
       navTo("repo_detail");
     }, onOpenCreateRepo: () => setIsCreateRepoOpen(true), showNotify, theme }), currentView === "repo_detail" && /* @__PURE__ */ React.createElement(RepoDetailView, { repoId: selectedRepoId, user, onBack: () => {
@@ -790,7 +836,7 @@
       ), /* @__PURE__ */ React.createElement("span", { style: { color: textMuted } }, "\u{1F4AC} Discussion Active")));
     }), !loading && filteredPosts.length === 0 && /* @__PURE__ */ React.createElement("div", { style: { textAlign: "center", padding: 60, background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: 16, color: textMuted, boxShadow: shadow } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 36, marginBottom: 10 } }, "\u{1F4F0}"), /* @__PURE__ */ React.createElement("p", { style: { margin: 0, fontWeight: 700, fontSize: 15, color: textMain } }, "No posts in this category yet."), /* @__PURE__ */ React.createElement("p", { style: { fontSize: 13, marginTop: 4 } }, "Be the first to share your project update or code snippet above!"))));
   }
-  function JobsView({ user, showNotify, theme }) {
+  function JobsView({ user, showNotify, theme, initialJobId, onClearInitialJob }) {
     const isDark = theme !== "light";
     const isAdmin = Boolean(user && (user.role === "admin" || user.role_type === "admin"));
     const [jobs, setJobs] = useState([]);
@@ -910,6 +956,19 @@
     useEffect(() => {
       fetchJobs();
     }, [selectedRole, selectedType, selectedExp]);
+    useEffect(() => {
+      if (initialJobId && jobs.length > 0) {
+        const target = jobs.find((j) => j.id === Number(initialJobId));
+        if (target) {
+          setSelectedJob(target);
+          setIsApplyModalOpen(true);
+          if (isAdmin) {
+            fetchJobApplicants(target.id);
+          }
+          if (onClearInitialJob) onClearInitialJob();
+        }
+      }
+    }, [initialJobId, jobs]);
     useEffect(() => {
       if (user) {
         if (isAdmin) {
@@ -4549,6 +4608,8 @@
     onOpenDeleteAccount,
     onOpenAdmin,
     onNavFeed,
+    onNavJobs,
+    onNavView,
     theme
   }) {
     const isDark = theme !== "light";
@@ -4559,6 +4620,13 @@
     const inputBg = isDark ? "#0d1117" : "#ffffff";
     const innerBg = isDark ? "#0d1117" : "#f6f8fa";
     const shadow = isDark ? "0 8px 24px rgba(0,0,0,0.3)" : "0 1px 3px rgba(31, 35, 40, 0.08)";
+    const triggerNav = (view, extra) => {
+      if (onNavView) {
+        onNavView(view, extra);
+      } else {
+        window.dispatchEvent(new CustomEvent("navTo", { detail: extra ? { view, ...extra } : view }));
+      }
+    };
     const [dashData, setDashData] = useState(user ? { user } : null);
     const [fetchError, setFetchError] = useState("");
     const [featuredJobs, setFeaturedJobs] = useState([]);
@@ -4673,35 +4741,35 @@
     ]).map((s, i) => /* @__PURE__ */ React.createElement("div", { key: i, style: { background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: 16, padding: "20px 18px", display: "flex", flexDirection: "column", justifyContent: "space-between", boxShadow: shadow } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 } }, /* @__PURE__ */ React.createElement("span", { style: { fontSize: 24 } }, s.icon), /* @__PURE__ */ React.createElement("span", { style: { fontSize: 11, color: textMuted, textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 700 } }, s.label)), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 24, fontWeight: 900, color: s.color } }, s.value), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, color: textMuted, marginTop: 4 } }, s.sub))))), /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 16 } }, /* @__PURE__ */ React.createElement("div", { style: { background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: 16, padding: "22px 24px", display: "flex", flexDirection: "column", gap: 14, boxShadow: shadow } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center" } }, /* @__PURE__ */ React.createElement("h3", { style: { fontWeight: 800, fontSize: 15, color: textMain, margin: 0 } }, "\u{1F464} Developer Identity"), /* @__PURE__ */ React.createElement(
       "button",
       {
-        onClick: () => window.dispatchEvent(new CustomEvent("navTo", { detail: "settings" })),
+        onClick: () => triggerNav("settings"),
         style: { background: "none", border: "none", color: isDark ? "#58a6ff" : "#0969da", fontSize: 12, cursor: "pointer", fontWeight: 700 }
       },
       "Edit Profile \u2192"
     )), /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 } }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, color: textMuted, textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 700 } }, "Username"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 13, fontWeight: 700, color: isDark ? "#58a6ff" : "#0969da", fontFamily: "monospace" } }, "@", profile?.username || "not_set")), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, color: textMuted, textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 700 } }, "Organization"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 13, fontWeight: 600, color: textMain } }, profile?.organization || "Independent")), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, color: textMuted, textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 700 } }, "Location"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 13, fontWeight: 600, color: textMain } }, profile?.location || "Remote / Worldwide")), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, color: textMuted, textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 700 } }, "Website"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 13, fontWeight: 600, color: isDark ? "#58a6ff" : "#0969da", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, profile?.website_url ? /* @__PURE__ */ React.createElement("a", { href: profile.website_url, target: "_blank", rel: "noreferrer", style: { color: isDark ? "#58a6ff" : "#0969da", textDecoration: "none" } }, profile.website_url.replace(/^https?:\/\//, "")) : "\u2014"))), profile?.bio && /* @__PURE__ */ React.createElement("div", { style: { background: innerBg, border: `1px solid ${cardBorder}`, borderRadius: 12, padding: "10px 14px", fontSize: 12, color: textMuted, lineHeight: 1.5 } }, '"', profile.bio, '"')), /* @__PURE__ */ React.createElement("div", { style: { background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: 16, padding: "22px 24px", display: "flex", flexDirection: "column", gap: 14, boxShadow: shadow } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center" } }, /* @__PURE__ */ React.createElement("h3", { style: { fontWeight: 800, fontSize: 15, color: textMain, margin: 0 } }, "\u2601\uFE0F Cloud Drive Sync & Health"), /* @__PURE__ */ React.createElement("span", { style: { fontSize: 11, padding: "2px 8px", borderRadius: 12, background: isDark ? "rgba(63,185,80,0.15)" : "#dcfce7", color: isDark ? "#3fb950" : "#15803d", fontWeight: 700 } }, "Connected")), /* @__PURE__ */ React.createElement("p", { style: { fontSize: 12, color: textMuted, margin: 0, lineHeight: 1.5 } }, "Automated Google Drive version sync active. All commits create real-time snapshot files in isolated repository cloud folders."), /* @__PURE__ */ React.createElement("div", { style: { background: innerBg, border: `1px solid ${cardBorder}`, borderRadius: 12, padding: "12px 14px", display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 12 } }, /* @__PURE__ */ React.createElement("span", { style: { color: textMuted } }, "Storage Used"), /* @__PURE__ */ React.createElement("span", { style: { fontWeight: 800, color: isDark ? "#58a6ff" : "#0969da" } }, storageMB, " MB / 15 GB Free Quota")), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 10 } }, /* @__PURE__ */ React.createElement(
       "button",
       {
-        onClick: () => window.dispatchEvent(new CustomEvent("navTo", { detail: "ai" })),
+        onClick: () => triggerNav("ai"),
         style: { flex: 1, padding: "8px 14px", borderRadius: 12, fontSize: 12, fontWeight: 700, background: "linear-gradient(135deg,#1f6feb,#388bfd)", color: "#fff", border: "none", cursor: "pointer" }
       },
       "\u2728 Ask AI Review"
     ), /* @__PURE__ */ React.createElement(
       "button",
       {
-        onClick: onNavFeed,
+        onClick: () => typeof onNavFeed === "function" ? onNavFeed() : triggerNav("feed"),
         style: { flex: 1, padding: "8px 14px", borderRadius: 12, fontSize: 12, fontWeight: 700, background: isDark ? "#21262d" : "#f6f8fa", color: isDark ? "#58a6ff" : "#0969da", border: `1px solid ${cardBorder}`, cursor: "pointer" }
       },
       "\u{1F4F0} Feed Updates"
     )))), /* @__PURE__ */ React.createElement("div", { style: { background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: 16, padding: "22px 24px", boxShadow: shadow } }, /* @__PURE__ */ React.createElement("h3", { style: { fontWeight: 800, fontSize: 15, marginBottom: 16, color: textMain } }, "\u26A1 Developer Quick Launch"), /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))", gap: 12 } }, [
-      { icon: "\u{1F4BC}", label: isAdmin ? "Manage Jobs" : "Explore Jobs", action: () => window.dispatchEvent(new CustomEvent("navTo", { detail: "jobs" })) },
-      { icon: "\u{1F4F0}", label: "Community Feed", action: onNavFeed },
-      { icon: "\u2728", label: "Ask AI Copilot", action: () => window.dispatchEvent(new CustomEvent("navTo", { detail: "ai" })) },
+      { icon: "\u{1F4BC}", label: isAdmin ? "Manage Jobs" : "Explore Jobs", action: () => typeof onNavJobs === "function" ? onNavJobs() : triggerNav("jobs") },
+      { icon: "\u{1F4F0}", label: "Community Feed", action: () => typeof onNavFeed === "function" ? onNavFeed() : triggerNav("feed") },
+      { icon: "\u2728", label: "Ask AI Copilot", action: () => triggerNav("ai") },
       ...!isAdmin ? [
         { icon: "\u{1F4C1}", label: "New Repository", action: onOpenCreateRepo },
-        { icon: "\u{1F500}", label: "View Repos", action: () => window.dispatchEvent(new CustomEvent("navTo", { detail: "repos" })) }
+        { icon: "\u{1F500}", label: "View Repos", action: () => triggerNav("repos") }
       ] : [],
-      { icon: "\u2699\uFE0F", label: "Settings", action: () => window.dispatchEvent(new CustomEvent("navTo", { detail: "settings" })) },
+      { icon: "\u2699\uFE0F", label: "Settings", action: () => triggerNav("settings") },
       ...!isAdmin && user.account_status !== "deletion_pending" ? [{ icon: "\u{1F5D1}\uFE0F", label: "Delete Account", action: onOpenDeleteAccount }] : [],
-      ...isAdmin ? [{ icon: "\u{1F6E1}\uFE0F", label: "Admin Cockpit", action: onOpenAdmin }] : []
+      ...isAdmin ? [{ icon: "\u{1F6E1}\uFE0F", label: "Admin Cockpit", action: () => typeof onOpenAdmin === "function" ? onOpenAdmin() : triggerNav("admin_cockpit") }] : []
     ].map((qa, i) => /* @__PURE__ */ React.createElement(
       "button",
       {
@@ -4737,7 +4805,7 @@
     )))), !isAdmin && /* @__PURE__ */ React.createElement("div", { style: { background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: 16, padding: "22px 24px", boxShadow: shadow } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16, flexWrap: "wrap", gap: 10 } }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("h3", { style: { fontWeight: 800, fontSize: 16, color: textMain, margin: 0 } }, "\u{1F4BC} Recommended Tech Jobs & Career Opportunities"), /* @__PURE__ */ React.createElement("p", { style: { margin: "4px 0 0", fontSize: 12, color: textMuted } }, "Active open positions curated across engineering disciplines. Click to view full details and apply.")), /* @__PURE__ */ React.createElement(
       "button",
       {
-        onClick: () => window.dispatchEvent(new CustomEvent("navTo", { detail: "jobs" })),
+        onClick: () => typeof onNavJobs === "function" ? onNavJobs() : triggerNav("jobs"),
         style: {
           padding: "8px 16px",
           borderRadius: 20,
@@ -4754,7 +4822,10 @@
       "div",
       {
         key: job.id,
-        onClick: () => window.dispatchEvent(new CustomEvent("navTo", { detail: "jobs" })),
+        onClick: () => {
+          if (typeof onNavJobs === "function") onNavJobs(job.id);
+          else triggerNav("jobs", { jobId: job.id });
+        },
         style: {
           background: innerBg,
           border: `1px solid ${cardBorder}`,
@@ -4778,11 +4849,32 @@
         }
       },
       /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8 } }, /* @__PURE__ */ React.createElement("span", { style: { fontWeight: 800, fontSize: 14, color: textMain } }, job.title), /* @__PURE__ */ React.createElement("span", { style: { fontSize: 10, padding: "2px 8px", borderRadius: 10, background: isDark ? "rgba(63,185,80,0.15)" : "#dcfce7", color: isDark ? "#3fb950" : "#15803d", fontWeight: 700, textTransform: "uppercase" } }, job.job_type)), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, color: isDark ? "#58a6ff" : "#0969da", marginTop: 4 } }, "\u{1F3E2} ", job.company), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, color: textMuted, marginTop: 2 } }, "\u{1F4CD} ", job.location, " \xB7 \u{1F4B0} ", job.salary_range)),
-      /* @__PURE__ */ React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", borderTop: `1px solid ${isDark ? "#21262d" : "#e2e8f0"}`, paddingTop: 10 } }, /* @__PURE__ */ React.createElement("span", { style: { fontSize: 11, color: textMuted } }, job.skills && job.skills.slice(0, 2).join(" \xB7 ")), /* @__PURE__ */ React.createElement("span", { style: { fontSize: 12, color: isDark ? "#58a6ff" : "#0969da", fontWeight: 700 } }, "Apply Now \u2192"))
-    )))), /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: 20 } }, isAdmin ? /* @__PURE__ */ React.createElement("div", { style: { background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: 16, padding: "22px 24px", boxShadow: shadow } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 } }, /* @__PURE__ */ React.createElement("h3", { style: { fontWeight: 800, fontSize: 15, color: textMain, margin: 0 } }, "\u{1F4F0} Community Feed Moderation"), /* @__PURE__ */ React.createElement("button", { onClick: onNavFeed, style: { background: "none", border: "none", color: isDark ? "#58a6ff" : "#0969da", fontSize: 12, cursor: "pointer", fontWeight: 700 } }, "Open Feed \u2192")), /* @__PURE__ */ React.createElement("p", { style: { fontSize: 13, color: textMuted, lineHeight: 1.5, marginBottom: 16 } }, "Review technical updates and snippets shared across the developer ecosystem. Administrators have overriding deletion and moderation authority."), /* @__PURE__ */ React.createElement(
+      /* @__PURE__ */ React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", borderTop: `1px solid ${isDark ? "#21262d" : "#e2e8f0"}`, paddingTop: 10 } }, /* @__PURE__ */ React.createElement("span", { style: { fontSize: 11, color: textMuted } }, job.skills && job.skills.slice(0, 2).join(" \xB7 ")), /* @__PURE__ */ React.createElement(
+        "button",
+        {
+          type: "button",
+          onClick: (e) => {
+            e.stopPropagation();
+            if (typeof onNavJobs === "function") onNavJobs(job.id);
+            else triggerNav("jobs", { jobId: job.id });
+          },
+          style: {
+            background: isDark ? "rgba(88,166,255,0.15)" : "#e0f2fe",
+            border: `1px solid ${isDark ? "rgba(88,166,255,0.3)" : "#bae6fd"}`,
+            color: isDark ? "#58a6ff" : "#0969da",
+            fontSize: 12,
+            fontWeight: 700,
+            padding: "4px 10px",
+            borderRadius: 8,
+            cursor: "pointer"
+          }
+        },
+        "Apply Now \u2192"
+      ))
+    )))), /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: 20 } }, isAdmin ? /* @__PURE__ */ React.createElement("div", { style: { background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: 16, padding: "22px 24px", boxShadow: shadow } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 } }, /* @__PURE__ */ React.createElement("h3", { style: { fontWeight: 800, fontSize: 15, color: textMain, margin: 0 } }, "\u{1F4F0} Community Feed Moderation"), /* @__PURE__ */ React.createElement("button", { onClick: () => typeof onNavFeed === "function" ? onNavFeed() : triggerNav("feed"), style: { background: "none", border: "none", color: isDark ? "#58a6ff" : "#0969da", fontSize: 12, cursor: "pointer", fontWeight: 700 } }, "Open Feed \u2192")), /* @__PURE__ */ React.createElement("p", { style: { fontSize: 13, color: textMuted, lineHeight: 1.5, marginBottom: 16 } }, "Review technical updates and snippets shared across the developer ecosystem. Administrators have overriding deletion and moderation authority."), /* @__PURE__ */ React.createElement(
       "button",
       {
-        onClick: onNavFeed,
+        onClick: () => typeof onNavFeed === "function" ? onNavFeed() : triggerNav("feed"),
         style: { padding: "9px 18px", borderRadius: 12, background: isDark ? "#21262d" : "#f6f8fa", border: `1px solid ${cardBorder}`, color: isDark ? "#58a6ff" : "#0969da", fontSize: 12, fontWeight: 700, cursor: "pointer" }
       },
       "View Community Stream"

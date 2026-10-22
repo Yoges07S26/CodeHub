@@ -109,6 +109,7 @@ function App() {
     // Default to dashboard after login so the page is always available as the main workspace view
     const [currentView, setCurrentView] = useState(user ? 'dashboard' : 'landing');
     const [selectedRepoId, setSelectedRepoId] = useState(null);
+    const [selectedJobId, setSelectedJobId] = useState(null);
     const [notification, setNotification] = useState(null);
 
     useEffect(() => {
@@ -247,7 +248,31 @@ function App() {
         } finally { setIsAiLoading(false); }
     };
 
-    const navTo = (view) => setCurrentView(view);
+    const navTo = (view, extra = {}) => {
+        if (extra && extra.jobId) {
+            setSelectedJobId(extra.jobId);
+        }
+        if (extra && extra.repoId) {
+            setSelectedRepoId(extra.repoId);
+        }
+        setCurrentView(view);
+    };
+
+    useEffect(() => {
+        const handleNavTo = (e) => {
+            const detail = e.detail;
+            if (typeof detail === 'string') {
+                setCurrentView(detail);
+            } else if (detail && typeof detail === 'object') {
+                if (detail.jobId) setSelectedJobId(detail.jobId);
+                if (detail.repoId) setSelectedRepoId(detail.repoId);
+                if (detail.view) setCurrentView(detail.view);
+            }
+        };
+        window.addEventListener('navTo', handleNavTo);
+        return () => window.removeEventListener('navTo', handleNavTo);
+    }, []);
+
     const isAuthOrLanding = currentView === 'landing' || currentView === 'login' || currentView === 'register';
 
     return (
@@ -396,10 +421,31 @@ function App() {
                 {currentView === 'feed' && <FeedView user={user} showNotify={showNotify} theme={theme} />}
 
                 {/* JOB SEARCH & CAREER MODULE */}
-                {currentView === 'jobs' && <JobsView user={user} showNotify={showNotify} theme={theme} />}
+                {currentView === 'jobs' && (
+                    <JobsView
+                        user={user}
+                        showNotify={showNotify}
+                        theme={theme}
+                        initialJobId={selectedJobId}
+                        onClearInitialJob={() => setSelectedJobId(null)}
+                    />
+                )}
 
                 {/* DASHBOARD */}
-                {currentView === 'dashboard' && <DashboardView user={user} repositories={repositories} onSelectRepo={id => { setSelectedRepoId(id); navTo('repo_detail'); }} onOpenCreateRepo={() => setIsCreateRepoOpen(true)} onOpenDeleteAccount={() => setIsDeleteAccountOpen(true)} onOpenAdmin={() => navTo('admin_cockpit')} onNavFeed={() => navTo('feed')} theme={theme} />}
+                {currentView === 'dashboard' && (
+                    <DashboardView
+                        user={user}
+                        repositories={repositories}
+                        onSelectRepo={id => { setSelectedRepoId(id); navTo('repo_detail'); }}
+                        onOpenCreateRepo={() => setIsCreateRepoOpen(true)}
+                        onOpenDeleteAccount={() => setIsDeleteAccountOpen(true)}
+                        onOpenAdmin={() => navTo('admin_cockpit')}
+                        onNavFeed={() => navTo('feed')}
+                        onNavJobs={(jobId) => navTo('jobs', { jobId })}
+                        onNavView={(view, extra) => navTo(view, extra)}
+                        theme={theme}
+                    />
+                )}
 
                 {/* REPOS LIST (USER ONLY) */}
                 {currentView === 'repos' && <ReposView user={user} repositories={repositories} onSelectRepo={id => { setSelectedRepoId(id); navTo('repo_detail'); }} onOpenCreateRepo={() => setIsCreateRepoOpen(true)} showNotify={showNotify} theme={theme} />}
@@ -1116,7 +1162,7 @@ function FeedView({ user, showNotify, theme }) {
 // - Admins CANNOT apply for jobs (application form removed, apply restricted)
 // - Developer users browse jobs and apply
 // ══════════════════════════════════════════════════════════════════════════════
-function JobsView({ user, showNotify, theme }) {
+function JobsView({ user, showNotify, theme, initialJobId, onClearInitialJob }) {
     const isDark = theme !== 'light';
     const isAdmin = Boolean(user && (user.role === 'admin' || user.role_type === 'admin'));
 
@@ -1253,6 +1299,20 @@ function JobsView({ user, showNotify, theme }) {
     useEffect(() => {
         fetchJobs();
     }, [selectedRole, selectedType, selectedExp]);
+
+    useEffect(() => {
+        if (initialJobId && jobs.length > 0) {
+            const target = jobs.find(j => j.id === Number(initialJobId));
+            if (target) {
+                setSelectedJob(target);
+                setIsApplyModalOpen(true);
+                if (isAdmin) {
+                    fetchJobApplicants(target.id);
+                }
+                if (onClearInitialJob) onClearInitialJob();
+            }
+        }
+    }, [initialJobId, jobs]);
 
     useEffect(() => {
         if (user) {
@@ -5895,6 +5955,8 @@ function DashboardView({
   onOpenDeleteAccount,
   onOpenAdmin,
   onNavFeed,
+  onNavJobs,
+  onNavView,
   theme,
 }) {
   const isDark = theme !== 'light';
@@ -5905,6 +5967,14 @@ function DashboardView({
   const inputBg = isDark ? '#0d1117' : '#ffffff';
   const innerBg = isDark ? '#0d1117' : '#f6f8fa';
   const shadow = isDark ? '0 8px 24px rgba(0,0,0,0.3)' : '0 1px 3px rgba(31, 35, 40, 0.08)';
+
+  const triggerNav = (view, extra) => {
+    if (onNavView) {
+      onNavView(view, extra);
+    } else {
+      window.dispatchEvent(new CustomEvent('navTo', { detail: extra ? { view, ...extra } : view }));
+    }
+  };
 
   const [dashData, setDashData] = useState(user ? { user } : null);
   const [fetchError, setFetchError] = useState('');
@@ -6087,7 +6157,7 @@ function DashboardView({
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <h3 style={{ fontWeight: 800, fontSize: 15, color: textMain, margin: 0 }}>👤 Developer Identity</h3>
             <button
-              onClick={() => window.dispatchEvent(new CustomEvent('navTo', { detail: 'settings' }))}
+              onClick={() => triggerNav('settings')}
               style={{ background: 'none', border: 'none', color: isDark ? '#58a6ff' : '#0969da', fontSize: 12, cursor: 'pointer', fontWeight: 700 }}>
               Edit Profile →
             </button>
@@ -6134,12 +6204,12 @@ function DashboardView({
           </div>
           <div style={{ display: 'flex', gap: 10 }}>
             <button
-              onClick={() => window.dispatchEvent(new CustomEvent('navTo', { detail: 'ai' }))}
+              onClick={() => triggerNav('ai')}
               style={{ flex: 1, padding: '8px 14px', borderRadius: 12, fontSize: 12, fontWeight: 700, background: 'linear-gradient(135deg,#1f6feb,#388bfd)', color: '#fff', border: 'none', cursor: 'pointer' }}>
               ✨ Ask AI Review
             </button>
             <button
-              onClick={onNavFeed}
+              onClick={() => (typeof onNavFeed === 'function' ? onNavFeed() : triggerNav('feed'))}
               style={{ flex: 1, padding: '8px 14px', borderRadius: 12, fontSize: 12, fontWeight: 700, background: isDark ? '#21262d' : '#f6f8fa', color: isDark ? '#58a6ff' : '#0969da', border: `1px solid ${cardBorder}`, cursor: 'pointer' }}>
               📰 Feed Updates
             </button>
@@ -6152,18 +6222,18 @@ function DashboardView({
         <h3 style={{ fontWeight: 800, fontSize: 15, marginBottom: 16, color: textMain }}>⚡ Developer Quick Launch</h3>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: 12 }}>
           {[
-            { icon: '💼', label: isAdmin ? 'Manage Jobs' : 'Explore Jobs', action: () => window.dispatchEvent(new CustomEvent('navTo', { detail: 'jobs' })) },
-            { icon: '📰', label: 'Community Feed', action: onNavFeed },
-            { icon: '✨', label: 'Ask AI Copilot', action: () => window.dispatchEvent(new CustomEvent('navTo', { detail: 'ai' })) },
+            { icon: '💼', label: isAdmin ? 'Manage Jobs' : 'Explore Jobs', action: () => (typeof onNavJobs === 'function' ? onNavJobs() : triggerNav('jobs')) },
+            { icon: '📰', label: 'Community Feed', action: () => (typeof onNavFeed === 'function' ? onNavFeed() : triggerNav('feed')) },
+            { icon: '✨', label: 'Ask AI Copilot', action: () => triggerNav('ai') },
             ...(!isAdmin ? [
               { icon: '📁', label: 'New Repository', action: onOpenCreateRepo },
-              { icon: '🔀', label: 'View Repos', action: () => window.dispatchEvent(new CustomEvent('navTo', { detail: 'repos' })) },
+              { icon: '🔀', label: 'View Repos', action: () => triggerNav('repos') },
             ] : []),
-            { icon: '⚙️', label: 'Settings', action: () => window.dispatchEvent(new CustomEvent('navTo', { detail: 'settings' })) },
+            { icon: '⚙️', label: 'Settings', action: () => triggerNav('settings') },
             ...(!isAdmin && user.account_status !== 'deletion_pending'
               ? [{ icon: '🗑️', label: 'Delete Account', action: onOpenDeleteAccount }]
               : []),
-            ...(isAdmin ? [{ icon: '🛡️', label: 'Admin Cockpit', action: onOpenAdmin }] : []),
+            ...(isAdmin ? [{ icon: '🛡️', label: 'Admin Cockpit', action: () => (typeof onOpenAdmin === 'function' ? onOpenAdmin() : triggerNav('admin_cockpit')) }] : []),
           ].map((qa, i) => (
             <button
               key={i}
@@ -6204,7 +6274,7 @@ function DashboardView({
               </p>
             </div>
             <button
-              onClick={() => window.dispatchEvent(new CustomEvent('navTo', { detail: 'jobs' }))}
+              onClick={() => (typeof onNavJobs === 'function' ? onNavJobs() : triggerNav('jobs'))}
               style={{
                 padding: '8px 16px',
                 borderRadius: 20,
@@ -6231,7 +6301,10 @@ function DashboardView({
               {featuredJobs.map(job => (
                 <div
                   key={job.id}
-                  onClick={() => window.dispatchEvent(new CustomEvent('navTo', { detail: 'jobs' }))}
+                  onClick={() => {
+                    if (typeof onNavJobs === 'function') onNavJobs(job.id);
+                    else triggerNav('jobs', { jobId: job.id });
+                  }}
                   style={{
                     background: innerBg,
                     border: `1px solid ${cardBorder}`,
@@ -6260,7 +6333,26 @@ function DashboardView({
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: `1px solid ${isDark ? '#21262d' : '#e2e8f0'}`, paddingTop: 10 }}>
                     <span style={{ fontSize: 11, color: textMuted }}>{job.skills && job.skills.slice(0, 2).join(' · ')}</span>
-                    <span style={{ fontSize: 12, color: isDark ? '#58a6ff' : '#0969da', fontWeight: 700 }}>Apply Now →</span>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (typeof onNavJobs === 'function') onNavJobs(job.id);
+                        else triggerNav('jobs', { jobId: job.id });
+                      }}
+                      style={{
+                        background: isDark ? 'rgba(88,166,255,0.15)' : '#e0f2fe',
+                        border: `1px solid ${isDark ? 'rgba(88,166,255,0.3)' : '#bae6fd'}`,
+                        color: isDark ? '#58a6ff' : '#0969da',
+                        fontSize: 12,
+                        fontWeight: 700,
+                        padding: '4px 10px',
+                        borderRadius: 8,
+                        cursor: 'pointer'
+                      }}
+                    >
+                      Apply Now →
+                    </button>
                   </div>
                 </div>
               ))}
@@ -6275,7 +6367,7 @@ function DashboardView({
           <div style={{ background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: 16, padding: '22px 24px', boxShadow: shadow }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
               <h3 style={{ fontWeight: 800, fontSize: 15, color: textMain, margin: 0 }}>📰 Community Feed Moderation</h3>
-              <button onClick={onNavFeed} style={{ background: 'none', border: 'none', color: isDark ? '#58a6ff' : '#0969da', fontSize: 12, cursor: 'pointer', fontWeight: 700 }}>
+              <button onClick={() => (typeof onNavFeed === 'function' ? onNavFeed() : triggerNav('feed'))} style={{ background: 'none', border: 'none', color: isDark ? '#58a6ff' : '#0969da', fontSize: 12, cursor: 'pointer', fontWeight: 700 }}>
                 Open Feed →
               </button>
             </div>
@@ -6283,7 +6375,7 @@ function DashboardView({
               Review technical updates and snippets shared across the developer ecosystem. Administrators have overriding deletion and moderation authority.
             </p>
             <button
-              onClick={onNavFeed}
+              onClick={() => (typeof onNavFeed === 'function' ? onNavFeed() : triggerNav('feed'))}
               style={{ padding: '9px 18px', borderRadius: 12, background: isDark ? '#21262d' : '#f6f8fa', border: `1px solid ${cardBorder}`, color: isDark ? '#58a6ff' : '#0969da', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}
             >
               View Community Stream
