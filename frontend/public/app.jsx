@@ -8,7 +8,8 @@ async function apiCall(endpoint, method = 'GET', body = null) {
     const config = { method, headers };
     if (body) config.body = JSON.stringify(body);
 
-    const apiBase = window.location.port === '8000' 
+    // Relative '/api' works automatically on Render, mobile, custom domain, and localhost
+    const apiBase = window.location.protocol.startsWith('http') 
         ? '/api' 
         : `http://${window.location.hostname || 'localhost'}:8000/api`;
 
@@ -16,10 +17,14 @@ async function apiCall(endpoint, method = 'GET', body = null) {
     try {
         res = await fetch(`${apiBase}${endpoint}`, config);
     } catch (netErr) {
-        try {
-            res = await fetch(`http://127.0.0.1:8000/api${endpoint}`, config);
-        } catch (secondErr) {
-            throw new Error('Connection failed: Unable to reach backend API on port 8000. Please ensure the Node.js/Express server is running (node server.js on port 8000).');
+        if (apiBase !== '/api') {
+            try {
+                res = await fetch(`http://127.0.0.1:8000/api${endpoint}`, config);
+            } catch (secondErr) {
+                throw new Error('Connection failed: Unable to reach backend API on port 8000.');
+            }
+        } else {
+            throw new Error(`Connection failed: Unable to reach backend API (${netErr.message}).`);
         }
     }
 
