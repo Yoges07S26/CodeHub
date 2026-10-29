@@ -8,7 +8,21 @@
     "seed": "node seed_admin.js",
     "seed:jobs": "node seed_jobs.js"
   },
-  "keywords": ["codehub", "express", "mongodb", "mongoose"],
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "formidable": "^2.1.2",
+    "mongodb": "^5.9.2",
+    "mongoose": "^7.8.0"
+  },
+  "keywords": [
+    "codehub",
+    "express",
+    "mongodb",
+    "mongoose"
+  ],
   "author": "CodeHub",
   "license": "ISC",
   "type": "commonjs"
