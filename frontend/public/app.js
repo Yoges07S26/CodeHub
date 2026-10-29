@@ -30,6 +30,17 @@
     }
     return data;
   }
+  function formatBytes(bytes, decimals = 2) {
+    const b = Number(bytes);
+    if (!b || isNaN(b) || b <= 0) return "0 B";
+    const k = 1024;
+    const dm = decimals < 0 ? 0 : decimals;
+    const sizes = ["B", "KB", "MB", "GB", "TB"];
+    const i = Math.floor(Math.log(b) / Math.log(k));
+    if (i <= 0) return `${b} B`;
+    const val = (b / Math.pow(k, i)).toFixed(dm);
+    return `${parseFloat(val)} ${sizes[i]}`;
+  }
   function UserAvatar({ user, size = 36 }) {
     if (user && user.avatar_url) {
       return /* @__PURE__ */ React.createElement(
@@ -1134,25 +1145,30 @@
     const filteredApplicants = allApplicants.filter(
       (a) => applicantStatusFilter === "all" || a.status === applicantStatusFilter
     );
-    return /* @__PURE__ */ React.createElement("div", { style: { maxWidth: 1360, margin: "0 auto", width: "100%", display: "flex", flexDirection: "column", gap: 24 } }, /* @__PURE__ */ React.createElement("style", null, `
+    return /* @__PURE__ */ React.createElement("div", { style: { maxWidth: 1440, margin: "0 auto", width: "100%", display: "flex", flexDirection: "column", gap: 24 } }, /* @__PURE__ */ React.createElement("style", null, `
                 .codehub-jobs-grid {
                     display: grid;
-                    grid-template-columns: repeat(4, minmax(0, 1fr));
+                    grid-template-columns: repeat(5, minmax(0, 1fr));
                     gap: 16px;
                 }
-                @media (max-width: 1200px) {
+                @media (max-width: 1300px) {
                     .codehub-jobs-grid {
-                        grid-template-columns: repeat(3, minmax(0, 1fr));
+                        grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
                     }
                 }
-                @media (max-width: 860px) {
+                @media (max-width: 1050px) {
                     .codehub-jobs-grid {
-                        grid-template-columns: repeat(2, minmax(0, 1fr));
+                        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
                     }
                 }
-                @media (max-width: 560px) {
+                @media (max-width: 780px) {
                     .codehub-jobs-grid {
-                        grid-template-columns: 1fr;
+                        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+                    }
+                }
+                @media (max-width: 520px) {
+                    .codehub-jobs-grid {
+                        grid-template-columns: 1fr !important;
                     }
                 }
                 .codehub-job-card {
@@ -1418,7 +1434,7 @@
         }
       },
       "Reset All Filters"
-    )) : /* @__PURE__ */ React.createElement("div", { className: "codehub-jobs-grid", style: { display: "grid", gridTemplateColumns: "repeat(4, minmax(0, 1fr))", gap: 16 } }, jobs.map((job) => {
+    )) : /* @__PURE__ */ React.createElement("div", { className: "codehub-jobs-grid", style: { display: "grid", gridTemplateColumns: "repeat(5, minmax(0, 1fr))", gap: 16 } }, jobs.map((job) => {
       const hasApplied = appliedJobIds.has(job.id);
       const isJobOpen = job.status === "open";
       const jobImgSrc = job.image_url || getRoleFallbackImage(job.role);
@@ -2277,38 +2293,7 @@
         if (showNotify) showNotify(err.message, "error");
       }
     };
-    return /* @__PURE__ */ React.createElement("div", { style: { maxWidth: 1360, margin: "0 auto", width: "100%", display: "flex", flexDirection: "column", gap: 24 } }, /* @__PURE__ */ React.createElement("style", null, `
-                .codehub-jobs-grid {
-                    display: grid;
-                    grid-template-columns: repeat(4, minmax(0, 1fr));
-                    gap: 16px;
-                }
-                @media (max-width: 1200px) {
-                    .codehub-jobs-grid {
-                        grid-template-columns: repeat(3, minmax(0, 1fr));
-                    }
-                }
-                @media (max-width: 860px) {
-                    .codehub-jobs-grid {
-                        grid-template-columns: repeat(2, minmax(0, 1fr));
-                    }
-                }
-                @media (max-width: 560px) {
-                    .codehub-jobs-grid {
-                        grid-template-columns: 1fr;
-                    }
-                }
-                .codehub-job-card {
-                    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-                }
-                .codehub-job-card:hover {
-                    transform: translateY(-2px);
-                    box-shadow: 0 8px 24px rgba(0,0,0,0.12) !important;
-                }
-                .codehub-job-card:hover .codehub-job-img {
-                    transform: scale(1.04);
-                }
-            `), /* @__PURE__ */ React.createElement("div", { style: {
+    return /* @__PURE__ */ React.createElement("div", { style: { maxWidth: 1360, margin: "0 auto", width: "100%", display: "flex", flexDirection: "column", gap: 24 } }, /* @__PURE__ */ React.createElement("div", { style: {
       background: isDark ? isAdmin ? "linear-gradient(135deg, #1f1035, #161b22)" : "linear-gradient(135deg, #0d1f47, #161b22)" : isAdmin ? "linear-gradient(135deg, #f5f0ff, #f0fdf4)" : "linear-gradient(135deg, #e0f2fe, #f0fdf4)",
       border: "1px solid " + (isAdmin ? isDark ? "rgba(210,168,255,0.4)" : "#e9d5ff" : isDark ? cardBorder : "#bae6fd"),
       borderRadius: 16,
@@ -2429,7 +2414,7 @@
           borderTop: `1px solid ${isDark ? "#21262d" : "#f0f2f5"}`,
           paddingTop: 12,
           marginBottom: isAdmin ? 12 : 0
-        } }, /* @__PURE__ */ React.createElement("span", null, "\u{1F33F} ", repo.branch_count || 1, " branches"), /* @__PURE__ */ React.createElement("span", null, "\u{1F4E6} ", repo.commit_count || 1, " commits"), /* @__PURE__ */ React.createElement("span", { style: { color: isDark ? "#58a6ff" : "#0969da", fontWeight: 600 } }, "\u2601\uFE0F Drive")), isAdmin && /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 8, borderTop: `1px solid ${isDark ? "#21262d" : "#f0f2f5"}`, paddingTop: 10 } }, /* @__PURE__ */ React.createElement(
+        } }, /* @__PURE__ */ React.createElement("span", null, "\u{1F33F} ", repo.branch_count || 1, " branches"), /* @__PURE__ */ React.createElement("span", null, "\u{1F4E6} ", repo.commit_count || 1, " commits"), /* @__PURE__ */ React.createElement("span", { style: { color: isDark ? "#58a6ff" : "#0969da", fontWeight: 600 } }, "\u{1F4BE} ", formatBytes(repo.size_bytes || 0))), isAdmin && /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 8, borderTop: `1px solid ${isDark ? "#21262d" : "#f0f2f5"}`, paddingTop: 10 } }, /* @__PURE__ */ React.createElement(
           "button",
           {
             type: "button",
@@ -3371,7 +3356,14 @@
         }
       },
       "Generate Token"
-    )), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 8 } }, tokens.map((t) => /* @__PURE__ */ React.createElement("div", { key: t.id, style: { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 14px", borderRadius: 8, background: inputBg, border: "1px solid " + cardBorder } }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 700, fontSize: 13, color: textMain } }, t.name), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, color: textMuted } }, t.token_preview, " \xB7 Created ", new Date(t.created_at).toLocaleDateString())), /* @__PURE__ */ React.createElement("button", { onClick: () => handleDeleteToken(t.id), style: { color: "#f85149", background: "transparent", border: "none", cursor: "pointer", fontSize: 12, fontWeight: 700 } }, "Revoke")))))), activeTab === "preferences" && /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 20 } }, /* @__PURE__ */ React.createElement("div", { style: { background: cardBg, border: "1px solid " + cardBorder, borderRadius: 14, padding: 24 } }, /* @__PURE__ */ React.createElement("h3", { style: { margin: "0 0 6px 0", fontSize: 16, fontWeight: 800, color: textMain } }, "\u2601\uFE0F Cloud Storage Quota (Virtual Drive)"), /* @__PURE__ */ React.createElement("p", { style: { margin: "0 0 16px 0", fontSize: 13, color: textMuted } }, "15 GB free encrypted storage allocated per account for commits and repository trees."), /* @__PURE__ */ React.createElement("div", { style: { height: 8, borderRadius: 4, background: isDark ? "#21262d" : "#eaeef2", overflow: "hidden", marginBottom: 8 } }, /* @__PURE__ */ React.createElement("div", { style: { width: "4%", height: "100%", background: "#58a6ff" } })), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, color: textMuted } }, "Using ", /* @__PURE__ */ React.createElement("strong", null, settingsData?.quota?.storage_used_bytes ? (settingsData.quota.storage_used_bytes / (1024 * 1024)).toFixed(2) : "0.00", " MB"), " of 15.00 GB")), /* @__PURE__ */ React.createElement("div", { style: { background: cardBg, border: "1px solid rgba(248,81,73,0.3)", borderRadius: 14, padding: 24 } }, /* @__PURE__ */ React.createElement("h3", { style: { margin: "0 0 6px 0", fontSize: 16, fontWeight: 800, color: "#f85149" } }, "\u26A0\uFE0F Account Management"), /* @__PURE__ */ React.createElement("p", { style: { margin: "0 0 16px 0", fontSize: 13, color: textMuted } }, "Permanent actions regarding your CodeHub developer profile."), /* @__PURE__ */ React.createElement(
+    )), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 8 } }, tokens.map((t) => /* @__PURE__ */ React.createElement("div", { key: t.id, style: { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 14px", borderRadius: 8, background: inputBg, border: "1px solid " + cardBorder } }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 700, fontSize: 13, color: textMain } }, t.name), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, color: textMuted } }, t.token_preview, " \xB7 Created ", new Date(t.created_at).toLocaleDateString())), /* @__PURE__ */ React.createElement("button", { onClick: () => handleDeleteToken(t.id), style: { color: "#f85149", background: "transparent", border: "none", cursor: "pointer", fontSize: 12, fontWeight: 700 } }, "Revoke")))))), activeTab === "preferences" && /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 20 } }, /* @__PURE__ */ React.createElement("div", { style: { background: cardBg, border: "1px solid " + cardBorder, borderRadius: 14, padding: 24 } }, (() => {
+      const quotaUsedBytes = Number(settingsData?.quota?.storage_used_bytes || 0);
+      const quotaMaxBytes = Number(settingsData?.quota?.storage_quota_bytes || 15 * 1024 * 1024 * 1024);
+      const quotaPercent = quotaMaxBytes > 0 ? quotaUsedBytes / quotaMaxBytes * 100 : 0;
+      const quotaPercentLabel = quotaPercent > 0 && quotaPercent < 0.01 ? "< 0.01%" : `${quotaPercent.toFixed(2)}%`;
+      const quotaBarWidth = quotaUsedBytes > 0 ? Math.max(quotaPercent, 0.75) : 0;
+      return /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 } }, /* @__PURE__ */ React.createElement("h3", { style: { margin: 0, fontSize: 16, fontWeight: 800, color: textMain } }, "\u2601\uFE0F Cloud Storage Quota (Virtual Drive)"), /* @__PURE__ */ React.createElement("span", { style: { fontSize: 12, fontWeight: 800, color: isDark ? "#58a6ff" : "#0969da" } }, quotaPercentLabel, " used")), /* @__PURE__ */ React.createElement("p", { style: { margin: "0 0 16px 0", fontSize: 13, color: textMuted } }, "15 GB free encrypted storage allocated per account for commits and repository trees."), /* @__PURE__ */ React.createElement("div", { style: { height: 8, borderRadius: 4, background: isDark ? "#21262d" : "#eaeef2", overflow: "hidden", marginBottom: 8 } }, /* @__PURE__ */ React.createElement("div", { style: { width: `${quotaBarWidth}%`, height: "100%", background: "linear-gradient(90deg, #1f6feb, #58a6ff)", borderRadius: 4, transition: "width 0.4s ease" } })), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 12, color: textMuted, flexWrap: "wrap", gap: 8 } }, /* @__PURE__ */ React.createElement("div", null, "Using ", /* @__PURE__ */ React.createElement("strong", null, formatBytes(quotaUsedBytes)), " of ", /* @__PURE__ */ React.createElement("strong", null, formatBytes(quotaMaxBytes))), /* @__PURE__ */ React.createElement("div", null, settingsData?.quota?.files_stored ?? 0, " files stored \u2022 ", settingsData?.quota?.repositories ?? 0, " repositories")));
+    })()), /* @__PURE__ */ React.createElement("div", { style: { background: cardBg, border: "1px solid rgba(248,81,73,0.3)", borderRadius: 14, padding: 24 } }, /* @__PURE__ */ React.createElement("h3", { style: { margin: "0 0 6px 0", fontSize: 16, fontWeight: 800, color: "#f85149" } }, "\u26A0\uFE0F Account Management"), /* @__PURE__ */ React.createElement("p", { style: { margin: "0 0 16px 0", fontSize: 13, color: textMuted } }, "Permanent actions regarding your CodeHub developer profile."), /* @__PURE__ */ React.createElement(
       "button",
       {
         onClick: onOpenDeleteAccount,
@@ -3942,7 +3934,7 @@
       background: badgeBg,
       color: badgeText,
       border: `1px solid ${badgeBorder}`
-    } }, repo.visibility)), /* @__PURE__ */ React.createElement("p", { style: { fontSize: 13, color: textMuted, margin: "6px 0 0" } }, repo.description || "No description provided."), /* @__PURE__ */ React.createElement("p", { style: { fontSize: 12, color: isDark ? "#3fb950" : "#15803d", fontFamily: "monospace", margin: "4px 0 0" } }, "\u2601\uFE0F Drive Storage ID: ", repo.google_drive_folder_id)))), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 10 } }, [["code", "\u{1F4C1} Code Tree"], ["issues_prs", `\u{1F500} Issues & PRs (${itemsList.length})`]].map(([k, label]) => {
+    } }, repo.visibility)), /* @__PURE__ */ React.createElement("p", { style: { fontSize: 13, color: textMuted, margin: "6px 0 0" } }, repo.description || "No description provided."), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 14, alignItems: "center", marginTop: 6, flexWrap: "wrap" } }, /* @__PURE__ */ React.createElement("span", { style: { fontSize: 12, color: isDark ? "#3fb950" : "#15803d", fontFamily: "monospace" } }, "\u2601\uFE0F Drive Storage ID: ", repo.google_drive_folder_id), /* @__PURE__ */ React.createElement("span", { style: { fontSize: 12, color: textMuted, fontWeight: 600 } }, "\u{1F4BE} Total Size: ", /* @__PURE__ */ React.createElement("strong", { style: { color: textMain } }, formatBytes(repo.size_bytes || (files || []).reduce((acc, f) => acc + (f.size || 0), 0)))))))), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 10 } }, [["code", "\u{1F4C1} Code Tree"], ["issues_prs", `\u{1F500} Issues & PRs (${itemsList.length})`]].map(([k, label]) => {
       const active = activeTab === k;
       return /* @__PURE__ */ React.createElement(
         "button",
@@ -4097,14 +4089,17 @@
             fontSize: 12,
             fontFamily: "monospace",
             marginBottom: 4,
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
             background: isSel ? isDark ? "rgba(88,166,255,0.15)" : "#e0f2fe" : "transparent",
             color: isSel ? isDark ? "#58a6ff" : "#0969da" : textMuted,
             border: isSel ? `1px solid ${isDark ? "rgba(88,166,255,0.3)" : "#bae6fd"}` : "1px solid transparent",
             fontWeight: isSel ? 700 : 500
           }
         },
-        "\u{1F4C4} ",
-        f.file_path
+        /* @__PURE__ */ React.createElement("span", { style: { overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, "\u{1F4C4} ", f.file_path),
+        /* @__PURE__ */ React.createElement("span", { style: { fontSize: 10, color: textMuted, opacity: 0.85, marginLeft: 8 } }, formatBytes(f.size || 0))
       );
     }), files.length === 0 && /* @__PURE__ */ React.createElement("p", { style: { fontSize: 12, color: textMuted } }, "No files yet.")), /* @__PURE__ */ React.createElement("div", null, isEditingFile ? /* @__PURE__ */ React.createElement(
       "form",
@@ -4210,7 +4205,7 @@
       padding: "12px 18px",
       background: innerBg,
       borderBottom: `1px solid ${cardBorder}`
-    } }, /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "monospace", fontSize: 13, color: isDark ? "#58a6ff" : "#0969da", fontWeight: 700 } }, "\u{1F4C4} ", selectedFile.file_path), isOwnerOrAdmin && user?.role !== "admin" && /* @__PURE__ */ React.createElement(
+    } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 10 } }, /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "monospace", fontSize: 13, color: isDark ? "#58a6ff" : "#0969da", fontWeight: 700 } }, "\u{1F4C4} ", selectedFile.file_path), /* @__PURE__ */ React.createElement("span", { style: { fontSize: 11, padding: "2px 8px", borderRadius: 6, background: isDark ? "#21262d" : "#f1f5f9", color: textMuted, fontWeight: 600 } }, formatBytes(selectedFile.size || 0))), isOwnerOrAdmin && user?.role !== "admin" && /* @__PURE__ */ React.createElement(
       "button",
       {
         onClick: () => {
@@ -4263,7 +4258,7 @@
         fontFamily: "monospace",
         fontSize: 11,
         fontWeight: 700
-      } }, "v", vh.version_number), /* @__PURE__ */ React.createElement("span", { style: { fontSize: 12, color: textMain } }, vh.commit_message)),
+      } }, "v", vh.version_number), /* @__PURE__ */ React.createElement("span", { style: { fontSize: 12, color: textMain } }, vh.commit_message), /* @__PURE__ */ React.createElement("span", { style: { fontSize: 10, color: textMuted, opacity: 0.85 } }, "(", formatBytes(vh.size || 0), ")")),
       isOwnerOrAdmin && user?.role !== "admin" && /* @__PURE__ */ React.createElement(
         "button",
         {
@@ -4567,6 +4562,7 @@
       { label: "Unverified", value: metrics.unverified_users, sub: "Need verification", color: isDark ? "#e3b341" : "#a16207" },
       { label: "Repositories", value: metrics.total_repositories, sub: `${metrics.public_repositories} public`, color: isDark ? "#3fb950" : "#15803d" },
       { label: "Total Commits", value: metrics.total_commits, sub: `${metrics.total_files} files`, color: isDark ? "#79c0ff" : "#0284c7" },
+      { label: "Drive Storage", value: formatBytes(metrics.aggregate_size_bytes || 0), sub: `${metrics.total_files || 0} files indexed`, color: isDark ? "#e3b341" : "#a16207" },
       { label: "Pending Purges", value: metrics.pending_deletions, sub: "Needs review", color: isDark ? "#f85149" : "#b91c1c" }
     ].map((s, i) => /* @__PURE__ */ React.createElement("div", { key: i, style: { background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: 16, padding: "22px 20px", boxShadow: shadow } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, color: textMuted, textTransform: "uppercase", letterSpacing: 1, marginBottom: 8, fontWeight: 700 } }, s.label), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 28, fontWeight: 900, color: s.color } }, s.value), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, color: textMuted, marginTop: 4 } }, s.sub)))), activeTab === "users" && /* @__PURE__ */ React.createElement("div", { style: { background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: 16, overflow: "hidden", boxShadow: shadow } }, /* @__PURE__ */ React.createElement("div", { style: { overflowX: "auto" } }, /* @__PURE__ */ React.createElement("table", { style: { width: "100%", borderCollapse: "collapse", fontSize: 12 } }, /* @__PURE__ */ React.createElement("thead", null, /* @__PURE__ */ React.createElement("tr", { style: { background: innerBg, borderBottom: `2px solid ${cardBorder}` } }, ["User", "Role", "Status", "Verified", "Repos", "Actions"].map((h) => /* @__PURE__ */ React.createElement("th", { key: h, style: { padding: "12px 16px", textAlign: "left", fontWeight: 800, color: textMuted, textTransform: "uppercase", fontSize: 11, letterSpacing: 1 } }, h)))), /* @__PURE__ */ React.createElement("tbody", null, usersList.map((u) => /* @__PURE__ */ React.createElement("tr", { key: u.id, style: { borderBottom: `1px solid ${isDark ? "#21262d" : "#f0f2f5"}` } }, /* @__PURE__ */ React.createElement("td", { style: { padding: "14px 16px" } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 10 } }, /* @__PURE__ */ React.createElement(UserAvatar, { user: u, size: 32 }), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 700, color: textMain } }, u.full_name || u.email), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, color: isDark ? "#58a6ff" : "#0969da", fontFamily: "monospace" } }, u.username && `@${u.username} \u2022 `, u.email)))), /* @__PURE__ */ React.createElement("td", { style: { padding: "14px 16px" } }, /* @__PURE__ */ React.createElement(
       "select",
@@ -4661,7 +4657,12 @@
     const stats = dashData?.stats || {};
     const activity = dashData?.activity || dashData?.recent_logs || [];
     const recentRepos = dashData?.recent_repos || userRepos;
-    const storageMB = ((stats.storage_bytes || 0) / (1024 * 1024)).toFixed(2);
+    const storageBytes = Number(stats.storage_bytes || 0);
+    const quotaBytes = 15 * 1024 * 1024 * 1024;
+    const quotaPercent = quotaBytes > 0 ? storageBytes / quotaBytes * 100 : 0;
+    const quotaPercentLabel = quotaPercent > 0 && quotaPercent < 0.01 ? "< 0.01%" : `${quotaPercent.toFixed(2)}%`;
+    const storageFormatted = formatBytes(storageBytes);
+    const storageBarWidth = storageBytes > 0 ? Math.max(quotaPercent, 0.75) : 0;
     return /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 24, maxWidth: 1200, margin: "0 auto", width: "100%" } }, /* @__PURE__ */ React.createElement("div", { style: {
       background: isDark ? isAdmin ? "linear-gradient(135deg, #1f1035, #161b22)" : "linear-gradient(135deg, #0d1f47 0%, #161240 50%, #1a0d40 100%)" : isAdmin ? "linear-gradient(135deg, #f5f0ff, #f0fdf4)" : "linear-gradient(135deg, #e0f2fe, #f0fdf4)",
       border: "1px solid " + (isAdmin ? isDark ? "#6e40c9" : "#e9d5ff" : isDark ? "#1f4280" : "#bae6fd"),
@@ -4736,7 +4737,7 @@
       { label: "Total Commits", value: stats.commits ?? 0, icon: "\u{1F4E6}", color: isDark ? "#3fb950" : "#15803d", sub: "Pushed versions" },
       { label: "Issues & PRs", value: (stats.issues ?? 0) + (stats.pull_requests ?? 0), icon: "\u{1F500}", color: isDark ? "#d2a8ff" : "#7c3aed", sub: `${stats.pull_requests ?? 0} PRs, ${stats.issues ?? 0} issues` },
       { label: "Community Feed", value: stats.feed_posts ?? 0, icon: "\u{1F4F0}", color: isDark ? "#79c0ff" : "#0284c7", sub: `${stats.likes_received ?? 0} likes received` },
-      { label: "Drive Storage", value: `${storageMB} MB`, icon: "\u2601\uFE0F", color: isDark ? "#e3b341" : "#a16207", sub: `${stats.files_stored ?? 0} files synced` },
+      { label: "Drive Storage", value: storageFormatted, icon: "\u2601\uFE0F", color: isDark ? "#e3b341" : "#a16207", sub: `${stats.files_stored ?? 0} files (${quotaPercentLabel} used)` },
       { label: "Account Tier", value: user.role?.toUpperCase(), icon: "\u{1F464}", color: isDark ? "#58a6ff" : "#0969da", sub: user.is_verified ? "Verified access" : "Unverified" }
     ]).map((s, i) => /* @__PURE__ */ React.createElement("div", { key: i, style: { background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: 16, padding: "20px 18px", display: "flex", flexDirection: "column", justifyContent: "space-between", boxShadow: shadow } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 } }, /* @__PURE__ */ React.createElement("span", { style: { fontSize: 24 } }, s.icon), /* @__PURE__ */ React.createElement("span", { style: { fontSize: 11, color: textMuted, textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 700 } }, s.label)), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 24, fontWeight: 900, color: s.color } }, s.value), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, color: textMuted, marginTop: 4 } }, s.sub))))), /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 16 } }, /* @__PURE__ */ React.createElement("div", { style: { background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: 16, padding: "22px 24px", display: "flex", flexDirection: "column", gap: 14, boxShadow: shadow } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center" } }, /* @__PURE__ */ React.createElement("h3", { style: { fontWeight: 800, fontSize: 15, color: textMain, margin: 0 } }, "\u{1F464} Developer Identity"), /* @__PURE__ */ React.createElement(
       "button",
@@ -4745,7 +4746,7 @@
         style: { background: "none", border: "none", color: isDark ? "#58a6ff" : "#0969da", fontSize: 12, cursor: "pointer", fontWeight: 700 }
       },
       "Edit Profile \u2192"
-    )), /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 } }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, color: textMuted, textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 700 } }, "Username"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 13, fontWeight: 700, color: isDark ? "#58a6ff" : "#0969da", fontFamily: "monospace" } }, "@", profile?.username || "not_set")), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, color: textMuted, textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 700 } }, "Organization"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 13, fontWeight: 600, color: textMain } }, profile?.organization || "Independent")), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, color: textMuted, textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 700 } }, "Location"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 13, fontWeight: 600, color: textMain } }, profile?.location || "Remote / Worldwide")), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, color: textMuted, textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 700 } }, "Website"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 13, fontWeight: 600, color: isDark ? "#58a6ff" : "#0969da", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, profile?.website_url ? /* @__PURE__ */ React.createElement("a", { href: profile.website_url, target: "_blank", rel: "noreferrer", style: { color: isDark ? "#58a6ff" : "#0969da", textDecoration: "none" } }, profile.website_url.replace(/^https?:\/\//, "")) : "\u2014"))), profile?.bio && /* @__PURE__ */ React.createElement("div", { style: { background: innerBg, border: `1px solid ${cardBorder}`, borderRadius: 12, padding: "10px 14px", fontSize: 12, color: textMuted, lineHeight: 1.5 } }, '"', profile.bio, '"')), /* @__PURE__ */ React.createElement("div", { style: { background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: 16, padding: "22px 24px", display: "flex", flexDirection: "column", gap: 14, boxShadow: shadow } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center" } }, /* @__PURE__ */ React.createElement("h3", { style: { fontWeight: 800, fontSize: 15, color: textMain, margin: 0 } }, "\u2601\uFE0F Cloud Drive Sync & Health"), /* @__PURE__ */ React.createElement("span", { style: { fontSize: 11, padding: "2px 8px", borderRadius: 12, background: isDark ? "rgba(63,185,80,0.15)" : "#dcfce7", color: isDark ? "#3fb950" : "#15803d", fontWeight: 700 } }, "Connected")), /* @__PURE__ */ React.createElement("p", { style: { fontSize: 12, color: textMuted, margin: 0, lineHeight: 1.5 } }, "Automated Google Drive version sync active. All commits create real-time snapshot files in isolated repository cloud folders."), /* @__PURE__ */ React.createElement("div", { style: { background: innerBg, border: `1px solid ${cardBorder}`, borderRadius: 12, padding: "12px 14px", display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 12 } }, /* @__PURE__ */ React.createElement("span", { style: { color: textMuted } }, "Storage Used"), /* @__PURE__ */ React.createElement("span", { style: { fontWeight: 800, color: isDark ? "#58a6ff" : "#0969da" } }, storageMB, " MB / 15 GB Free Quota")), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 10 } }, /* @__PURE__ */ React.createElement(
+    )), /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 } }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, color: textMuted, textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 700 } }, "Username"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 13, fontWeight: 700, color: isDark ? "#58a6ff" : "#0969da", fontFamily: "monospace" } }, "@", profile?.username || "not_set")), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, color: textMuted, textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 700 } }, "Organization"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 13, fontWeight: 600, color: textMain } }, profile?.organization || "Independent")), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, color: textMuted, textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 700 } }, "Location"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 13, fontWeight: 600, color: textMain } }, profile?.location || "Remote / Worldwide")), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, color: textMuted, textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 700 } }, "Website"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 13, fontWeight: 600, color: isDark ? "#58a6ff" : "#0969da", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, profile?.website_url ? /* @__PURE__ */ React.createElement("a", { href: profile.website_url, target: "_blank", rel: "noreferrer", style: { color: isDark ? "#58a6ff" : "#0969da", textDecoration: "none" } }, profile.website_url.replace(/^https?:\/\//, "")) : "\u2014"))), profile?.bio && /* @__PURE__ */ React.createElement("div", { style: { background: innerBg, border: `1px solid ${cardBorder}`, borderRadius: 12, padding: "10px 14px", fontSize: 12, color: textMuted, lineHeight: 1.5 } }, '"', profile.bio, '"')), /* @__PURE__ */ React.createElement("div", { style: { background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: 16, padding: "22px 24px", display: "flex", flexDirection: "column", gap: 14, boxShadow: shadow } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center" } }, /* @__PURE__ */ React.createElement("h3", { style: { fontWeight: 800, fontSize: 15, color: textMain, margin: 0 } }, "\u2601\uFE0F Cloud Drive Sync & Health"), /* @__PURE__ */ React.createElement("span", { style: { fontSize: 11, padding: "2px 8px", borderRadius: 12, background: isDark ? "rgba(63,185,80,0.15)" : "#dcfce7", color: isDark ? "#3fb950" : "#15803d", fontWeight: 700 } }, "Connected")), /* @__PURE__ */ React.createElement("p", { style: { fontSize: 12, color: textMuted, margin: 0, lineHeight: 1.5 } }, "Automated Google Drive version sync active. All commits create real-time snapshot files in isolated repository cloud folders."), /* @__PURE__ */ React.createElement("div", { style: { background: innerBg, border: `1px solid ${cardBorder}`, borderRadius: 12, padding: "12px 14px", display: "flex", flexDirection: "column", gap: 8, fontSize: 12 } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center" } }, /* @__PURE__ */ React.createElement("span", { style: { color: textMuted } }, "Storage Used"), /* @__PURE__ */ React.createElement("span", { style: { fontWeight: 800, color: isDark ? "#58a6ff" : "#0969da" } }, storageFormatted, " / 15 GB Free Quota (", quotaPercentLabel, ")")), /* @__PURE__ */ React.createElement("div", { style: { height: 6, borderRadius: 3, background: isDark ? "#21262d" : "#eaeef2", overflow: "hidden" } }, /* @__PURE__ */ React.createElement("div", { style: { width: `${storageBarWidth}%`, height: "100%", background: isDark ? "#58a6ff" : "#0969da", borderRadius: 3, transition: "width 0.4s ease" } }))), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 10 } }, /* @__PURE__ */ React.createElement(
       "button",
       {
         onClick: () => triggerNav("ai"),
@@ -4905,7 +4906,7 @@
         }
       },
       /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 800, fontSize: 13, color: isDark ? "#58a6ff" : "#0969da" } }, "\u{1F4E6} ", r.name), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, color: textMuted, marginTop: 3 } }, r.description || "No description provided")),
-      /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 8, fontSize: 11, color: textMuted } }, /* @__PURE__ */ React.createElement("span", null, "\u{1F33F} ", r.branch_count || 1), /* @__PURE__ */ React.createElement("span", null, "\u{1F4E6} ", r.commit_count || 1))
+      /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 10, fontSize: 11, color: textMuted, alignItems: "center" } }, /* @__PURE__ */ React.createElement("span", null, "\u{1F33F} ", r.branch_count || 1), /* @__PURE__ */ React.createElement("span", null, "\u{1F4E6} ", r.commit_count || 1), /* @__PURE__ */ React.createElement("span", { style: { color: isDark ? "#58a6ff" : "#0969da", fontWeight: 600 } }, "\u{1F4BE} ", formatBytes(r.size_bytes || 0)))
     )), recentRepos.length === 0 && /* @__PURE__ */ React.createElement("div", { style: { textAlign: "center", padding: 30, color: textMuted, fontSize: 13 } }, "No repositories yet. Create your first code workspace!"))), /* @__PURE__ */ React.createElement("div", { style: { background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: 16, padding: "22px 24px", boxShadow: shadow } }, /* @__PURE__ */ React.createElement("h3", { style: { fontWeight: 800, fontSize: 15, color: textMain, marginBottom: 14 } }, "\u{1F4CA} Recent Activity Stream"), activity.length === 0 ? /* @__PURE__ */ React.createElement("p", { style: { color: textMuted, fontSize: 13 } }, "No recent activity recorded.") : /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 10 } }, activity.slice(0, 7).map((a, i) => {
       const actionType = a && typeof a === "object" ? a.action_type || a.actionType || "" : String(a || "");
       const timestamp = a && typeof a === "object" ? a.timestamp || a.created_at || "" : "";

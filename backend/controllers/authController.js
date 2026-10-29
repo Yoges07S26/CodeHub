@@ -1,6 +1,7 @@
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 const User = require('../models/User');
+const UserContact = require('../models/UserContact');
 const AdminAccountActionRequest = require('../models/AdminAccountActionRequest');
 const { getNextSequence } = require('../models/Counter');
 const JWT = require('../services/jwtService');
@@ -61,6 +62,16 @@ class AuthController {
         avatar_url: avatarUrl,
         created_at: new Date()
       });
+
+      try {
+        await UserContact.create({
+          username,
+          full_name: fullName,
+          mail_id: email
+        });
+      } catch (cErr) {
+        console.error('[UserContact] Auto-sync failed on register:', cErr.message);
+      }
 
       await ActivityLogger.log(
         newUserId,

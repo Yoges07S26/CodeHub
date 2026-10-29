@@ -1,6 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import UserAvatar from './UserAvatar';
 
+function formatBytes(bytes, decimals = 2) {
+  const b = Number(bytes);
+  if (!b || isNaN(b) || b <= 0) return '0 B';
+  const k = 1024;
+  const dm = decimals < 0 ? 0 : decimals;
+  const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+  const i = Math.floor(Math.log(b) / Math.log(k));
+  if (i <= 0) return `${b} B`;
+  const val = (b / Math.pow(k, i)).toFixed(dm);
+  return `${parseFloat(val)} ${sizes[i]}`;
+}
+
 /**
  * DashboardView – role‑aware workspace dashboard.
  * Props:
@@ -96,7 +108,12 @@ export default function DashboardView({
   const stats = dashData?.stats || {};
   const activity = dashData?.activity || dashData?.recent_logs || [];
   const recentRepos = dashData?.recent_repos || userRepos;
-  const storageMB = ((stats.storage_bytes || 0) / (1024 * 1024)).toFixed(2);
+  const storageBytes = Number(stats.storage_bytes || 0);
+  const quotaBytes = 15 * 1024 * 1024 * 1024; // 15 GB Free Quota
+  const quotaPercent = quotaBytes > 0 ? (storageBytes / quotaBytes) * 100 : 0;
+  const quotaPercentLabel = quotaPercent > 0 && quotaPercent < 0.01 ? '< 0.01%' : `${quotaPercent.toFixed(2)}%`;
+  const storageFormatted = formatBytes(storageBytes);
+  const storageBarWidth = storageBytes > 0 ? Math.max(quotaPercent, 0.75) : 0;
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 24, maxWidth: 1200, margin: '0 auto', width: '100%' }}>
@@ -200,7 +217,7 @@ export default function DashboardView({
               { label: 'Total Commits', value: stats.commits ?? 0, icon: '📦', color: isDark ? '#3fb950' : '#15803d', sub: 'Pushed versions' },
               { label: 'Issues & PRs', value: (stats.issues ?? 0) + (stats.pull_requests ?? 0), icon: '🔀', color: isDark ? '#d2a8ff' : '#7c3aed', sub: `${stats.pull_requests ?? 0} PRs, ${stats.issues ?? 0} issues` },
               { label: 'Community Feed', value: stats.feed_posts ?? 0, icon: '📰', color: isDark ? '#79c0ff' : '#0284c7', sub: `${stats.likes_received ?? 0} likes received` },
-              { label: 'Drive Storage', value: `${storageMB} MB`, icon: '☁️', color: isDark ? '#e3b341' : '#a16207', sub: `${stats.files_stored ?? 0} files synced` },
+              { label: 'Drive Storage', value: storageFormatted, icon: '☁️', color: isDark ? '#e3b341' : '#a16207', sub: `${stats.files_stored ?? 0} files (${quotaPercentLabel} used)` },
               { label: 'Account Tier', value: user.role?.toUpperCase(), icon: '👤', color: isDark ? '#58a6ff' : '#0969da', sub: user.is_verified ? 'Verified access' : 'Unverified' },
             ]
         ).map((s, i) => (
@@ -265,9 +282,16 @@ export default function DashboardView({
           <p style={{ fontSize: 12, color: textMuted, margin: 0, lineHeight: 1.5 }}>
             Automated Google Drive version sync active. All commits create real-time snapshot files in isolated repository cloud folders.
           </p>
-          <div style={{ background: innerBg, border: `1px solid ${cardBorder}`, borderRadius: 12, padding: '12px 14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 12 }}>
-            <span style={{ color: textMuted }}>Storage Used</span>
-            <span style={{ fontWeight: 800, color: isDark ? '#58a6ff' : '#0969da' }}>{storageMB} MB / 15 GB Free Quota</span>
+          <div style={{ background: innerBg, border: `1px solid ${cardBorder}`, borderRadius: 12, padding: '12px 14px', display: 'flex', flexDirection: 'column', gap: 8, fontSize: 12 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ color: textMuted }}>Storage Used</span>
+              <span style={{ fontWeight: 800, color: isDark ? '#58a6ff' : '#0969da' }}>
+                {storageFormatted} / 15 GB Free Quota ({quotaPercentLabel})
+              </span>
+            </div>
+            <div style={{ height: 6, borderRadius: 3, background: isDark ? '#21262d' : '#eaeef2', overflow: 'hidden' }}>
+              <div style={{ width: `${storageBarWidth}%`, height: '100%', background: isDark ? '#58a6ff' : '#0969da', borderRadius: 3, transition: 'width 0.4s ease' }} />
+            </div>
           </div>
           <div style={{ display: 'flex', gap: 10 }}>
             <button
@@ -483,9 +507,10 @@ export default function DashboardView({
                     <div style={{ fontWeight: 800, fontSize: 13, color: isDark ? '#58a6ff' : '#0969da' }}>📦 {r.name}</div>
                     <div style={{ fontSize: 11, color: textMuted, marginTop: 3 }}>{r.description || 'No description provided'}</div>
                   </div>
-                  <div style={{ display: 'flex', gap: 8, fontSize: 11, color: textMuted }}>
+                  <div style={{ display: 'flex', gap: 10, fontSize: 11, color: textMuted, alignItems: 'center' }}>
                     <span>🌿 {r.branch_count || 1}</span>
                     <span>📦 {r.commit_count || 1}</span>
+                    <span style={{ color: isDark ? '#58a6ff' : '#0969da', fontWeight: 600 }}>💾 {formatBytes(r.size_bytes || 0)}</span>
                   </div>
                 </div>
               ))}

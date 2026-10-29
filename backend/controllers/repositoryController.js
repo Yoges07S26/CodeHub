@@ -28,11 +28,11 @@ class RepositoryController {
           .sort({ created_at: -1 }).lean();
       }
 
-      // Fetch owner emails, branch counts, and commit counts in parallel batches
+      // Fetch owner emails, branch counts, commit counts, and repository sizes in parallel batches
       const userIds = [...new Set(repos.map(r => r.user_id))];
       const repoIds = repos.map(r => r.id);
 
-      const [users, branchCounts, commitCounts] = await Promise.all([
+      const [users, branchCounts, commitCounts, repoSizes] = await Promise.all([
         User.find({ id: { $in: userIds } }, { id: 1, email: 1, username: 1, full_name: 1 }).lean(),
         Branch.aggregate([
           { $match: { repo_id: { $in: repoIds } } },
@@ -41,6 +41,10 @@ class RepositoryController {
         RepositoryCommit.aggregate([
           { $match: { repo_id: { $in: repoIds } } },
           { $group: { _id: '$repo_id', count: { $sum: 1 } } }
+        ]),
+        RepositoryFile.aggregate([
+          { $match: { repo_id: { $in: repoIds } } },
+          { $group: { _id: '$repo_id', total_size: { $sum: '$size' }, file_count: { $sum: 1 } } }
         ])
       ]);
 
@@ -50,12 +54,20 @@ class RepositoryController {
       branchCounts.forEach(b => { branchMap[b._id] = b.count; });
       const commitMap = {};
       commitCounts.forEach(c => { commitMap[c._id] = c.count; });
+      const sizeMap = {};
+      const fileCountMap = {};
+      repoSizes.forEach(s => {
+        sizeMap[s._id] = s.total_size || 0;
+        fileCountMap[s._id] = s.file_count || 0;
+      });
 
       for (const r of repos) {
         r.owner_email = userMap[r.user_id] || '';
         r.owner_name = userMap[r.user_id] || 'Developer';
         r.branch_count = branchMap[r.id] || 0;
         r.commit_count = commitMap[r.id] || 0;
+        r.size_bytes = sizeMap[r.id] || 0;
+        r.file_count = fileCountMap[r.id] || 0;
       }
 
       res.json({ success: true, repositories: repos });
@@ -175,12 +187,15 @@ class RepositoryController {
         }
       }
 
-      const [owner, branches, totalCommits] = await Promise.all([
+      const [owner, branches, totalCommits, repoFiles] = await Promise.all([
         User.findOne({ id: repo.user_id }, { email: 1 }).lean(),
         Branch.find({ repo_id: repoId }).sort({ id: 1 }).lean(),
-        RepositoryCommit.countDocuments({ repo_id: repoId })
+        RepositoryCommit.countDocuments({ repo_id: repoId }),
+        RepositoryFile.find({ repo_id: repoId }, { size: 1 }).lean()
       ]);
       repo.owner_email = owner ? owner.email : '';
+      repo.size_bytes = repoFiles.reduce((acc, f) => acc + (f.size || 0), 0);
+      repo.file_count = repoFiles.length;
 
       res.json({
         success: true,

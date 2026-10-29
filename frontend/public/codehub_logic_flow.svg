@@ -1,0 +1,245 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 820" width="100%" height="100%">
+  <defs>
+    <!-- Background Gradient -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0a0e17"/>
+      <stop offset="50%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#070a12"/>
+    </linearGradient>
+
+    <!-- Card Background Gradient -->
+    <linearGradient id="cardGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b" stop-opacity="0.85"/>
+      <stop offset="100%" stop-color="#0f172a" stop-opacity="0.85"/>
+    </linearGradient>
+
+    <!-- Header Gradient -->
+    <linearGradient id="titleGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#60a5fa"/>
+      <stop offset="50%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#34d399"/>
+    </linearGradient>
+
+    <!-- Accent Gradients -->
+    <linearGradient id="blueCyan" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3b82f6"/>
+      <stop offset="100%" stop-color="#06b6d4"/>
+    </linearGradient>
+
+    <linearGradient id="purplePink" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#8b5cf6"/>
+      <stop offset="100%" stop-color="#ec4899"/>
+    </linearGradient>
+
+    <linearGradient id="emeraldTeal" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10b981"/>
+      <stop offset="100%" stop-color="#14b8a6"/>
+    </linearGradient>
+
+    <linearGradient id="amberOrange" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#f97316"/>
+    </linearGradient>
+
+    <!-- Drop Shadows -->
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#000000" flood-opacity="0.5"/>
+    </filter>
+
+    <filter id="glowCyan" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+
+    <!-- Arrow Marker -->
+    <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 8 5 L 0 9 z" fill="#38bdf8"/>
+    </marker>
+  </defs>
+
+  <!-- Canvas Background -->
+  <rect width="1200" height="820" fill="url(#bgGrad)"/>
+
+  <!-- Subtle Grid Lines -->
+  <g opacity="0.07" stroke="#94a3b8" stroke-width="1">
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40"/>
+    </pattern>
+    <rect width="1200" height="820" fill="url(#grid)"/>
+  </g>
+
+  <!-- ── Header ── -->
+  <g transform="translate(60, 45)">
+    <rect x="0" y="0" width="1080" height="70" rx="14" fill="#1e293b" fill-opacity="0.4" stroke="#334155" stroke-width="1"/>
+    <text x="30" y="38" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="24" font-weight="900" fill="url(#titleGrad)">
+      CodeHub Platform — Step-by-Step System Logic Flow
+    </text>
+    <text x="30" y="58" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="500" fill="#94a3b8">
+      General Input ➔ Check / Condition ➔ Action ➔ Output Process Architecture
+    </text>
+    <rect x="940" y="20" width="110" height="28" rx="14" fill="#0369a1" fill-opacity="0.4" stroke="#38bdf8" stroke-width="1"/>
+    <text x="995" y="38" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="700" fill="#38bdf8" text-anchor="middle">
+      100% Dynamic
+    </text>
+  </g>
+
+  <!-- ── Connecting Arrow Lines (Top Row) ── -->
+  <line x1="390" y1="260" x2="435" y2="260" stroke="#38bdf8" stroke-width="3" stroke-dasharray="6,4" marker-end="url(#arrow)"/>
+  <line x1="765" y1="260" x2="810" y2="260" stroke="#38bdf8" stroke-width="3" stroke-dasharray="6,4" marker-end="url(#arrow)"/>
+
+  <!-- ── Connecting Arrow Line (Row 1 to Row 2) ── -->
+  <path d="M 975 410 L 975 480 L 225 480 L 225 530" fill="none" stroke="#38bdf8" stroke-width="3" stroke-dasharray="6,4" marker-end="url(#arrow)"/>
+
+  <!-- ── Connecting Arrow Line (Bottom Row) ── -->
+  <line x1="390" y1="655" x2="435" y2="655" stroke="#38bdf8" stroke-width="3" stroke-dasharray="6,4" marker-end="url(#arrow)"/>
+  <line x1="765" y1="655" x2="810" y2="655" stroke="#38bdf8" stroke-width="3" stroke-dasharray="6,4" marker-end="url(#arrow)"/>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- STEP 1: AUTHENTICATION & ROLE DISPATCH                -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <g transform="translate(60, 150)" filter="url(#shadow)">
+    <rect width="330" height="260" rx="18" fill="url(#cardGrad)" stroke="#3b82f6" stroke-width="1.5"/>
+    <rect x="0" y="0" width="330" height="42" rx="18" fill="url(#blueCyan)" fill-opacity="0.15"/>
+    <circle cx="28" cy="21" r="14" fill="#3b82f6"/>
+    <text x="28" y="26" font-family="sans-serif" font-size="12" font-weight="900" fill="#ffffff" text-anchor="middle">1</text>
+    <text x="54" y="26" font-family="sans-serif" font-size="14" font-weight="800" fill="#60a5fa">Authentication &amp; Role Check</text>
+
+    <!-- Step Body -->
+    <text x="20" y="65" font-family="monospace" font-size="11" font-weight="700" fill="#38bdf8">[INPUT]</text>
+    <text x="75" y="65" font-family="sans-serif" font-size="11" fill="#cbd5e1">Email &amp; Password</text>
+
+    <text x="20" y="95" font-family="monospace" font-size="11" font-weight="700" fill="#f59e0b">[CHECK]</text>
+    <text x="75" y="95" font-family="sans-serif" font-size="11" fill="#cbd5e1">Verify Password (bcrypt)</text>
+
+    <g transform="translate(20, 115)">
+      <rect width="290" height="110" rx="10" fill="#0f172a" stroke="#334155" stroke-width="1"/>
+      <text x="12" y="24" font-family="monospace" font-size="10" font-weight="700" fill="#a78bfa">IF Role == "admin":</text>
+      <text x="24" y="42" font-family="sans-serif" font-size="10.5" fill="#94a3b8">➔ Issue Token ➔ Open Admin Cockpit</text>
+      
+      <text x="12" y="68" font-family="monospace" font-size="10" font-weight="700" fill="#34d399">ELSE (Developer User):</text>
+      <text x="24" y="86" font-family="sans-serif" font-size="10.5" fill="#94a3b8">➔ Issue Token ➔ Open User Workspace</text>
+    </g>
+  </g>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- STEP 2: REPOSITORY & VIRTUAL DRIVE SETUP             -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <g transform="translate(435, 150)" filter="url(#shadow)">
+    <rect width="330" height="260" rx="18" fill="url(#cardGrad)" stroke="#06b6d4" stroke-width="1.5"/>
+    <rect x="0" y="0" width="330" height="42" rx="18" fill="url(#blueCyan)" fill-opacity="0.15"/>
+    <circle cx="28" cy="21" r="14" fill="#06b6d4"/>
+    <text x="28" y="26" font-family="sans-serif" font-size="12" font-weight="900" fill="#ffffff" text-anchor="middle">2</text>
+    <text x="54" y="26" font-family="sans-serif" font-size="14" font-weight="800" fill="#22d3ee">Repository &amp; Virtual Drive</text>
+
+    <!-- Step Body -->
+    <text x="20" y="65" font-family="monospace" font-size="11" font-weight="700" fill="#38bdf8">[INPUT]</text>
+    <text x="75" y="65" font-family="sans-serif" font-size="11" fill="#cbd5e1">Name, Description, Public/Private</text>
+
+    <text x="20" y="95" font-family="monospace" font-size="11" font-weight="700" fill="#f59e0b">[ACTION]</text>
+    <text x="75" y="95" font-family="sans-serif" font-size="11" fill="#cbd5e1">GoogleDriveService Engine</text>
+
+    <g transform="translate(20, 115)">
+      <rect width="290" height="110" rx="10" fill="#0f172a" stroke="#334155" stroke-width="1"/>
+      <text x="12" y="22" font-family="sans-serif" font-size="10.5" fill="#e2e8f0">• Generate "gdrive_folder_&lt;id&gt;"</text>
+      <text x="12" y="44" font-family="sans-serif" font-size="10.5" fill="#e2e8f0">• Create disk directory in storage/</text>
+      <text x="12" y="66" font-family="sans-serif" font-size="10.5" fill="#e2e8f0">• Create "main" branch in MongoDB</text>
+      <text x="12" y="88" font-family="sans-serif" font-size="10.5" fill="#34d399">➔ Initial README.md &amp; Commit (v1)</text>
+    </g>
+  </g>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- STEP 3: IN-BROWSER CODE COMMIT & ROLLBACK            -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <g transform="translate(810, 150)" filter="url(#shadow)">
+    <rect width="330" height="260" rx="18" fill="url(#cardGrad)" stroke="#10b981" stroke-width="1.5"/>
+    <rect x="0" y="0" width="330" height="42" rx="18" fill="url(#emeraldTeal)" fill-opacity="0.15"/>
+    <circle cx="28" cy="21" r="14" fill="#10b981"/>
+    <text x="28" y="26" font-family="sans-serif" font-size="12" font-weight="900" fill="#ffffff" text-anchor="middle">3</text>
+    <text x="54" y="26" font-family="sans-serif" font-size="14" font-weight="800" fill="#34d399">Code Editor &amp; Commit Snapshots</text>
+
+    <!-- Step Body -->
+    <text x="20" y="65" font-family="monospace" font-size="11" font-weight="700" fill="#38bdf8">[INPUT]</text>
+    <text x="75" y="65" font-family="sans-serif" font-size="11" fill="#cbd5e1">File Content &amp; Commit Message</text>
+
+    <text x="20" y="95" font-family="monospace" font-size="11" font-weight="700" fill="#f59e0b">[PIPELINE]</text>
+    <text x="90" y="95" font-family="sans-serif" font-size="11" fill="#cbd5e1">SHA-1 Hashing &amp; Snapshot</text>
+
+    <g transform="translate(20, 115)">
+      <rect width="290" height="110" rx="10" fill="#0f172a" stroke="#334155" stroke-width="1"/>
+      <text x="12" y="22" font-family="sans-serif" font-size="10.5" fill="#e2e8f0">• Calculate buffer byte size</text>
+      <text x="12" y="44" font-family="sans-serif" font-size="10.5" fill="#e2e8f0">• Save encrypted snapshot file</text>
+      <text x="12" y="66" font-family="sans-serif" font-size="10.5" fill="#e2e8f0">• Record version in history (v2, v3...)</text>
+      <text x="12" y="88" font-family="sans-serif" font-size="10.5" fill="#38bdf8">➔ 1-Click Rollback available anytime</text>
+    </g>
+  </g>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- STEP 4: DYNAMIC STORAGE & QUOTA CALCULATION          -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <g transform="translate(60, 530)" filter="url(#shadow)">
+    <rect width="330" height="240" rx="18" fill="url(#cardGrad)" stroke="#f59e0b" stroke-width="1.5"/>
+    <rect x="0" y="0" width="330" height="42" rx="18" fill="url(#amberOrange)" fill-opacity="0.15"/>
+    <circle cx="28" cy="21" r="14" fill="#f59e0b"/>
+    <text x="28" y="26" font-family="sans-serif" font-size="12" font-weight="900" fill="#ffffff" text-anchor="middle">4</text>
+    <text x="54" y="26" font-family="sans-serif" font-size="14" font-weight="800" fill="#fbbf24">Live Storage &amp; Quota</text>
+
+    <!-- Step Body -->
+    <text x="20" y="65" font-family="monospace" font-size="11" font-weight="700" fill="#38bdf8">[CALCULATION]</text>
+    <text x="115" y="65" font-family="sans-serif" font-size="11" fill="#cbd5e1">Sum all file.size bytes</text>
+
+    <g transform="translate(20, 85)">
+      <rect width="290" height="130" rx="10" fill="#0f172a" stroke="#334155" stroke-width="1"/>
+      <text x="12" y="22" font-family="sans-serif" font-size="10.5" fill="#e2e8f0">• Adaptive units: B ➔ KB ➔ MB ➔ GB</text>
+      <text x="12" y="44" font-family="sans-serif" font-size="10.5" fill="#e2e8f0">• Compares against 15 GB Free Tier</text>
+      <text x="12" y="66" font-family="sans-serif" font-size="10.5" fill="#e2e8f0">• Dynamically animates progress bar</text>
+      
+      <!-- Mini Progress Bar in SVG -->
+      <rect x="12" y="80" width="266" height="8" rx="4" fill="#334155"/>
+      <rect x="12" y="80" width="40" height="8" rx="4" fill="#38bdf8"/>
+      <text x="12" y="108" font-family="monospace" font-size="10" font-weight="700" fill="#38bdf8">
+        69 B / 15 GB (&lt; 0.01% used)
+      </text>
+    </g>
+  </g>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- STEP 5: CAREER BOARD & COMMUNITY FEED                -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <g transform="translate(435, 530)" filter="url(#shadow)">
+    <rect width="330" height="240" rx="18" fill="url(#cardGrad)" stroke="#8b5cf6" stroke-width="1.5"/>
+    <rect x="0" y="0" width="330" height="42" rx="18" fill="url(#purplePink)" fill-opacity="0.15"/>
+    <circle cx="28" cy="21" r="14" fill="#8b5cf6"/>
+    <text x="28" y="26" font-family="sans-serif" font-size="12" font-weight="900" fill="#ffffff" text-anchor="middle">5</text>
+    <text x="54" y="26" font-family="sans-serif" font-size="14" font-weight="800" fill="#c084fc">Careers, Community &amp; AI</text>
+
+    <!-- Step Body -->
+    <text x="20" y="65" font-family="monospace" font-size="11" font-weight="700" fill="#38bdf8">[FEATURES]</text>
+    <text x="95" y="65" font-family="sans-serif" font-size="11" fill="#cbd5e1">Interactive Developer Hub</text>
+
+    <g transform="translate(20, 85)">
+      <rect width="290" height="130" rx="10" fill="#0f172a" stroke="#334155" stroke-width="1"/>
+      <text x="12" y="24" font-family="sans-serif" font-size="10.5" fill="#e2e8f0">• 💼 Search 46+ Jobs &amp; Apply</text>
+      <text x="12" y="48" font-family="sans-serif" font-size="10.5" fill="#e2e8f0">• 📰 Community Stream: Post &amp; Like</text>
+      <text x="12" y="72" font-family="sans-serif" font-size="10.5" fill="#e2e8f0">• ✨ Ask Gemini AI for Code Review</text>
+      <text x="12" y="96" font-family="sans-serif" font-size="10.5" fill="#34d399">• 🔑 Personal Access Tokens (PATs)</text>
+    </g>
+  </g>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- SUMMARY OUTCOME CARD                                 -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <g transform="translate(810, 530)" filter="url(#shadow)">
+    <rect width="330" height="240" rx="18" fill="url(#cardGrad)" stroke="#38bdf8" stroke-width="1.5"/>
+    <rect x="0" y="0" width="330" height="42" rx="18" fill="url(#blueCyan)" fill-opacity="0.15"/>
+    <text x="20" y="26" font-family="sans-serif" font-size="14" font-weight="800" fill="#38bdf8">🚀 Full-Stack Result</text>
+
+    <g transform="translate(20, 55)">
+      <text x="0" y="22" font-family="sans-serif" font-size="11" font-weight="700" fill="#ffffff">Reliable, Fast &amp; 100% Local</text>
+      <text x="0" y="44" font-family="sans-serif" font-size="11" fill="#94a3b8">✔ Zero static hardcoding of sizes</text>
+      <text x="0" y="66" font-family="sans-serif" font-size="11" fill="#94a3b8">✔ Version snapshots stored on disk</text>
+      <text x="0" y="88" font-family="sans-serif" font-size="11" fill="#94a3b8">✔ Automated MongoDB index queries</text>
+      <text x="0" y="110" font-family="sans-serif" font-size="11" fill="#94a3b8">✔ Google Gemini AI Code Assistant</text>
+      <text x="0" y="132" font-family="sans-serif" font-size="11.5" font-weight="700" fill="#34d399">➔ Running on http://localhost:8000</text>
+    </g>
+  </g>
+</svg>

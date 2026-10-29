@@ -1,0 +1,1693 @@
+[{
+  "_id": {
+    "$oid": "6accec2b091af9a120a47b90"
+  },
+  "id": 1,
+  "title": "Senior Full Stack Engineer",
+  "company": "DevFlow Technologies",
+  "location": "Remote (Global)",
+  "type": "Full-time",
+  "role": "Full Stack",
+  "experienceLevel": "Senior",
+  "salary": "$130k - $160k / yr",
+  "description": "We are seeking an experienced Full Stack Engineer to architect high-throughput repository hosting, code collaboration, and real-time developer workflows.",
+  "requirements": [
+    "5+ years with React, Node.js and MongoDB",
+    "Experience with Git internals & VCS architecture",
+    "Strong proficiency in TypeScript and RESTful microservices"
+  ],
+  "skills": [
+    "React",
+    "Node.js",
+    "Express",
+    "MongoDB",
+    "Docker",
+    "TypeScript"
+  ],
+  "posted_by_user_id": 1,
+  "poster_name": "CodeHub Admin",
+  "poster_email": "admin@codehub.com",
+  "status": "open",
+  "applicants_count": 0,
+  "created_at": {
+    "$date": "2026-10-12T14:18:19.605Z"
+  },
+  "__v": 0,
+  "image_url": "/uploads/jobs/job_1_full_stack.jpg"
+},
+{
+  "_id": {
+    "$oid": "6accec2b091af9a120a47b95"
+  },
+  "id": 2,
+  "title": "Frontend React & UI/UX Architect",
+  "company": "PixelCraft Labs",
+  "location": "San Francisco, CA (Hybrid)",
+  "type": "Full-time",
+  "role": "Frontend",
+  "experienceLevel": "Mid Level",
+  "salary": "$110k - $140k / yr",
+  "description": "Build polished, responsive developer tooling interfaces with accessible themes (light & dark), smooth micro-interactions, and real-time state sync.",
+  "requirements": [
+    "3+ years in modern React and CSS design systems",
+    "Deep knowledge of web accessibility (WCAG) and responsive layouts",
+    "Experience with Monaco Editor or code diffing UIs"
+  ],
+  "skills": [
+    "React",
+    "TailwindCSS",
+    "CSS3",
+    "JavaScript",
+    "Figma",
+    "UI/UX"
+  ],
+  "posted_by_user_id": 1,
+  "poster_name": "CodeHub Admin",
+  "poster_email": "admin@codehub.com",
+  "status": "open",
+  "applicants_count": 1,
+  "created_at": {
+    "$date": "2026-10-12T14:18:19.648Z"
+  },
+  "__v": 0,
+  "image_url": "/uploads/jobs/job_2_frontend.jpg"
+},
+{
+  "_id": {
+    "$oid": "6accec2b091af9a120a47b99"
+  },
+  "id": 3,
+  "title": "Backend Systems & Cloud Engineer",
+  "company": "HyperScale Cloud",
+  "location": "New York, NY (Remote)",
+  "type": "Full-time",
+  "role": "Backend",
+  "experienceLevel": "Senior",
+  "salary": "$140k - $180k / yr",
+  "description": "Design distributed database sharding, storage engines, and secure authentication pipelines for millions of developer commits and files.",
+  "requirements": [
+    "Expertise in Node.js, Express, MongoDB and Redis",
+    "Deep understanding of JWT security, rate limiting, and RBAC",
+    "Cloud deployment experience (GCP / AWS / Docker)"
+  ],
+  "skills": [
+    "Node.js",
+    "MongoDB",
+    "Express",
+    "Redis",
+    "Docker",
+    "REST API"
+  ],
+  "posted_by_user_id": 2,
+  "poster_name": "System Administrator",
+  "poster_email": "system@codehub.com",
+  "status": "open",
+  "applicants_count": 0,
+  "created_at": {
+    "$date": "2026-10-12T14:18:19.676Z"
+  },
+  "__v": 0,
+  "image_url": "/uploads/jobs/job_3_backend.jpg"
+},
+{
+  "_id": {
+    "$oid": "6accec2b091af9a120a47b9d"
+  },
+  "id": 4,
+  "title": "AI / Machine Learning Engineer",
+  "company": "CognitiveCode AI",
+  "location": "Remote",
+  "type": "Full-time",
+  "role": "AI / ML Engineer",
+  "experienceLevel": "Mid Level",
+  "salary": "$125k - $165k / yr",
+  "description": "Integrate LLMs, code generation assistants (Gemini API), automated security auditing, and intelligent code review pipelines into IDE tooling.",
+  "requirements": [
+    "Experience calling and fine-tuning Gemini / OpenAI APIs",
+    "Background in NLP, code analysis, and RAG pipelines",
+    "Proficiency in Python and Node.js"
+  ],
+  "skills": [
+    "Gemini API",
+    "Python",
+    "Machine Learning",
+    "Node.js",
+    "LLM",
+    "AI"
+  ],
+  "posted_by_user_id": 3,
+  "poster_name": "Yogeswaran",
+  "poster_email": "yoges@codehub.com",
+  "status": "open",
+  "applicants_count": 0,
+  "created_at": {
+    "$date": "2026-10-12T14:18:19.699Z"
+  },
+  "__v": 0,
+  "image_url": "/uploads/jobs/job_4_ai_ml_engineer.jpg"
+},
+{
+  "_id": {
+    "$oid": "6accec2b091af9a120a47ba1"
+  },
+  "id": 5,
+  "title": "DevOps & Infrastructure Automation Engineer",
+  "company": "GitOps Pipeline Solutions",
+  "location": "Remote",
+  "type": "Contract",
+  "role": "DevOps / Cloud",
+  "experienceLevel": "Lead / Staff",
+  "salary": "$80 - $110 / hr",
+  "description": "Implement automated CI/CD pipelines, container orchestration, cluster monitoring, and automated backup disaster recovery systems.",
+  "requirements": [
+    "Kubernetes, Docker, GitHub Actions, Terraform",
+    "Strong scripting skills (Bash, PowerShell, Python)",
+    "Experience maintaining high-availability database clusters"
+  ],
+  "skills": [
+    "Docker",
+    "Kubernetes",
+    "CI/CD",
+    "GitHub Actions",
+    "Linux",
+    "AWS"
+  ],
+  "posted_by_user_id": 1,
+  "poster_name": "CodeHub Admin",
+  "poster_email": "admin@codehub.com",
+  "status": "open",
+  "applicants_count": 0,
+  "created_at": {
+    "$date": "2026-10-12T14:18:19.711Z"
+  },
+  "__v": 0,
+  "image_url": "/uploads/jobs/job_5_devops_cloud.jpg"
+},
+{
+  "_id": {
+    "$oid": "6accec2b091af9a120a47ba5"
+  },
+  "id": 6,
+  "title": "Junior Mobile App Developer (React Native)",
+  "company": "AppVenture Studios",
+  "location": "Austin, TX (Remote)",
+  "type": "Internship",
+  "role": "Mobile Developer",
+  "experienceLevel": "Entry Level",
+  "salary": "$60k - $80k / yr",
+  "description": "Help develop our mobile companion app for CodeHub, enabling developers to review pull requests, inspect commit diffs, and receive alerts on the go.",
+  "requirements": [
+    "Basic understanding of React and React Native",
+    "Passion for mobile UX and Git version control",
+    "Curious, eager to learn, and team-oriented"
+  ],
+  "skills": [
+    "React Native",
+    "JavaScript",
+    "Mobile",
+    "Git",
+    "iOS",
+    "Android"
+  ],
+  "posted_by_user_id": 2,
+  "poster_name": "System Administrator",
+  "poster_email": "system@codehub.com",
+  "status": "open",
+  "applicants_count": 0,
+  "created_at": {
+    "$date": "2026-10-12T14:18:19.732Z"
+  },
+  "__v": 0,
+  "image_url": "/uploads/jobs/job_6_mobile_developer.jpg"
+},
+{
+  "_id": {
+    "$oid": "6acd1c51021c0080321f8cf6"
+  },
+  "id": 7,
+  "title": "Senior Cybersecurity & Application Security Auditor",
+  "company": "ShieldSec Systems",
+  "location": "Remote (US/EU)",
+  "type": "Full-time",
+  "role": "Cybersecurity",
+  "experienceLevel": "Senior",
+  "salary": "$150k - $190k / yr",
+  "description": "Perform rigorous SAST and DAST penetration testing, vulnerability remediation, cryptographic token review, and threat modeling across developer platforms.",
+  "requirements": [
+    "5+ years in AppSec, OWASP Top 10 mitigation, and auth protocols",
+    "Experience auditing Node.js, Express and MongoDB codebases",
+    "Security certifications (CISSP, CEH, or OSCP preferred)"
+  ],
+  "skills": [
+    "Cybersecurity",
+    "AppSec",
+    "Penetration Testing",
+    "JWT",
+    "Node.js",
+    "Cryptography"
+  ],
+  "posted_by_user_id": 1,
+  "poster_name": "CodeHub Admin",
+  "poster_email": "admin@codehub.com",
+  "status": "open",
+  "applicants_count": 0,
+  "created_at": {
+    "$date": "2026-10-12T17:43:45.463Z"
+  },
+  "__v": 0,
+  "image_url": "/uploads/jobs/job_7_cybersecurity.jpg"
+},
+{
+  "_id": {
+    "$oid": "6acd1c51021c0080321f8cfa"
+  },
+  "id": 8,
+  "title": "Lead Product & UI/UX Designer",
+  "company": "DesignMatrix Studio",
+  "location": "Seattle, WA (Remote)",
+  "type": "Full-time",
+  "role": "UI/UX & Product",
+  "experienceLevel": "Lead / Staff",
+  "salary": "$135k - $175k / yr",
+  "description": "Design intuitive developer-first experiences, code navigation interfaces, dashboard telemetry, and accessible design system components.",
+  "requirements": [
+    "Extensive Figma prototyping portfolio for SaaS / Developer tools",
+    "Deep appreciation for dark/light theme ergonomics and WCAG contrast",
+    "Ability to conduct user research and turn feedback into actionable specs"
+  ],
+  "skills": [
+    "UI/UX",
+    "Figma",
+    "Design Systems",
+    "User Research",
+    "CSS3",
+    "Wireframing"
+  ],
+  "posted_by_user_id": 3,
+  "poster_name": "Yogeswaran",
+  "poster_email": "yoges@codehub.com",
+  "status": "open",
+  "applicants_count": 0,
+  "created_at": {
+    "$date": "2026-10-12T17:43:45.481Z"
+  },
+  "__v": 0,
+  "image_url": "/uploads/jobs/job_8_ui_ux_product.jpg"
+},
+{
+  "_id": {
+    "$oid": "6acd1c51021c0080321f8cfe"
+  },
+  "id": 9,
+  "title": "Engineering Manager - Core Platform",
+  "company": "CodeHub Technologies",
+  "location": "San Francisco, CA (Hybrid)",
+  "type": "Full-time",
+  "role": "Engineering Manager",
+  "experienceLevel": "Lead / Staff",
+  "salary": "$180k - $230k / yr",
+  "description": "Lead a world-class team of distributed systems and frontend engineers building the next generation of cloud code collaboration tools.",
+  "requirements": [
+    "Prior experience managing 8+ software engineers",
+    "Track record delivering high-availability developer platforms",
+    "Strong technical foundation in full stack web technologies"
+  ],
+  "skills": [
+    "Engineering Management",
+    "Agile",
+    "System Design",
+    "Mentorship",
+    "Node.js",
+    "Git"
+  ],
+  "posted_by_user_id": 1,
+  "poster_name": "CodeHub Admin",
+  "poster_email": "admin@codehub.com",
+  "status": "open",
+  "applicants_count": 0,
+  "created_at": {
+    "$date": "2026-10-12T17:43:45.490Z"
+  },
+  "__v": 0,
+  "image_url": "/uploads/jobs/job_9_engineering_manager.jpg"
+},
+{
+  "_id": {
+    "$oid": "6acd1c51021c0080321f8d02"
+  },
+  "id": 10,
+  "title": "Staff Database Architect (MongoDB & Distributed Sharding)",
+  "company": "AtlasData Labs",
+  "location": "Remote",
+  "type": "Full-time",
+  "role": "Backend",
+  "experienceLevel": "Lead / Staff",
+  "salary": "$165k - $210k / yr",
+  "description": "Optimize MongoDB replica sets, write custom aggregation pipelines, design compound indexing strategies, and ensure zero-downtime data migrations.",
+  "requirements": [
+    "Deep MongoDB internals knowledge, WiredTiger engine, and indexing",
+    "Experience handling terabyte-scale document collections",
+    "Proficiency in Node.js Mongoose or Go drivers"
+  ],
+  "skills": [
+    "MongoDB",
+    "NoSQL",
+    "Database Architecture",
+    "Performance Tuning",
+    "Node.js"
+  ],
+  "posted_by_user_id": 2,
+  "poster_name": "System Administrator",
+  "poster_email": "system@codehub.com",
+  "status": "open",
+  "applicants_count": 0,
+  "created_at": {
+    "$date": "2026-10-12T17:43:45.496Z"
+  },
+  "__v": 0,
+  "image_url": "/uploads/jobs/job_10_backend.jpg"
+},
+{
+  "_id": {
+    "$oid": "6acd1c51021c0080321f8d06"
+  },
+  "id": 11,
+  "title": "Cloud Solutions Architect (AWS & GCP)",
+  "company": "SkyBridge Cloud Partners",
+  "location": "Remote",
+  "type": "Contract",
+  "role": "DevOps / Cloud",
+  "experienceLevel": "Senior",
+  "salary": "$95 - $130 / hr",
+  "description": "Architect multi-cloud disaster recovery, Terraform infrastructure-as-code, and serverless edge functions for developer collaboration services.",
+  "requirements": [
+    "AWS Certified Solutions Architect or GCP Professional Cloud Architect",
+    "Strong proficiency with Terraform, Docker, and Kubernetes",
+    "Proven background in high-concurrency microservices"
+  ],
+  "skills": [
+    "AWS",
+    "Google Cloud",
+    "Terraform",
+    "Kubernetes",
+    "Docker",
+    "DevOps"
+  ],
+  "posted_by_user_id": 1,
+  "poster_name": "CodeHub Admin",
+  "poster_email": "admin@codehub.com",
+  "status": "open",
+  "applicants_count": 0,
+  "created_at": {
+    "$date": "2026-10-12T17:43:45.504Z"
+  },
+  "__v": 0,
+  "image_url": "/uploads/jobs/job_11_devops_cloud.jpg"
+},
+{
+  "_id": {
+    "$oid": "6acd1c51021c0080321f8d0a"
+  },
+  "id": 12,
+  "title": "Full Stack JavaScript / TypeScript Engineer",
+  "company": "Veloce Software",
+  "location": "Boston, MA (Remote)",
+  "type": "Full-time",
+  "role": "Full Stack",
+  "experienceLevel": "Mid Level",
+  "salary": "$115k - $145k / yr",
+  "description": "Build full-cycle features across our React single-page frontend and Express.js REST API. Implement state caching, real-time webhooks, and git diff views.",
+  "requirements": [
+    "3+ years with modern JavaScript (ES6+), React and Node.js",
+    "Experience building RESTful APIs and connecting MongoDB databases",
+    "Proficiency with Git version control and PR code reviews"
+  ],
+  "skills": [
+    "JavaScript",
+    "TypeScript",
+    "React",
+    "Node.js",
+    "Express",
+    "MongoDB"
+  ],
+  "posted_by_user_id": 3,
+  "poster_name": "Yogeswaran",
+  "poster_email": "yoges@codehub.com",
+  "status": "open",
+  "applicants_count": 0,
+  "created_at": {
+    "$date": "2026-10-12T17:43:45.509Z"
+  },
+  "__v": 0,
+  "image_url": "/uploads/jobs/job_12_full_stack.jpg"
+},
+{
+  "_id": {
+    "$oid": "6acd1c51021c0080321f8d0e"
+  },
+  "id": 13,
+  "title": "Junior Frontend Developer",
+  "company": "BrightByte Tech",
+  "location": "Remote",
+  "type": "Full-time",
+  "role": "Frontend",
+  "experienceLevel": "Entry Level",
+  "salary": "$75k - $95k / yr",
+  "description": "Collaborate with senior designers and engineers to implement reusable UI components, forms, modals, and responsive layouts across our web portals.",
+  "requirements": [
+    "Solid foundation in HTML5, CSS3, and JavaScript",
+    "Hands-on experience building projects with React",
+    "Enthusiasm for writing clean, readable code with attention to detail"
+  ],
+  "skills": [
+    "HTML5",
+    "CSS3",
+    "JavaScript",
+    "React",
+    "Git",
+    "Responsive Design"
+  ],
+  "posted_by_user_id": 1,
+  "poster_name": "CodeHub Admin",
+  "poster_email": "admin@codehub.com",
+  "status": "open",
+  "applicants_count": 0,
+  "created_at": {
+    "$date": "2026-10-12T17:43:45.515Z"
+  },
+  "__v": 0,
+  "image_url": "/uploads/jobs/job_13_frontend.jpg"
+},
+{
+  "_id": {
+    "$oid": "6acd1c51021c0080321f8d12"
+  },
+  "id": 14,
+  "title": "Machine Learning Research Engineer (LLM & NLP)",
+  "company": "NexusAI Labs",
+  "location": "San Jose, CA (Remote)",
+  "type": "Full-time",
+  "role": "AI / ML Engineer",
+  "experienceLevel": "Senior",
+  "salary": "$160k - $210k / yr",
+  "description": "Train and fine-tune large language models for code synthesis, semantic bug detection, and automated PR change explanations.",
+  "requirements": [
+    "MS or PhD in Computer Science, Machine Learning, or related field",
+    "Experience with PyTorch, TensorFlow, HuggingFace transformers",
+    "Background in code representation models and tokenization"
+  ],
+  "skills": [
+    "PyTorch",
+    "TensorFlow",
+    "NLP",
+    "Python",
+    "LLM",
+    "AI",
+    "Machine Learning"
+  ],
+  "posted_by_user_id": 3,
+  "poster_name": "Yogeswaran",
+  "poster_email": "yoges@codehub.com",
+  "status": "open",
+  "applicants_count": 0,
+  "created_at": {
+    "$date": "2026-10-12T17:43:45.524Z"
+  },
+  "__v": 0,
+  "image_url": "/uploads/jobs/job_14_ai_ml_engineer.jpg"
+},
+{
+  "_id": {
+    "$oid": "6acd1c51021c0080321f8d16"
+  },
+  "id": 15,
+  "title": "Senior iOS & Android Engineer (React Native)",
+  "company": "PulseMobile Systems",
+  "location": "Remote",
+  "type": "Full-time",
+  "role": "Mobile Developer",
+  "experienceLevel": "Senior",
+  "salary": "$135k - $170k / yr",
+  "description": "Lead mobile app development for CodeHub across iOS and Android. Ensure 60fps animations, offline-first sync, and push notifications.",
+  "requirements": [
+    "4+ years building cross-platform apps with React Native",
+    "Experience deploying to Apple App Store and Google Play Store",
+    "Knowledge of native modules (Swift / Kotlin) when necessary"
+  ],
+  "skills": [
+    "React Native",
+    "Mobile",
+    "iOS",
+    "Android",
+    "JavaScript",
+    "TypeScript"
+  ],
+  "posted_by_user_id": 2,
+  "poster_name": "System Administrator",
+  "poster_email": "system@codehub.com",
+  "status": "open",
+  "applicants_count": 0,
+  "created_at": {
+    "$date": "2026-10-12T17:43:45.531Z"
+  },
+  "__v": 0,
+  "image_url": "/uploads/jobs/job_15_mobile_developer.jpg"
+},
+{
+  "_id": {
+    "$oid": "6acd1c51021c0080321f8d1a"
+  },
+  "id": 16,
+  "title": "Site Reliability Engineer (SRE & Observability)",
+  "company": "UptimeForge Global",
+  "location": "Remote",
+  "type": "Full-time",
+  "role": "DevOps / Cloud",
+  "experienceLevel": "Mid Level",
+  "salary": "$120k - $155k / yr",
+  "description": "Maintain 99.99% service availability, configure Prometheus and Grafana dashboards, establish alerting thresholds, and conduct incident post-mortems.",
+  "requirements": [
+    "3+ years in SRE or DevOps operations",
+    "Proficiency with Linux systems administration and shell scripting",
+    "Experience with containerized microservices and automated rollback strategies"
+  ],
+  "skills": [
+    "SRE",
+    "Linux",
+    "Docker",
+    "Kubernetes",
+    "Monitoring",
+    "Bash",
+    "DevOps"
+  ],
+  "posted_by_user_id": 1,
+  "poster_name": "CodeHub Admin",
+  "poster_email": "admin@codehub.com",
+  "status": "open",
+  "applicants_count": 0,
+  "created_at": {
+    "$date": "2026-10-12T17:43:45.542Z"
+  },
+  "__v": 0,
+  "image_url": "/uploads/jobs/job_16_devops_cloud.jpg"
+},
+{
+  "_id": {
+    "$oid": "6acd1c51021c0080321f8d1e"
+  },
+  "id": 17,
+  "title": "Data Platform Engineer (Python & Pipelines)",
+  "company": "DataStream Analytics",
+  "location": "Chicago, IL (Remote)",
+  "type": "Full-time",
+  "role": "Data Engineer",
+  "experienceLevel": "Mid Level",
+  "salary": "$115k - $150k / yr",
+  "description": "Construct real-time streaming data ingestion pipelines, repository activity analytics, and developer contribution graphs.",
+  "requirements": [
+    "Strong Python development skills",
+    "Experience with Pandas, NumPy, Kafka, or Spark",
+    "Relational and NoSQL database modeling expertise"
+  ],
+  "skills": [
+    "Python",
+    "Pandas",
+    "NumPy",
+    "MongoDB",
+    "Data Pipelines",
+    "SQL"
+  ],
+  "posted_by_user_id": 3,
+  "poster_name": "Yogeswaran",
+  "poster_email": "yoges@codehub.com",
+  "status": "open",
+  "applicants_count": 0,
+  "created_at": {
+    "$date": "2026-10-12T17:43:45.548Z"
+  },
+  "__v": 0,
+  "image_url": "/uploads/jobs/job_17_data_engineer.jpg"
+},
+{
+  "_id": {
+    "$oid": "6acd1c51021c0080321f8d22"
+  },
+  "id": 18,
+  "title": "Senior Backend Engineer (Node.js & Microservices)",
+  "company": "OmniCode Inc.",
+  "location": "Remote",
+  "type": "Full-time",
+  "role": "Backend",
+  "experienceLevel": "Senior",
+  "salary": "$135k - $170k / yr",
+  "description": "Architect scalable webhook workers, background queue processors, and secure multi-tenant data pipelines for developer platforms.",
+  "requirements": [
+    "5+ years designing enterprise Node.js & Express systems",
+    "Deep understanding of event loops, asynchronous concurrency, and Redis",
+    "Experience writing automated unit and integration test suites"
+  ],
+  "skills": [
+    "Node.js",
+    "Express",
+    "Redis",
+    "MongoDB",
+    "REST API",
+    "Docker"
+  ],
+  "posted_by_user_id": 2,
+  "poster_name": "System Administrator",
+  "poster_email": "system@codehub.com",
+  "status": "open",
+  "applicants_count": 0,
+  "created_at": {
+    "$date": "2026-10-12T17:43:45.553Z"
+  },
+  "__v": 0,
+  "image_url": "/uploads/jobs/job_18_backend.jpg"
+},
+{
+  "_id": {
+    "$oid": "6acd20f62a28b3fb14965ba3"
+  },
+  "id": 19,
+  "title": "Lead Architect 1791828214122",
+  "company": "CodeHub Core",
+  "location": "Remote",
+  "type": "Full-time",
+  "role": "Backend",
+  "experienceLevel": "Mid Level",
+  "salary": "$100k - $140k / yr",
+  "description": "High performance systems",
+  "requirements": [],
+  "skills": [],
+  "posted_by_user_id": 4,
+  "poster_name": "Yoges",
+  "poster_email": "ponyogeswaran@gmail.com",
+  "status": "open",
+  "applicants_count": 2,
+  "created_at": {
+    "$date": "2026-10-12T18:03:34.141Z"
+  },
+  "__v": 0,
+  "image_url": "/uploads/jobs/job_19_downloaded.jpg"
+},
+{
+  "_id": {
+    "$oid": "6ad8bc05a3669e44ba99c2cb"
+  },
+  "id": 21,
+  "title": "Lead React & Next.js Systems Architect",
+  "company": "FinVantage Capital",
+  "location": "New York, NY (Hybrid)",
+  "type": "Full-time",
+  "role": "Frontend",
+  "experienceLevel": "Lead / Staff",
+  "salary": "$160k - $200k / yr",
+  "description": "Architect institutional-grade financial trading portals and high-concurrency developer dashboards with micro-frontends and SSR caching.",
+  "requirements": [
+    "6+ years mastering React, Next.js, and TypeScript",
+    "Experience building latency-sensitive market data visualizations",
+    "Track record establishing frontend build systems and performance budgets"
+  ],
+  "skills": [
+    "Next.js",
+    "React",
+    "TypeScript",
+    "TailwindCSS",
+    "Redux Toolkit",
+    "Microfrontends"
+  ],
+  "posted_by_user_id": 1,
+  "poster_name": "CodeHub Admin",
+  "poster_email": "admin@codehub.com",
+  "status": "open",
+  "image_url": "/uploads/jobs/job_19_frontend.jpg",
+  "applicants_count": 0,
+  "created_at": {
+    "$date": "2026-10-21T13:20:05.866Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6ad8bc06a3669e44ba99c2cf"
+  },
+  "id": 22,
+  "title": "Distributed Systems Core Engineer (Rust & Go)",
+  "company": "ApexMesh Network",
+  "location": "Zurich, Switzerland (Remote)",
+  "type": "Full-time",
+  "role": "Backend",
+  "experienceLevel": "Senior",
+  "salary": "$155k - $195k / yr",
+  "description": "Build low-latency peer-to-peer repository synchronization, deduplicated block storage engines, and consensus networking protocols.",
+  "requirements": [
+    "Strong command of Rust or Go in production distributed environments",
+    "Deep understanding of POSIX filesystems, memory management, and socket programming",
+    "Familiarity with Raft, Paxos, or gossip protocols"
+  ],
+  "skills": [
+    "Rust",
+    "Go",
+    "Distributed Systems",
+    "gRPC",
+    "Networking",
+    "Concurrency"
+  ],
+  "posted_by_user_id": 2,
+  "poster_name": "System Administrator",
+  "poster_email": "system@codehub.com",
+  "status": "open",
+  "image_url": "/uploads/jobs/job_20_backend.jpg",
+  "applicants_count": 0,
+  "created_at": {
+    "$date": "2026-10-21T13:20:06.488Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6ad8bc07a3669e44ba99c2d3"
+  },
+  "id": 23,
+  "title": "AI Prompt & LLM Evaluation Specialist",
+  "company": "Synthetix Intelligence",
+  "location": "Austin, TX (Remote)",
+  "type": "Full-time",
+  "role": "AI / ML Engineer",
+  "experienceLevel": "Mid Level",
+  "salary": "$110k - $140k / yr",
+  "description": "Design automated benchmarking suites, multi-turn prompt pipelines, and semantic evaluation metrics for developer-focused coding assistants.",
+  "requirements": [
+    "Hands-on experience with LLM evaluation frameworks and prompt engineering",
+    "Proficiency in Python, LangChain, and API-based model testing",
+    "Demonstrated understanding of hallucinations, safety guardrails, and context windows"
+  ],
+  "skills": [
+    "Prompt Engineering",
+    "Python",
+    "LLM",
+    "Gemini API",
+    "LangChain",
+    "Evaluation"
+  ],
+  "posted_by_user_id": 3,
+  "poster_name": "Yogeswaran",
+  "poster_email": "yoges@codehub.com",
+  "status": "open",
+  "image_url": "/uploads/jobs/job_21_ai_ml_engineer.jpg",
+  "applicants_count": 0,
+  "created_at": {
+    "$date": "2026-10-21T13:20:07.072Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6ad8bc07a3669e44ba99c2d7"
+  },
+  "id": 24,
+  "title": "Kubernetes Platform & GitOps Engineer",
+  "company": "CloudWeave Systems",
+  "location": "Seattle, WA (Remote)",
+  "type": "Full-time",
+  "role": "DevOps / Cloud",
+  "experienceLevel": "Senior",
+  "salary": "$145k - $180k / yr",
+  "description": "Operate enterprise Kubernetes clusters across hybrid clouds using ArgoCD, Helm, and custom Kubernetes operators for containerized applications.",
+  "requirements": [
+    "CKA / CKS certification preferred with 4+ years production Kubernetes experience",
+    "Expertise in ArgoCD, Flux, or GitOps operational workflows",
+    "Deep knowledge of service meshes (Istio/Linkerd) and ingress controllers"
+  ],
+  "skills": [
+    "Kubernetes",
+    "ArgoCD",
+    "GitOps",
+    "Helm",
+    "Docker",
+    "Terraform",
+    "Prometheus"
+  ],
+  "posted_by_user_id": 1,
+  "poster_name": "CodeHub Admin",
+  "poster_email": "admin@codehub.com",
+  "status": "open",
+  "image_url": "/uploads/jobs/job_22_devops_cloud.jpg",
+  "applicants_count": 0,
+  "created_at": {
+    "$date": "2026-10-21T13:20:07.614Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6ad8bc07a3669e44ba99c2db"
+  },
+  "id": 25,
+  "title": "Senior Zero-Trust Security Architect",
+  "company": "Vigilance Cyber Defense",
+  "location": "Washington, DC (Remote)",
+  "type": "Full-time",
+  "role": "Cybersecurity",
+  "experienceLevel": "Senior",
+  "salary": "$155k - $190k / yr",
+  "description": "Spearhead zero-trust network access, secret rotation infrastructure, OAuth2/OIDC token verification, and SOC2 / FedRAMP compliance automation.",
+  "requirements": [
+    "Extensive background in identity management, SAML, OAuth2, and mutual TLS",
+    "Proficiency in cloud security posture management (CSPM) and container auditing",
+    "CISSP, CCSP, or equivalent industry accreditation"
+  ],
+  "skills": [
+    "Zero Trust",
+    "OAuth2",
+    "JWT",
+    "Cybersecurity",
+    "SOC2",
+    "InfraSec"
+  ],
+  "posted_by_user_id": 2,
+  "poster_name": "System Administrator",
+  "poster_email": "system@codehub.com",
+  "status": "open",
+  "image_url": "/uploads/jobs/job_23_cybersecurity.jpg",
+  "applicants_count": 0,
+  "created_at": {
+    "$date": "2026-10-21T13:20:07.987Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6ad8bc08a3669e44ba99c2df"
+  },
+  "id": 26,
+  "title": "Cross-Platform Mobile Engineer (Flutter & Dart)",
+  "company": "NovaByte Interactive",
+  "location": "Los Angeles, CA (Remote)",
+  "type": "Full-time",
+  "role": "Mobile Developer",
+  "experienceLevel": "Mid Level",
+  "salary": "$120k - $150k / yr",
+  "description": "Craft fluid, high-performance mobile user experiences across Android and iOS using Flutter, BLoC state management, and native camera/storage integrations.",
+  "requirements": [
+    "3+ years shipping production Flutter applications",
+    "Strong mastery of Dart, asynchronous streams, and reactive state",
+    "Experience integrating REST APIs and handling offline database synchronization"
+  ],
+  "skills": [
+    "Flutter",
+    "Dart",
+    "Mobile",
+    "iOS",
+    "Android",
+    "BLoC",
+    "REST API"
+  ],
+  "posted_by_user_id": 3,
+  "poster_name": "Yogeswaran",
+  "poster_email": "yoges@codehub.com",
+  "status": "open",
+  "image_url": "/uploads/jobs/job_24_mobile_developer.jpg",
+  "applicants_count": 0,
+  "created_at": {
+    "$date": "2026-10-21T13:20:08.759Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6ad8bc09a3669e44ba99c2e3"
+  },
+  "id": 27,
+  "title": "Principal Design System Architect (Figma & Tokens)",
+  "company": "Aura Design Systems",
+  "location": "London, UK (Remote)",
+  "type": "Full-time",
+  "role": "UI/UX & Product",
+  "experienceLevel": "Lead / Staff",
+  "salary": "$145k - $185k / yr",
+  "description": "Unify design tokens, interactive component libraries, accessible micro-interactions, and documentation across web, desktop, and mobile suites.",
+  "requirements": [
+    "7+ years crafting scalable enterprise design systems",
+    "Deep knowledge of CSS variables, Tailwind, W3C Design Tokens, and Storybook",
+    "Relentless passion for typography, spacing scales, and WCAG AAA compliance"
+  ],
+  "skills": [
+    "Design Systems",
+    "Figma",
+    "UI/UX",
+    "Storybook",
+    "CSS",
+    "Typography"
+  ],
+  "posted_by_user_id": 1,
+  "poster_name": "CodeHub Admin",
+  "poster_email": "admin@codehub.com",
+  "status": "open",
+  "image_url": "/uploads/jobs/job_25_ui_ux_product.jpg",
+  "applicants_count": 0,
+  "created_at": {
+    "$date": "2026-10-21T13:20:09.558Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6ad8bc09a3669e44ba99c2e7"
+  },
+  "id": 28,
+  "title": "Engineering Director - Developer Ecosystem",
+  "company": "DevSphere Global",
+  "location": "San Francisco, CA (Hybrid)",
+  "type": "Full-time",
+  "role": "Engineering Manager",
+  "experienceLevel": "Lead / Staff",
+  "salary": "$220k - $280k / yr",
+  "description": "Lead 25+ engineers and engineering managers across developer experience, repository engines, public APIs, and enterprise cloud infrastructure.",
+  "requirements": [
+    "Demonstrated leadership managing multiple engineering teams and managers",
+    "Strategic vision for developer platform roadmaps and technical scalability",
+    "Strong engineering pedigree in cloud-native SaaS platforms"
+  ],
+  "skills": [
+    "Engineering Management",
+    "Executive Leadership",
+    "System Architecture",
+    "Agile",
+    "Strategy"
+  ],
+  "posted_by_user_id": 1,
+  "poster_name": "CodeHub Admin",
+  "poster_email": "admin@codehub.com",
+  "status": "open",
+  "image_url": "/uploads/jobs/job_26_engineering_manager.jpg",
+  "applicants_count": 0,
+  "created_at": {
+    "$date": "2026-10-21T13:20:09.972Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6ad8bc0aa3669e44ba99c2eb"
+  },
+  "id": 29,
+  "title": "Senior QA Automation & Performance Engineer",
+  "company": "TestForge Automation",
+  "location": "Chicago, IL (Remote)",
+  "type": "Full-time",
+  "role": "QA & Testing",
+  "experienceLevel": "Senior",
+  "salary": "$115k - $145k / yr",
+  "description": "Architect end-to-end browser automation suites with Playwright, load testing pipelines with k6, and regression gates inside GitHub Actions.",
+  "requirements": [
+    "4+ years in automated web and API testing with Playwright or Cypress",
+    "Hands-on experience running distributed stress and performance tests with k6 or JMeter",
+    "Solid JavaScript/TypeScript scripting skills and CI pipeline integration"
+  ],
+  "skills": [
+    "QA Automation",
+    "Playwright",
+    "Cypress",
+    "k6",
+    "Jest",
+    "CI/CD"
+  ],
+  "posted_by_user_id": 2,
+  "poster_name": "System Administrator",
+  "poster_email": "system@codehub.com",
+  "status": "open",
+  "image_url": "/uploads/jobs/job_27_qa_testing.jpg",
+  "applicants_count": 0,
+  "created_at": {
+    "$date": "2026-10-21T13:20:10.378Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6ad8bc0aa3669e44ba99c2ef"
+  },
+  "id": 30,
+  "title": "Real-Time Data Streaming Architect (Kafka & Spark)",
+  "company": "DataFlow Dynamics",
+  "location": "Boston, MA (Remote)",
+  "type": "Full-time",
+  "role": "Data Engineer",
+  "experienceLevel": "Lead / Staff",
+  "salary": "$160k - $205k / yr",
+  "description": "Design fault-tolerant data streaming architectures processing billions of telemetry events daily using Apache Kafka, Flink, and cloud data warehouses.",
+  "requirements": [
+    "5+ years designing enterprise data pipelines and stream processing systems",
+    "Deep expertise in Apache Kafka, Spark Streaming, and columnar data formats (Parquet)",
+    "Proficiency in Python, Scala, or Java, alongside SQL optimization"
+  ],
+  "skills": [
+    "Apache Kafka",
+    "Spark",
+    "Data Pipelines",
+    "Python",
+    "Flink",
+    "Big Data"
+  ],
+  "posted_by_user_id": 3,
+  "poster_name": "Yogeswaran",
+  "poster_email": "yoges@codehub.com",
+  "status": "open",
+  "image_url": "/uploads/jobs/job_28_data_engineer.jpg",
+  "applicants_count": 0,
+  "created_at": {
+    "$date": "2026-10-21T13:20:10.855Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6ad8bc0ba3669e44ba99c2f3"
+  },
+  "id": 31,
+  "title": "Junior Full Stack Web Developer (Node & React)",
+  "company": "LaunchPad Innovations",
+  "location": "Denver, CO (Remote)",
+  "type": "Full-time",
+  "role": "Full Stack",
+  "experienceLevel": "Entry Level",
+  "salary": "$70k - $90k / yr",
+  "description": "Join a dynamic team building modern web features. You will learn best practices in full stack development, code reviews, and test-driven architecture.",
+  "requirements": [
+    "Demonstrated understanding of HTML, CSS, JavaScript (ES6+), React, and Node.js",
+    "Familiarity with MongoDB or relational databases",
+    "Strong communication skills and passion for continuous learning"
+  ],
+  "skills": [
+    "JavaScript",
+    "React",
+    "Node.js",
+    "MongoDB",
+    "HTML5",
+    "Git"
+  ],
+  "posted_by_user_id": 1,
+  "poster_name": "CodeHub Admin",
+  "poster_email": "admin@codehub.com",
+  "status": "open",
+  "image_url": "/uploads/jobs/job_29_full_stack.jpg",
+  "applicants_count": 0,
+  "created_at": {
+    "$date": "2026-10-21T13:20:11.193Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6ad8bc0ba3669e44ba99c2f7"
+  },
+  "id": 32,
+  "title": "Computer Vision & Edge AI Engineer",
+  "company": "OpticSense AI",
+  "location": "San Diego, CA (Remote)",
+  "type": "Full-time",
+  "role": "AI / ML Engineer",
+  "experienceLevel": "Senior",
+  "salary": "$150k - $195k / yr",
+  "description": "Train edge computer vision models for automated document OCR, structural code diagram recognition, and real-time biometric identity verification.",
+  "requirements": [
+    "Extensive hands-on experience in OpenCV, PyTorch, YOLO, and TensorRT",
+    "Proven deployment of optimized models to edge devices or low-latency servers",
+    "Background in neural network pruning, quantization, and ONNX conversion"
+  ],
+  "skills": [
+    "Computer Vision",
+    "PyTorch",
+    "OpenCV",
+    "Python",
+    "YOLO",
+    "Deep Learning"
+  ],
+  "posted_by_user_id": 3,
+  "poster_name": "Yogeswaran",
+  "poster_email": "yoges@codehub.com",
+  "status": "open",
+  "image_url": "/uploads/jobs/job_30_ai_ml_engineer.jpg",
+  "applicants_count": 0,
+  "created_at": {
+    "$date": "2026-10-21T13:20:11.535Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6ad8bc0ca3669e44ba99c2fb"
+  },
+  "id": 33,
+  "title": "Native iOS Engineer (Swift & SwiftUI)",
+  "company": "Starlight Mobile",
+  "location": "San Jose, CA (Remote)",
+  "type": "Full-time",
+  "role": "Mobile Developer",
+  "experienceLevel": "Senior",
+  "salary": "$140k - $175k / yr",
+  "description": "Design first-class iOS developer tools, widgets, and lock-screen live activities using Swift 6, SwiftUI, Combine, and modern concurrency async/await.",
+  "requirements": [
+    "4+ years shipping premier iOS applications to the App Store",
+    "Mastery of Swift, SwiftUI, Instruments memory profiling, and CoreData/SwiftData",
+    "Deep understanding of Apple HIG and accessibility standards"
+  ],
+  "skills": [
+    "Swift",
+    "SwiftUI",
+    "iOS",
+    "Apple HIG",
+    "Combine",
+    "Xcode"
+  ],
+  "posted_by_user_id": 2,
+  "poster_name": "System Administrator",
+  "poster_email": "system@codehub.com",
+  "status": "open",
+  "image_url": "/uploads/jobs/job_31_mobile_developer.jpg",
+  "applicants_count": 0,
+  "created_at": {
+    "$date": "2026-10-21T13:20:12.119Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6ad8bc0ca3669e44ba99c2ff"
+  },
+  "id": 34,
+  "title": "Native Android Engineer (Kotlin & Jetpack Compose)",
+  "company": "DroidCraft Labs",
+  "location": "Berlin, Germany (Remote)",
+  "type": "Full-time",
+  "role": "Mobile Developer",
+  "experienceLevel": "Mid Level",
+  "salary": "$115k - $145k / yr",
+  "description": "Build responsive, Material 3 mobile interfaces using Jetpack Compose, Kotlin Coroutines, Flow, and clean MVVM architecture.",
+  "requirements": [
+    "3+ years in Android app development with Kotlin",
+    "Expertise in Jetpack Compose, Hilt dependency injection, and Room database",
+    "Experience writing automated unit tests and UI tests with Espresso"
+  ],
+  "skills": [
+    "Kotlin",
+    "Android",
+    "Jetpack Compose",
+    "Coroutines",
+    "Material Design",
+    "Room"
+  ],
+  "posted_by_user_id": 2,
+  "poster_name": "System Administrator",
+  "poster_email": "system@codehub.com",
+  "status": "open",
+  "image_url": "/uploads/jobs/job_32_mobile_developer.jpg",
+  "applicants_count": 0,
+  "created_at": {
+    "$date": "2026-10-21T13:20:12.706Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6ad8bc0da3669e44ba99c303"
+  },
+  "id": 35,
+  "title": "Cloud Security & IAM Governance Engineer",
+  "company": "GuardianCloud Solutions",
+  "location": "Atlanta, GA (Remote)",
+  "type": "Full-time",
+  "role": "Cybersecurity",
+  "experienceLevel": "Mid Level",
+  "salary": "$125k - $160k / yr",
+  "description": "Implement principle-of-least-privilege IAM policies, automate key rotations, and configure AWS GuardDuty and Security Hub across cloud accounts.",
+  "requirements": [
+    "3+ years in cloud infrastructure security with AWS or Azure",
+    "Strong proficiency with Terraform and policy-as-code (OPA / Sentinel)",
+    "Experience auditing access permissions and resolving compliance gaps"
+  ],
+  "skills": [
+    "Cloud Security",
+    "AWS IAM",
+    "Terraform",
+    "DevSecOps",
+    "Compliance",
+    "Cybersecurity"
+  ],
+  "posted_by_user_id": 1,
+  "poster_name": "CodeHub Admin",
+  "poster_email": "admin@codehub.com",
+  "status": "open",
+  "image_url": "/uploads/jobs/job_33_cybersecurity.jpg",
+  "applicants_count": 0,
+  "created_at": {
+    "$date": "2026-10-21T13:20:13.314Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6ad8bc0da3669e44ba99c307"
+  },
+  "id": 36,
+  "title": "Senior GraphQL & API Gateway Architect",
+  "company": "QueryScale Labs",
+  "location": "Toronto, Canada (Remote)",
+  "type": "Full-time",
+  "role": "Backend",
+  "experienceLevel": "Senior",
+  "salary": "$135k - $170k / yr",
+  "description": "Architect unified GraphQL federated schemas, query complexity analysis, distributed rate limiters, and reverse proxy caching layers.",
+  "requirements": [
+    "5+ years in backend API engineering and distributed architectures",
+    "Deep knowledge of GraphQL Federation (Apollo Federation / GraphQL Mesh)",
+    "Experience tuning Node.js and Redis for sub-10ms response times"
+  ],
+  "skills": [
+    "GraphQL",
+    "Apollo Federation",
+    "Node.js",
+    "Redis",
+    "API Gateway",
+    "TypeScript"
+  ],
+  "posted_by_user_id": 2,
+  "poster_name": "System Administrator",
+  "poster_email": "system@codehub.com",
+  "status": "open",
+  "image_url": "/uploads/jobs/job_34_backend.jpg",
+  "applicants_count": 0,
+  "created_at": {
+    "$date": "2026-10-21T13:20:13.745Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6ad8bc0ea3669e44ba99c30b"
+  },
+  "id": 37,
+  "title": "Junior UI/UX Designer & Prototyper",
+  "company": "CreativePixels",
+  "location": "Portland, OR (Remote)",
+  "type": "Full-time",
+  "role": "UI/UX & Product",
+  "experienceLevel": "Entry Level",
+  "salary": "$65k - $85k / yr",
+  "description": "Collaborate with senior designers to build wireframes, interactive user journeys, and component variants in Figma for our developer platform.",
+  "requirements": [
+    "Proficiency with Figma components, auto-layout, and prototyping",
+    "Strong eye for visual hierarchy, layout spacing, and color theory",
+    "A creative design portfolio demonstrating web or mobile UI explorations"
+  ],
+  "skills": [
+    "Figma",
+    "UI/UX",
+    "Wireframing",
+    "Prototyping",
+    "Design",
+    "HTML/CSS"
+  ],
+  "posted_by_user_id": 3,
+  "poster_name": "Yogeswaran",
+  "poster_email": "yoges@codehub.com",
+  "status": "open",
+  "image_url": "/uploads/jobs/job_35_ui_ux_product.jpg",
+  "applicants_count": 0,
+  "created_at": {
+    "$date": "2026-10-21T13:20:14.092Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6ad8bc0ea3669e44ba99c30f"
+  },
+  "id": 38,
+  "title": "High-Performance WebGL & 3D Web Graphics Engineer",
+  "company": "Vivid3D Studio",
+  "location": "Vancouver, Canada (Remote)",
+  "type": "Full-time",
+  "role": "Frontend",
+  "experienceLevel": "Senior",
+  "salary": "$130k - $165k / yr",
+  "description": "Build cutting-edge 3D repository visualization graphs, code topology maps, and interactive shaders using Three.js, WebGL, and WebGPU.",
+  "requirements": [
+    "4+ years in modern WebGL, Three.js, or Babylon.js development",
+    "Strong mathematical foundation in 3D linear algebra and matrix transformations",
+    "Experience writing custom GLSL shaders and optimizing browser frame rates"
+  ],
+  "skills": [
+    "Three.js",
+    "WebGL",
+    "WebGPU",
+    "GLSL",
+    "JavaScript",
+    "3D Graphics"
+  ],
+  "posted_by_user_id": 1,
+  "poster_name": "CodeHub Admin",
+  "poster_email": "admin@codehub.com",
+  "status": "open",
+  "image_url": "/uploads/jobs/job_36_frontend.jpg",
+  "applicants_count": 0,
+  "created_at": {
+    "$date": "2026-10-21T13:20:14.458Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6ad8bc0ea3669e44ba99c313"
+  },
+  "id": 39,
+  "title": "Multi-Region Site Reliability Engineer (SRE)",
+  "company": "ResilienceOps",
+  "location": "Amsterdam, Netherlands (Remote)",
+  "type": "Full-time",
+  "role": "DevOps / Cloud",
+  "experienceLevel": "Senior",
+  "salary": "$135k - $175k / yr",
+  "description": "Architect active-active multi-region failover, automated circuit breaking, chaos engineering simulations, and OpenTelemetry tracing pipelines.",
+  "requirements": [
+    "4+ years supporting critical 24/7 web platforms as an SRE",
+    "Proficiency with distributed tracing (OpenTelemetry, Jaeger) and Prometheus",
+    "Experience conducting chaos drills with tools like Chaos Mesh or Gremlin"
+  ],
+  "skills": [
+    "SRE",
+    "Chaos Engineering",
+    "OpenTelemetry",
+    "Kubernetes",
+    "Linux",
+    "Go"
+  ],
+  "posted_by_user_id": 2,
+  "poster_name": "System Administrator",
+  "poster_email": "system@codehub.com",
+  "status": "open",
+  "image_url": "/uploads/jobs/job_37_devops_cloud.jpg",
+  "applicants_count": 0,
+  "created_at": {
+    "$date": "2026-10-21T13:20:14.845Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6ad8bc10a3669e44ba99c317"
+  },
+  "id": 40,
+  "title": "CI/CD & Release Automation Engineer (GitHub Actions)",
+  "company": "PipelinePro Technologies",
+  "location": "Dallas, TX (Remote)",
+  "type": "Full-time",
+  "role": "DevOps / Cloud",
+  "experienceLevel": "Mid Level",
+  "salary": "$115k - $145k / yr",
+  "description": "Standardize self-hosted GitHub Actions runners, multi-architecture Docker container builds, automated semantic versioning, and npm packaging.",
+  "requirements": [
+    "3+ years architecting CI/CD pipelines with GitHub Actions or GitLab CI",
+    "Strong scripting skills in Bash, PowerShell, and Python",
+    "Experience with Docker buildx, caching strategies, and artifact registries"
+  ],
+  "skills": [
+    "GitHub Actions",
+    "CI/CD",
+    "Docker",
+    "Bash",
+    "PowerShell",
+    "DevOps"
+  ],
+  "posted_by_user_id": 1,
+  "poster_name": "CodeHub Admin",
+  "poster_email": "admin@codehub.com",
+  "status": "open",
+  "image_url": "/uploads/jobs/job_38_devops_cloud.jpg",
+  "applicants_count": 0,
+  "created_at": {
+    "$date": "2026-10-21T13:20:16.056Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6ad8bc10a3669e44ba99c31b"
+  },
+  "id": 41,
+  "title": "Staff AI Researcher - Multimodal Foundation Models",
+  "company": "CognitionForge",
+  "location": "Cambridge, MA (Hybrid)",
+  "type": "Full-time",
+  "role": "AI / ML Engineer",
+  "experienceLevel": "Lead / Staff",
+  "salary": "$195k - $260k / yr",
+  "description": "Pioneer next-generation foundation models that reason jointly over source code, terminal execution traces, and software architecture diagrams.",
+  "requirements": [
+    "PhD or equivalent research publication track record (NeurIPS, ICML, ICLR)",
+    "Expertise in transformer architectures, attention mechanisms, and RLHF",
+    "Extensive experience training large models on multi-GPU/TPU clusters"
+  ],
+  "skills": [
+    "AI Research",
+    "PyTorch",
+    "Transformers",
+    "RLHF",
+    "LLM",
+    "Distributed Training"
+  ],
+  "posted_by_user_id": 3,
+  "poster_name": "Yogeswaran",
+  "poster_email": "yoges@codehub.com",
+  "status": "open",
+  "image_url": "/uploads/jobs/job_39_ai_ml_engineer.jpg",
+  "applicants_count": 0,
+  "created_at": {
+    "$date": "2026-10-21T13:20:16.491Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6ad8bc10a3669e44ba99c31f"
+  },
+  "id": 42,
+  "title": "Staff Backend Architect (Event Sourcing & CQRS)",
+  "company": "MicroScale Systems",
+  "location": "Singapore (Remote)",
+  "type": "Full-time",
+  "role": "Backend",
+  "experienceLevel": "Lead / Staff",
+  "salary": "$165k - $215k / yr",
+  "description": "Design immutable commit histories, event sourcing backbones, snapshotting mechanisms, and CQRS projection workers for collaborative repositories.",
+  "requirements": [
+    "6+ years architecting enterprise event-driven architectures",
+    "Deep understanding of event sourcing, CQRS patterns, and eventual consistency",
+    "Extensive experience with Node.js, Go, or Java microservices"
+  ],
+  "skills": [
+    "Event Sourcing",
+    "CQRS",
+    "Node.js",
+    "System Design",
+    "Microservices",
+    "MongoDB"
+  ],
+  "posted_by_user_id": 2,
+  "poster_name": "System Administrator",
+  "poster_email": "system@codehub.com",
+  "status": "open",
+  "image_url": "/uploads/jobs/job_40_backend.jpg",
+  "applicants_count": 0,
+  "created_at": {
+    "$date": "2026-10-21T13:20:16.898Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6ad8bc11a3669e44ba99c323"
+  },
+  "id": 43,
+  "title": "Senior Developer Experience (DX) Engineer",
+  "company": "SyncPoint Software",
+  "location": "Sydney, Australia (Remote)",
+  "type": "Full-time",
+  "role": "Full Stack",
+  "experienceLevel": "Senior",
+  "salary": "$140k - $175k / yr",
+  "description": "Empower thousands of software engineers by building lightning-fast CLI tools, local development environments, and instant preview deployments.",
+  "requirements": [
+    "4+ years in full stack development with empathy for developer workflows",
+    "Proficiency creating Node.js / Go CLI tools, linting rules, and editor plugins",
+    "Experience optimizing webpack/esbuild/Vite build speeds"
+  ],
+  "skills": [
+    "Developer Experience",
+    "CLI",
+    "TypeScript",
+    "Node.js",
+    "esbuild",
+    "DevTools"
+  ],
+  "posted_by_user_id": 3,
+  "poster_name": "Yogeswaran",
+  "poster_email": "yoges@codehub.com",
+  "status": "open",
+  "image_url": "/uploads/jobs/job_41_full_stack.jpg",
+  "applicants_count": 0,
+  "created_at": {
+    "$date": "2026-10-21T13:20:17.303Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6ad8bc11a3669e44ba99c327"
+  },
+  "id": 44,
+  "title": "QA Automation Engineer (Playwright & Cypress)",
+  "company": "QualityFirst Systems",
+  "location": "Dublin, Ireland (Remote)",
+  "type": "Full-time",
+  "role": "QA & Testing",
+  "experienceLevel": "Mid Level",
+  "salary": "$95k - $125k / yr",
+  "description": "Write robust UI and REST API test suites, integrate visual regression snapshots, and prevent flaky test runs in automated build pipelines.",
+  "requirements": [
+    "3+ years in automated web testing with Playwright or Cypress",
+    "Solid JavaScript/TypeScript programming foundation",
+    "Experience configuring automated test reports and failure screenshots"
+  ],
+  "skills": [
+    "Playwright",
+    "Cypress",
+    "API Testing",
+    "JavaScript",
+    "Jest",
+    "CI/CD"
+  ],
+  "posted_by_user_id": 1,
+  "poster_name": "CodeHub Admin",
+  "poster_email": "admin@codehub.com",
+  "status": "open",
+  "image_url": "/uploads/jobs/job_42_qa_testing.jpg",
+  "applicants_count": 0,
+  "created_at": {
+    "$date": "2026-10-21T13:20:17.761Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6ad8bc12a3669e44ba99c32b"
+  },
+  "id": 45,
+  "title": "Embedded Systems & IoT Firmware Engineer (C/C++)",
+  "company": "SmartHardware Dynamics",
+  "location": "Munich, Germany (Remote)",
+  "type": "Full-time",
+  "role": "Other",
+  "experienceLevel": "Senior",
+  "salary": "$125k - $165k / yr",
+  "description": "Develop low-power real-time operating system (FreeRTOS) firmware, OTA update protocols, and secure hardware crypto-element integrations.",
+  "requirements": [
+    "4+ years in embedded C/C++ firmware development on ARM Cortex-M or ESP32",
+    "Hands-on familiarity with I2C, SPI, UART, BLE, and MQTT protocols",
+    "Experience with secure bootloaders and remote OTA firmware updates"
+  ],
+  "skills": [
+    "Embedded C",
+    "C++",
+    "FreeRTOS",
+    "IoT",
+    "ESP32",
+    "Hardware"
+  ],
+  "posted_by_user_id": 2,
+  "poster_name": "System Administrator",
+  "poster_email": "system@codehub.com",
+  "status": "open",
+  "image_url": "/uploads/jobs/job_43_other.jpg",
+  "applicants_count": 0,
+  "created_at": {
+    "$date": "2026-10-21T13:20:18.125Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6ad8bc12a3669e44ba99c32f"
+  },
+  "id": 46,
+  "title": "Blockchain Smart Contract Security Auditor (Solidity)",
+  "company": "DecentralGuard",
+  "location": "Remote (Global)",
+  "type": "Contract",
+  "role": "Blockchain & Web3",
+  "experienceLevel": "Senior",
+  "salary": "$90 - $140 / hr",
+  "description": "Audit decentralized protocol smart contracts, detect reentrancy and oracle manipulation vectors, and verify mathematical invariants with formal methods.",
+  "requirements": [
+    "3+ years auditing EVM smart contracts (Solidity, Foundry, Hardhat)",
+    "Deep understanding of common DeFi attack vectors and MEV vulnerabilities",
+    "Experience using static analysis tools like Slither, Mythril, or Certora"
+  ],
+  "skills": [
+    "Solidity",
+    "Web3",
+    "Smart Contracts",
+    "Security Auditing",
+    "Ethereum",
+    "Foundry"
+  ],
+  "posted_by_user_id": 1,
+  "poster_name": "CodeHub Admin",
+  "poster_email": "admin@codehub.com",
+  "status": "open",
+  "image_url": "/uploads/jobs/job_44_blockchain_web3.jpg",
+  "applicants_count": 0,
+  "created_at": {
+    "$date": "2026-10-21T13:20:18.588Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6ad8bc12a3669e44ba99c333"
+  },
+  "id": 47,
+  "title": "Technical Product Manager - Developer Tools",
+  "company": "StackCraft Corp",
+  "location": "San Francisco, CA (Hybrid)",
+  "type": "Full-time",
+  "role": "Other",
+  "experienceLevel": "Senior",
+  "salary": "$150k - $190k / yr",
+  "description": "Define product requirements, developer documentation, and roadmap execution for next-generation repository hosting and CI/CD pipelines.",
+  "requirements": [
+    "4+ years as a Product Manager for developer-centric or B2B SaaS products",
+    "Strong technical background with ability to read code and understand API architectures",
+    "Data-driven mindset with proven ability to run customer discovery interviews"
+  ],
+  "skills": [
+    "Product Management",
+    "Developer Tools",
+    "Agile",
+    "User Research",
+    "API Design",
+    "Roadmap"
+  ],
+  "posted_by_user_id": 1,
+  "poster_name": "CodeHub Admin",
+  "poster_email": "admin@codehub.com",
+  "status": "open",
+  "image_url": "/uploads/jobs/job_45_other.jpg",
+  "applicants_count": 0,
+  "created_at": {
+    "$date": "2026-10-21T13:20:18.948Z"
+  },
+  "__v": 0
+}]

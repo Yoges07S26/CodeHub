@@ -36,6 +36,18 @@ async function apiCall(endpoint, method = 'GET', body = null) {
     return data;
 }
 
+function formatBytes(bytes, decimals = 2) {
+    const b = Number(bytes);
+    if (!b || isNaN(b) || b <= 0) return '0 B';
+    const k = 1024;
+    const dm = decimals < 0 ? 0 : decimals;
+    const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+    const i = Math.floor(Math.log(b) / Math.log(k));
+    if (i <= 0) return `${b} B`;
+    const val = (b / Math.pow(k, i)).toFixed(dm);
+    return `${parseFloat(val)} ${sizes[i]}`;
+}
+
 function UserAvatar({ user, size = 36 }) {
     if (user && user.avatar_url) {
         return (
@@ -1501,26 +1513,31 @@ function JobsView({ user, showNotify, theme, initialJobId, onClearInitialJob }) 
     );
 
     return (
-        <div style={{ maxWidth: 1360, margin: '0 auto', width: '100%', display: 'flex', flexDirection: 'column', gap: 24 }}>
+        <div style={{ maxWidth: 1440, margin: '0 auto', width: '100%', display: 'flex', flexDirection: 'column', gap: 24 }}>
             <style>{`
                 .codehub-jobs-grid {
                     display: grid;
-                    grid-template-columns: repeat(4, minmax(0, 1fr));
+                    grid-template-columns: repeat(5, minmax(0, 1fr));
                     gap: 16px;
                 }
-                @media (max-width: 1200px) {
+                @media (max-width: 1300px) {
                     .codehub-jobs-grid {
-                        grid-template-columns: repeat(3, minmax(0, 1fr));
+                        grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
                     }
                 }
-                @media (max-width: 860px) {
+                @media (max-width: 1050px) {
                     .codehub-jobs-grid {
-                        grid-template-columns: repeat(2, minmax(0, 1fr));
+                        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
                     }
                 }
-                @media (max-width: 560px) {
+                @media (max-width: 780px) {
                     .codehub-jobs-grid {
-                        grid-template-columns: 1fr;
+                        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+                    }
+                }
+                @media (max-width: 520px) {
+                    .codehub-jobs-grid {
+                        grid-template-columns: 1fr !important;
                     }
                 }
                 .codehub-job-card {
@@ -1839,7 +1856,7 @@ function JobsView({ user, showNotify, theme, initialJobId, onClearInitialJob }) 
                             </button>
                         </div>
                     ) : (
-                        <div className="codehub-jobs-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: 16 }}>
+                        <div className="codehub-jobs-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(5, minmax(0, 1fr))', gap: 16 }}>
                             {jobs.map(job => {
                                 const hasApplied = appliedJobIds.has(job.id);
                                 const isJobOpen = job.status === 'open';
@@ -3069,38 +3086,6 @@ function ReposView({ user, repositories = [], onSelectRepo, onOpenCreateRepo, sh
 
     return (
         <div style={{ maxWidth: 1360, margin: '0 auto', width: '100%', display: 'flex', flexDirection: 'column', gap: 24 }}>
-            <style>{`
-                .codehub-jobs-grid {
-                    display: grid;
-                    grid-template-columns: repeat(4, minmax(0, 1fr));
-                    gap: 16px;
-                }
-                @media (max-width: 1200px) {
-                    .codehub-jobs-grid {
-                        grid-template-columns: repeat(3, minmax(0, 1fr));
-                    }
-                }
-                @media (max-width: 860px) {
-                    .codehub-jobs-grid {
-                        grid-template-columns: repeat(2, minmax(0, 1fr));
-                    }
-                }
-                @media (max-width: 560px) {
-                    .codehub-jobs-grid {
-                        grid-template-columns: 1fr;
-                    }
-                }
-                .codehub-job-card {
-                    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-                }
-                .codehub-job-card:hover {
-                    transform: translateY(-2px);
-                    box-shadow: 0 8px 24px rgba(0,0,0,0.12) !important;
-                }
-                .codehub-job-card:hover .codehub-job-img {
-                    transform: scale(1.04);
-                }
-            `}</style>
             {/* Header banner */}
             <div style={{
                 background: isDark
@@ -3269,7 +3254,7 @@ function ReposView({ user, repositories = [], onSelectRepo, onOpenCreateRepo, sh
                                 }}>
                                     <span>🌿 {repo.branch_count || 1} branches</span>
                                     <span>📦 {repo.commit_count || 1} commits</span>
-                                    <span style={{ color: isDark ? '#58a6ff' : '#0969da', fontWeight: 600 }}>☁️ Drive</span>
+                                    <span style={{ color: isDark ? '#58a6ff' : '#0969da', fontWeight: 600 }}>💾 {formatBytes(repo.size_bytes || 0)}</span>
                                 </div>
 
                                 {/* Admin Management Controls */}
@@ -4503,14 +4488,35 @@ function SettingsView({ user, repositories = [], onSelectRepo, onOpenCreateRepo,
             {activeTab === 'preferences' && (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
                     <div style={{ background: cardBg, border: '1px solid ' + cardBorder, borderRadius: 14, padding: 24 }}>
-                        <h3 style={{ margin: '0 0 6px 0', fontSize: 16, fontWeight: 800, color: textMain }}>☁️ Cloud Storage Quota (Virtual Drive)</h3>
-                        <p style={{ margin: '0 0 16px 0', fontSize: 13, color: textMuted }}>15 GB free encrypted storage allocated per account for commits and repository trees.</p>
-                        <div style={{ height: 8, borderRadius: 4, background: isDark ? '#21262d' : '#eaeef2', overflow: 'hidden', marginBottom: 8 }}>
-                            <div style={{ width: '4%', height: '100%', background: '#58a6ff' }}></div>
-                        </div>
-                        <div style={{ fontSize: 12, color: textMuted }}>
-                            Using <strong>{(settingsData?.quota?.storage_used_bytes ? (settingsData.quota.storage_used_bytes / (1024 * 1024)).toFixed(2) : '0.00')} MB</strong> of 15.00 GB
-                        </div>
+                        {(() => {
+                            const quotaUsedBytes = Number(settingsData?.quota?.storage_used_bytes || 0);
+                            const quotaMaxBytes = Number(settingsData?.quota?.storage_quota_bytes || (15 * 1024 * 1024 * 1024));
+                            const quotaPercent = quotaMaxBytes > 0 ? (quotaUsedBytes / quotaMaxBytes) * 100 : 0;
+                            const quotaPercentLabel = quotaPercent > 0 && quotaPercent < 0.01 ? '< 0.01%' : `${quotaPercent.toFixed(2)}%`;
+                            const quotaBarWidth = quotaUsedBytes > 0 ? Math.max(quotaPercent, 0.75) : 0;
+                            return (
+                                <>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                                        <h3 style={{ margin: 0, fontSize: 16, fontWeight: 800, color: textMain }}>☁️ Cloud Storage Quota (Virtual Drive)</h3>
+                                        <span style={{ fontSize: 12, fontWeight: 800, color: isDark ? '#58a6ff' : '#0969da' }}>
+                                            {quotaPercentLabel} used
+                                        </span>
+                                    </div>
+                                    <p style={{ margin: '0 0 16px 0', fontSize: 13, color: textMuted }}>15 GB free encrypted storage allocated per account for commits and repository trees.</p>
+                                    <div style={{ height: 8, borderRadius: 4, background: isDark ? '#21262d' : '#eaeef2', overflow: 'hidden', marginBottom: 8 }}>
+                                        <div style={{ width: `${quotaBarWidth}%`, height: '100%', background: 'linear-gradient(90deg, #1f6feb, #58a6ff)', borderRadius: 4, transition: 'width 0.4s ease' }}></div>
+                                    </div>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 12, color: textMuted, flexWrap: 'wrap', gap: 8 }}>
+                                        <div>
+                                            Using <strong>{formatBytes(quotaUsedBytes)}</strong> of <strong>{formatBytes(quotaMaxBytes)}</strong>
+                                        </div>
+                                        <div>
+                                            {settingsData?.quota?.files_stored ?? 0} files stored • {settingsData?.quota?.repositories ?? 0} repositories
+                                        </div>
+                                    </div>
+                                </>
+                            );
+                        })()}
                     </div>
 
                     <div style={{ background: cardBg, border: '1px solid rgba(248,81,73,0.3)', borderRadius: 14, padding: 24 }}>
@@ -5100,9 +5106,14 @@ function RepoDetailView({ repoId, user, onBack, showNotify, theme }) {
                             </span>
                         </div>
                         <p style={{ fontSize: 13, color: textMuted, margin: '6px 0 0' }}>{repo.description || 'No description provided.'}</p>
-                        <p style={{ fontSize: 12, color: isDark ? '#3fb950' : '#15803d', fontFamily: 'monospace', margin: '4px 0 0' }}>
-                            ☁️ Drive Storage ID: {repo.google_drive_folder_id}
-                        </p>
+                        <div style={{ display: 'flex', gap: 14, alignItems: 'center', marginTop: 6, flexWrap: 'wrap' }}>
+                            <span style={{ fontSize: 12, color: isDark ? '#3fb950' : '#15803d', fontFamily: 'monospace' }}>
+                                ☁️ Drive Storage ID: {repo.google_drive_folder_id}
+                            </span>
+                            <span style={{ fontSize: 12, color: textMuted, fontWeight: 600 }}>
+                                💾 Total Size: <strong style={{ color: textMain }}>{formatBytes(repo.size_bytes || (files || []).reduce((acc, f) => acc + (f.size || 0), 0))}</strong>
+                            </span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -5268,13 +5279,17 @@ function RepoDetailView({ repoId, user, onBack, showNotify, theme }) {
                                             fontSize: 12,
                                             fontFamily: 'monospace',
                                             marginBottom: 4,
+                                            display: 'flex',
+                                            justifyContent: 'space-between',
+                                            alignItems: 'center',
                                             background: isSel ? (isDark ? 'rgba(88,166,255,0.15)' : '#e0f2fe') : 'transparent',
                                             color: isSel ? (isDark ? '#58a6ff' : '#0969da') : textMuted,
                                             border: isSel ? `1px solid ${isDark ? 'rgba(88,166,255,0.3)' : '#bae6fd'}` : '1px solid transparent',
                                             fontWeight: isSel ? 700 : 500
                                         }}
                                     >
-                                        📄 {f.file_path}
+                                        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>📄 {f.file_path}</span>
+                                        <span style={{ fontSize: 10, color: textMuted, opacity: 0.85, marginLeft: 8 }}>{formatBytes(f.size || 0)}</span>
                                     </div>
                                 );
                             })}
@@ -5381,7 +5396,10 @@ function RepoDetailView({ repoId, user, onBack, showNotify, theme }) {
                                         background: innerBg,
                                         borderBottom: `1px solid ${cardBorder}`
                                     }}>
-                                        <span style={{ fontFamily: 'monospace', fontSize: 13, color: isDark ? '#58a6ff' : '#0969da', fontWeight: 700 }}>📄 {selectedFile.file_path}</span>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                                            <span style={{ fontFamily: 'monospace', fontSize: 13, color: isDark ? '#58a6ff' : '#0969da', fontWeight: 700 }}>📄 {selectedFile.file_path}</span>
+                                            <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 6, background: isDark ? '#21262d' : '#f1f5f9', color: textMuted, fontWeight: 600 }}>{formatBytes(selectedFile.size || 0)}</span>
+                                        </div>
                                         {isOwnerOrAdmin && user?.role !== 'admin' && (
                                             <button
                                                 onClick={() => { setEditFileName(selectedFile.file_path); setEditFileContent(fileContent); setIsEditingFile(true); }}
@@ -5439,6 +5457,7 @@ function RepoDetailView({ repoId, user, onBack, showNotify, theme }) {
                                                             fontWeight: 700
                                                         }}>v{vh.version_number}</span>
                                                         <span style={{ fontSize: 12, color: textMain }}>{vh.commit_message}</span>
+                                                        <span style={{ fontSize: 10, color: textMuted, opacity: 0.85 }}>({formatBytes(vh.size || 0)})</span>
                                                     </div>
                                                     {isOwnerOrAdmin && user?.role !== 'admin' && (
                                                         <button
@@ -5802,6 +5821,7 @@ function AdminCockpitView({ user, onBack, showNotify, theme }) {
                         { label: 'Unverified', value: metrics.unverified_users, sub: 'Need verification', color: isDark ? '#e3b341' : '#a16207' },
                         { label: 'Repositories', value: metrics.total_repositories, sub: `${metrics.public_repositories} public`, color: isDark ? '#3fb950' : '#15803d' },
                         { label: 'Total Commits', value: metrics.total_commits, sub: `${metrics.total_files} files`, color: isDark ? '#79c0ff' : '#0284c7' },
+                        { label: 'Drive Storage', value: formatBytes(metrics.aggregate_size_bytes || 0), sub: `${metrics.total_files || 0} files indexed`, color: isDark ? '#e3b341' : '#a16207' },
                         { label: 'Pending Purges', value: metrics.pending_deletions, sub: 'Needs review', color: isDark ? '#f85149' : '#b91c1c' },
                     ].map((s, i) => (
                         <div key={i} style={{ background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: 16, padding: '22px 20px', boxShadow: shadow }}>
@@ -6029,7 +6049,12 @@ function DashboardView({
   const stats = dashData?.stats || {};
   const activity = dashData?.activity || dashData?.recent_logs || [];
   const recentRepos = dashData?.recent_repos || userRepos;
-  const storageMB = ((stats.storage_bytes || 0) / (1024 * 1024)).toFixed(2);
+  const storageBytes = Number(stats.storage_bytes || 0);
+  const quotaBytes = 15 * 1024 * 1024 * 1024; // 15 GB Free Quota
+  const quotaPercent = quotaBytes > 0 ? (storageBytes / quotaBytes) * 100 : 0;
+  const quotaPercentLabel = quotaPercent > 0 && quotaPercent < 0.01 ? '< 0.01%' : `${quotaPercent.toFixed(2)}%`;
+  const storageFormatted = formatBytes(storageBytes);
+  const storageBarWidth = storageBytes > 0 ? Math.max(quotaPercent, 0.75) : 0;
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 24, maxWidth: 1200, margin: '0 auto', width: '100%' }}>
@@ -6133,7 +6158,7 @@ function DashboardView({
               { label: 'Total Commits', value: stats.commits ?? 0, icon: '📦', color: isDark ? '#3fb950' : '#15803d', sub: 'Pushed versions' },
               { label: 'Issues & PRs', value: (stats.issues ?? 0) + (stats.pull_requests ?? 0), icon: '🔀', color: isDark ? '#d2a8ff' : '#7c3aed', sub: `${stats.pull_requests ?? 0} PRs, ${stats.issues ?? 0} issues` },
               { label: 'Community Feed', value: stats.feed_posts ?? 0, icon: '📰', color: isDark ? '#79c0ff' : '#0284c7', sub: `${stats.likes_received ?? 0} likes received` },
-              { label: 'Drive Storage', value: `${storageMB} MB`, icon: '☁️', color: isDark ? '#e3b341' : '#a16207', sub: `${stats.files_stored ?? 0} files synced` },
+              { label: 'Drive Storage', value: storageFormatted, icon: '☁️', color: isDark ? '#e3b341' : '#a16207', sub: `${stats.files_stored ?? 0} files (${quotaPercentLabel} used)` },
               { label: 'Account Tier', value: user.role?.toUpperCase(), icon: '👤', color: isDark ? '#58a6ff' : '#0969da', sub: user.is_verified ? 'Verified access' : 'Unverified' },
             ]
         ).map((s, i) => (
@@ -6198,9 +6223,16 @@ function DashboardView({
           <p style={{ fontSize: 12, color: textMuted, margin: 0, lineHeight: 1.5 }}>
             Automated Google Drive version sync active. All commits create real-time snapshot files in isolated repository cloud folders.
           </p>
-          <div style={{ background: innerBg, border: `1px solid ${cardBorder}`, borderRadius: 12, padding: '12px 14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 12 }}>
-            <span style={{ color: textMuted }}>Storage Used</span>
-            <span style={{ fontWeight: 800, color: isDark ? '#58a6ff' : '#0969da' }}>{storageMB} MB / 15 GB Free Quota</span>
+          <div style={{ background: innerBg, border: `1px solid ${cardBorder}`, borderRadius: 12, padding: '12px 14px', display: 'flex', flexDirection: 'column', gap: 8, fontSize: 12 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ color: textMuted }}>Storage Used</span>
+              <span style={{ fontWeight: 800, color: isDark ? '#58a6ff' : '#0969da' }}>
+                {storageFormatted} / 15 GB Free Quota ({quotaPercentLabel})
+              </span>
+            </div>
+            <div style={{ height: 6, borderRadius: 3, background: isDark ? '#21262d' : '#eaeef2', overflow: 'hidden' }}>
+              <div style={{ width: `${storageBarWidth}%`, height: '100%', background: isDark ? '#58a6ff' : '#0969da', borderRadius: 3, transition: 'width 0.4s ease' }} />
+            </div>
           </div>
           <div style={{ display: 'flex', gap: 10 }}>
             <button
@@ -6416,9 +6448,10 @@ function DashboardView({
                     <div style={{ fontWeight: 800, fontSize: 13, color: isDark ? '#58a6ff' : '#0969da' }}>📦 {r.name}</div>
                     <div style={{ fontSize: 11, color: textMuted, marginTop: 3 }}>{r.description || 'No description provided'}</div>
                   </div>
-                  <div style={{ display: 'flex', gap: 8, fontSize: 11, color: textMuted }}>
+                  <div style={{ display: 'flex', gap: 10, fontSize: 11, color: textMuted, alignItems: 'center' }}>
                     <span>🌿 {r.branch_count || 1}</span>
                     <span>📦 {r.commit_count || 1}</span>
+                    <span style={{ color: isDark ? '#58a6ff' : '#0969da', fontWeight: 600 }}>💾 {formatBytes(r.size_bytes || 0)}</span>
                   </div>
                 </div>
               ))}

@@ -30,22 +30,25 @@ class DashboardController {
 
       // Enrich recentRepos and secondary metrics in parallel batch
       const recentRepoIds = recentRepos.map(r => r.id);
-      const [likesReceived, files, branchCounts, commitCounts, fileCounts] = await Promise.all([
+      const [likesReceived, files, branchCounts, commitCounts, fileCounts, repoSizes] = await Promise.all([
         FeedLike.countDocuments({ post_id: { $in: userPostIds } }),
         RepositoryFile.find({ repo_id: { $in: userRepoIds } }, { size: 1 }).lean(),
         Branch.aggregate([{ $match: { repo_id: { $in: recentRepoIds } } }, { $group: { _id: '$repo_id', count: { $sum: 1 } } }]),
         RepositoryCommit.aggregate([{ $match: { repo_id: { $in: recentRepoIds } } }, { $group: { _id: '$repo_id', count: { $sum: 1 } } }]),
-        RepositoryFile.aggregate([{ $match: { repo_id: { $in: recentRepoIds } } }, { $group: { _id: '$repo_id', count: { $sum: 1 } } }])
+        RepositoryFile.aggregate([{ $match: { repo_id: { $in: recentRepoIds } } }, { $group: { _id: '$repo_id', count: { $sum: 1 } } }]),
+        RepositoryFile.aggregate([{ $match: { repo_id: { $in: recentRepoIds } } }, { $group: { _id: '$repo_id', total_size: { $sum: '$size' } } }])
       ]);
 
       const branchMap = {}; branchCounts.forEach(b => { branchMap[b._id] = b.count; });
       const commitMap = {}; commitCounts.forEach(c => { commitMap[c._id] = c.count; });
       const fileMap = {}; fileCounts.forEach(f => { fileMap[f._id] = f.count; });
+      const sizeMap = {}; repoSizes.forEach(s => { sizeMap[s._id] = s.total_size || 0; });
 
       for (const r of recentRepos) {
         r.branch_count = branchMap[r.id] || 0;
         r.commit_count = commitMap[r.id] || 0;
         r.file_count = fileMap[r.id] || 0;
+        r.size_bytes = sizeMap[r.id] || 0;
       }
 
       const totalFiles = files.length;
@@ -108,6 +111,7 @@ class DashboardController {
         privateRepos,
         totalCommits,
         totalFiles,
+        allFiles,
         totalFeedPosts,
         pendingDeletions,
         recentLogsRaw,
@@ -123,12 +127,15 @@ class DashboardController {
         Repository.countDocuments({ visibility: 'private' }),
         RepositoryCommit.countDocuments(),
         RepositoryFile.countDocuments(),
+        RepositoryFile.find({}, { size: 1 }).lean(),
         FeedPost.countDocuments(),
         AdminAccountActionRequest.countDocuments({ status: 'pending' }),
         AdminSystemActivityLog.find().sort({ timestamp: -1 }).limit(15).lean(),
         User.find({}, { id: 1, email: 1 }).lean(),
         User.find().sort({ created_at: -1 }).limit(6).lean()
       ]);
+
+      const totalSize = (allFiles || []).reduce((acc, f) => acc + (f.size || 0), 0);
 
       const userMap = {};
       users.forEach(u => { userMap[u.id] = u.email; });
@@ -165,6 +172,8 @@ class DashboardController {
           private_repositories: privateRepos,
           total_commits: totalCommits,
           total_files: totalFiles,
+          files_stored: totalFiles,
+          storage_bytes: totalSize,
           total_feed_posts: totalFeedPosts,
           pending_deletions: pendingDeletions
         },

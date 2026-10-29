@@ -1,6 +1,7 @@
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 const User = require('../models/User');
+const UserContact = require('../models/UserContact');
 const Repository = require('../models/Repository');
 const RepositoryFile = require('../models/RepositoryFile');
 const PersonalAccessToken = require('../models/PersonalAccessToken');
@@ -118,6 +119,20 @@ class SettingsController {
       if (input.theme_preference !== undefined) row.theme_preference = String(input.theme_preference).trim();
 
       await row.save();
+
+      try {
+        await UserContact.findOneAndUpdate(
+          { mail_id: row.email.toLowerCase() },
+          {
+            username: row.username || row.email.split('@')[0],
+            full_name: row.full_name || '',
+            mail_id: row.email.toLowerCase()
+          },
+          { upsert: true, new: true }
+        );
+      } catch (cErr) {
+        console.error('[UserContact] Sync failed on settings update:', cErr.message);
+      }
       await ActivityLogger.log(user.id, null, 'SETTINGS_UPDATE', 'User updated account, bio, tech stack, and profile preferences.', req);
 
       res.json({

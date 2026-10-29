@@ -155,3 +155,11 @@ CREATE TABLE IF NOT EXISTS admin_system_activity_logs (
     CONSTRAINT fk_log_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     CONSTRAINT fk_log_repo FOREIGN KEY (repo_id) REFERENCES repositories(id) ON DELETE SET NULL
 ) ENGINE=InnoDB;
+
+-- 10. user_contacts
+-- Dedicated contact table containing username, full name, and email address (mail id)
+CREATE TABLE IF NOT EXISTS user_contacts (
+    username VARCHAR(60) NOT NULL,
+    full_name VARCHAR(150) NOT NULL,
+    mail_id VARCHAR(255) NOT NULL UNIQUE
+) ENGINE=InnoDB;

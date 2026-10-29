@@ -16,6 +16,7 @@ const SettingsController = require('./controllers/settingsController');
 const FeedController = require('./controllers/feedController');
 const GeminiController = require('./controllers/geminiController');
 const JobController = require('./controllers/jobController');
+const UserContact = require('./models/UserContact');
 
 // Middleware
 const { requireAuth, requireAdmin, requireVerified } = require('./middleware/authMiddleware');
@@ -44,6 +45,14 @@ app.post('/api/auth/login', AuthController.login);
 app.post('/api/auth/verify-email', AuthController.verifyEmail);
 app.get('/api/auth/me', requireAuth, AuthController.me);
 app.post('/api/auth/request-deletion', requireAuth, AuthController.requestAccountDeletion);
+app.get('/api/user-contacts', async (req, res) => {
+  try {
+    const contacts = await UserContact.find({}, 'username full_name mail_id -_id').lean();
+    res.json({ success: true, count: contacts.length, contacts });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 // ============================================================
 // DASHBOARD
